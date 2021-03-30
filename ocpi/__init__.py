@@ -14,6 +14,7 @@ from flask_restx import Api
 from ocpi.namespaces.commands import commands_ns
 from ocpi.namespaces.reservation import reservation_ns
 from ocpi.namespaces.sessions import sessions_ns
+from ocpi.namespaces.locations import locations_ns
 
 
 def createBlueprint(injected_objects):
@@ -46,7 +47,7 @@ def createBlueprint(injected_objects):
         default_label="Beschreibung der API für das App-Framework"
     )
 
-    for namesp in [commands_ns, reservation_ns, sessions_ns]:
+    for namesp in [commands_ns, reservation_ns, sessions_ns, locations_ns]:
         for res in namesp.resources:
             res.kwargs['resource_class_kwargs'] = injected_objects
         api.add_namespace(namesp, path="/"+namesp.name)

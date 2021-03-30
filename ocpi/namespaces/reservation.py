@@ -6,7 +6,7 @@ Created on Thu Mar 18 00:26:34 2021
 @author: maurer
 """
 from flask_restx import Resource, Namespace
-from ocpi.models import ReserveNow
+from ocpi.models.commands import ReserveNow
 
 
 reservation_ns = Namespace(name="testing", validate=True)

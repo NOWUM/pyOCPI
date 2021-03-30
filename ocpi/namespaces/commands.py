@@ -7,17 +7,10 @@ Created on Thu Mar 18 00:26:15 2021
 """
 
 from flask_restx import Resource, Namespace
-from ocpi.models import StartSession, StopSession, UnlockConnector, CommandResponse, CommandResult, CancelReservation, ReserveNow
+from ocpi.models.commands import add_models_to_commands_namespace, StartSession, StopSession, UnlockConnector, CommandResponse, CommandResult, CancelReservation, ReserveNow
 
 commands_ns = Namespace(name="commands", validate=True)
-commands_ns.models[StartSession.name] = StartSession
-commands_ns.models[StopSession.name] = StopSession
-commands_ns.models[UnlockConnector.name] = UnlockConnector
-commands_ns.models[CommandResponse.name] = CommandResponse
-commands_ns.models[CommandResult.name] = CommandResult
-commands_ns.models[CancelReservation.name] = CancelReservation
-commands_ns.models[ReserveNow.name] = ReserveNow
-
+add_models_to_commands_namespace(commands_ns)
 
 @commands_ns.route('/START_SESSION', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')

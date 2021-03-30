@@ -8,7 +8,7 @@ Created on Thu Mar 18 12:32:01 2021
 
 from flask_restx import Resource, Namespace
 from flask_restx.inputs import datetime_from_iso8601
-from ocpi.models import add_models_to_session_namespace, Session, ChargingPreferences
+from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences
 from flask_restx import reqparse
 
 sessions_ns = Namespace(name="sessions", validate=True)
