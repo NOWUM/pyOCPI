@@ -7,7 +7,7 @@ Created on Thu Mar 18 18:26:15 2021
 """
 
 from flask_restx import Resource, Namespace
-from ocpi.models.location import add_models_to_location_namespace, EVSE, Location
+from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
 from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 
@@ -17,12 +17,11 @@ add_models_to_location_namespace(locations_ns)
 
 
 
-@locations_ns.route('/', doc={"description": "API Endpoint for Session management"})
-class get_session(Resource):
+@locations_ns.route('/', doc={"description": "API Endpoint for Locations management"})
+class get_locations(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
-        self.sessionmanager = kwargs['session_manager']
+        self.locationmanager = kwargs['location_manager']
         super().__init__(api, *args, **kwargs)
 
     @locations_ns.doc(params={
@@ -32,9 +31,10 @@ class get_session(Resource):
         'limit': {'in': 'query', 'description': 'number of entries to get', 'default': '50'},
 
     })
+    @locations_ns.marshal_with(Location)
     def get(self):
         '''
-        Only Sessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
+        Get Location, allows pagination
         '''
         parser = reqparse.RequestParser()
         parser.add_argument('from', type=datetime_from_iso8601)
@@ -43,57 +43,119 @@ class get_session(Resource):
         parser.add_argument('limit', type=int)
         args = parser.parse_args()
 
-        return list(self.sessionmanager.sessions.values())[args['offset']:args['offset']+args['limit']]
+        return list(self.locationmanager.sessions.values())[args['offset']:args['offset']+args['limit']]
 
 
-charging_pref_results = ["ACCEPTED", "DEPARTURE_REQUIRED",
-                         "ENERGY_NEED_REQUIRED", "NOT_POSSIBLE", "PROFILE_TYPE_NOT_SUPPORTED"]
+# keep in mind: https://stackoverflow.com/a/16569475
+@locations_ns.route('/<string:location_id>',
+                    '/<string:location_id>/<string:evse_uid>',
+                    '/<string:location_id>/<string:evse_uid>/<string:connector_id>')
+class get_location(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.locationmanager = kwargs['location_manager']
+        super().__init__(api, *args, **kwargs)
 
-charging_prefs = {}
+    def get(self, location_id,evse_uid=None,connector_id=None):
+        '''
+        Filter Locations/EVSEs/Connectors by id
+        '''
 
-@locations_ns.route('/START_SESSION', doc={"description": "OCPI Command API"},)
-@locations_ns.response(404, 'Command not found')
-class start_session(Resource):
-    @locations_ns.doc('PostCommand')  # operationId
-    def post(self):
-        '''Start Charging Session'''
-        # return resMan.create(api.payload), 201
-        pass
+        return self.locationmanager.sessions[location_id]
 
+# Receiver interface: eMSP and NSP.
 
-@locations_ns.route('/STOP_SESSION', doc={"description": "OCPI Command API"},)
-@locations_ns.response(404, 'Command not found')
-class stop_session(Resource):
-    @locations_ns.expect(EVSE)
-    def post(self):
-        '''Stop Charging Session'''
-        # return resMan.create(api.payload), 201
-        pass
+@locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>')
+class manage_location(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.locationmanager = kwargs['location_manager']
+        super().__init__(api, *args, **kwargs)
 
+    @locations_ns.marshal_with(Location)
+    def get(self, country_code, party_id,location_id):
+        '''
+        Get Location by ID
+        '''
 
-@locations_ns.route('/UNLOCK_CONNECTOR', doc={"description": "OCPI Command API"},)
-@locations_ns.response(404, 'Command not found')
-class unlock_connector(Resource):
+        return self.locationmanager.sessions[location_id]
+
     @locations_ns.expect(Location)
-    def post(self):
-        '''Unlock Connector'''
-        # return resMan.create(api.payload), 201
-        pass
+    @locations_ns.marshal_with(Location)
+    def put(self, country_code, party_id,location_id):
+        '''
+        Add/Replace Location by ID
+        '''
 
+        return self.locationmanager.sessions[location_id]
 
-@locations_ns.route('/CANCEL_RESERVATION', doc={"description": "OCPI Command API"},)
-@locations_ns.response(404, 'Command not found')
-class cancel_reservation(Resource):
-    def post(self):
-        '''cancel reservation'''
-        # return resMan.create(api.payload), 201
-        pass
+    @locations_ns.expect(Location)
+    @locations_ns.marshal_with(Location)
+    def patch(self, country_code, party_id,location_id):
+        '''
+        Partially update Location
+        '''
 
+        return self.locationmanager.sessions[location_id]
 
-@locations_ns.route('/RESERVE_NOW', doc={"description": "OCPI Command API"},)
-@locations_ns.response(404, 'Command not found')
-class resrve_now(Resource):
-    def post(self):
-        '''resrve Now'''
-        # return resMan.create(api.payload), 201
-        pass
+@locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>')
+class manage_evse(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.locationmanager = kwargs['location_manager']
+        super().__init__(api, *args, **kwargs)
+
+    @locations_ns.marshal_with(EVSE)
+    def get(self, country_code, party_id,location_id,evse_uid):
+        '''
+        Get EVSE by ID
+        '''
+
+        return self.locationmanager.sessions[location_id][evse_uid]
+
+    @locations_ns.expect(EVSE)
+    @locations_ns.marshal_with(EVSE)
+    def put(self, country_code, party_id,location_id,evse_uid):
+        '''
+        Add/Replace EVSE by ID
+        '''
+
+        return self.locationmanager.sessions[location_id][evse_uid]
+
+    @locations_ns.expect(EVSE)
+    @locations_ns.marshal_with(EVSE)
+    def patch(self, country_code, party_id,location_id,evse_uid):
+        '''
+        Partially update EVSE
+        '''
+
+        return self.locationmanager.sessions[location_id][evse_uid]
+
+@locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>/<string:connector_id>')
+class manage_connector(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.locationmanager = kwargs['location_manager']
+        super().__init__(api, *args, **kwargs)
+
+    @locations_ns.marshal_with(Connector)
+    def get(self, country_code, party_id,location_id,evse_uid,connector_id):
+        '''
+        Get Connector by ID
+        '''
+
+        return self.locationmanager.sessions[location_id][evse_uid][connector_id]
+
+    @locations_ns.expect(Connector)
+    @locations_ns.marshal_with(Connector)
+    def put(self, country_code, party_id,location_id,evse_uid):
+        '''
+        Add/Replace Connector by ID
+        '''
+
+        return self.locationmanager.sessions[location_id][evse_uid]
+
+    @locations_ns.expect(Connector)
+    @locations_ns.marshal_with(Connector)
+    def patch(self, country_code, party_id,location_id,evse_uid):
+        '''
+        Partially update Connector
+        '''
+
+        return self.locationmanager.sessions[location_id][evse_uid]

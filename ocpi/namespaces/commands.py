@@ -12,16 +12,22 @@ from ocpi.models.commands import add_models_to_commands_namespace, StartSession,
 commands_ns = Namespace(name="commands", validate=True)
 add_models_to_commands_namespace(commands_ns)
 
+
 @commands_ns.route('/START_SESSION', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')
 class start_session(Resource):
+
+    def __init__(self, api=None, *args, **kwargs):
+        # sessions is a black box dependency
+        self.command_manager = kwargs['command_manager']
+        super().__init__(api, *args, **kwargs)
+
     @commands_ns.doc('PostCommand')  # operationId
     @commands_ns.expect(StartSession)
-    @commands_ns.marshal_with(StartSession, code=201)
+    @commands_ns.marshal_with(CommandResponse, code=201)
     def post(self):
         '''Start Charging Session'''
-        # return resMan.create(api.payload), 201
-        pass
+        return self.command_manager.startSession(commands_ns.payload)
 
 
 @commands_ns.route('/STOP_SESSION', doc={"description": "OCPI Command API"},)
@@ -33,8 +39,7 @@ class stop_session(Resource):
     @commands_ns.marshal_with(CommandResponse, code=200)
     def post(self):
         '''Stop Charging Session'''
-        # return resMan.create(api.payload), 201
-        pass
+        return self.command_manager.stopSession(commands_ns.payload)
 
 
 @commands_ns.route('/UNLOCK_CONNECTOR', doc={"description": "OCPI Command API"},)
@@ -45,8 +50,7 @@ class unlock_connector(Resource):
     @commands_ns.marshal_with(CommandResponse, code=200)
     def post(self):
         '''Unlock Connector'''
-        # return resMan.create(api.payload), 201
-        pass
+        return self.command_manager.unlockConnector(commands_ns.payload)
 
 
 @commands_ns.route('/CANCEL_RESERVATION', doc={"description": "OCPI Command API"},)
@@ -57,8 +61,7 @@ class cancel_reservation(Resource):
     @commands_ns.marshal_with(CommandResponse, code=200)
     def post(self):
         '''cancel reservation'''
-        # return resMan.create(api.payload), 201
-        pass
+        return self.command_manager.cancelReservation(commands_ns.payload)
 
 
 @commands_ns.route('/RESERVE_NOW', doc={"description": "OCPI Command API"},)
@@ -69,5 +72,4 @@ class resrve_now(Resource):
     @commands_ns.marshal_with(CommandResponse, code=200)
     def post(self):
         '''resrve Now'''
-        # return resMan.create(api.payload), 201
-        pass
+        return self.command_manager.reserveNow(commands_ns.payload)

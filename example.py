@@ -9,39 +9,32 @@ Starter class for pyOCPI test
 """
 
 from ocpi import createBlueprint
-
-
-class SessionManager(object):
-
-    def __init__(self):
-        self.sessions = {}
-
-
-class ReservationManager(object):
-
-    def __init__(self):
-        self.reservations = []
-
-    def create(self, payload):
-        self.reservations.append(payload)
-        return payload['price']*1.19+3
+from ocpi.managers import cm, SessionManager, LocationManager, ReservationManager, CommandsManager
 
 
 if __name__ == '__main__':
 
     from flask import Flask, redirect
     app = Flask(__name__)
+    app.config['RESTX_MASK_SWAGGER'] = False
 
     @app.route('/', methods=['POST', 'GET'])
     def home():
-        return redirect('/api/v1/ui')
+        return redirect('/ocpi/v2/ui')
 
     # inject dependencies here
     # must be as expected
     ses = SessionManager()
     res = ReservationManager()
+    loc = LocationManager()
+    commands = CommandsManager()
     injected_objects = {'db': 'db_test',
-                        'session_manager': ses, 'res_man': res}
+                        'session_manager': ses,
+                        'res_man': res,
+                        'location_manager': loc,
+                        'credentials_manager': cm,
+                        'commands_manager': commands,
+                        }
 
     blueprint = createBlueprint(injected_objects)
     app.register_blueprint(blueprint)

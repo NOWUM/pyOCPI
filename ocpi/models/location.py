@@ -150,16 +150,6 @@ status = [
     'UNKNOWN'
 ]
 
-image_category = [
-    'CHARGER',
-    'ENTRANCE',
-    'LOCATION',
-    'NETWORK',
-    'OPERATOR',
-    'OTHER',
-    'OWNER',
-]
-
 parking_restrictions = [
     'EV_ONLY',
     'PLUGGED',
@@ -175,6 +165,16 @@ parking_type = [
     'ON_DRIVEWAY',
     'ON_STREET',
     'UNDERGROUND_GARAGE',
+]
+
+image_category = [
+    'CHARGER',
+    'ENTRANCE',
+    'LOCATION',
+    'NETWORK',
+    'OPERATOR',
+    'OTHER',
+    'OWNER',
 ]
 
 Image = Model('Image', {
@@ -206,11 +206,11 @@ ExceptionalPeriod = Model('ExceptionalPeriod', {
 })
 
 PublishTokenType = Model('PublishTokenType', {
-    'id	': fields.String(max_length=36),
-    'type	': fields.String(enum=TokenType),
-    'visual_number	': fields.String(max_length=64),
-    'issuer	': fields.String(max_length=64),
-    'group_id	': fields.String(max_length=36),
+    'id': fields.String(max_length=36),
+    'type': fields.String(enum=TokenType),
+    'visual_number': fields.String(max_length=64),
+    'issuer': fields.String(max_length=64),
+    'group_id': fields.String(max_length=36),
 })
 
 Hours = Model('Hours', {
@@ -227,11 +227,11 @@ StatusSchedule = Model('StatusSchedule', {
 })
 
 Connector = Model('Connector', {
-    'id	':     fields.String(max_length=36, required=True, description='Identifier of the Connector within the EVSE. Two Connectors may have the same id as long as they do not belong to the same EVSE object.'),
+    'id':     fields.String(max_length=36, required=True, description='Identifier of the Connector within the EVSE. Two Connectors may have the same id as long as they do not belong to the same EVSE object.'),
     'standard':  fields.String(enum=connector_type, description='The standard of the installed connector.'),
     'format':    fields.String(enum=connector_format, description='The format (socket/cable) of the installed connector.'),
     'power_type': fields.String(enum=power_type, description='Type of power outlet'),
-    'max_voltage	':  fields.Integer(description='Maximum voltage of the connector (line to neutral for AC_3_PHASE), in volt [V]. For example: DC Chargers might vary the voltage during charging when battery almost full.'),
+    'max_voltage':  fields.Integer(description='Maximum voltage of the connector (line to neutral for AC_3_PHASE), in volt [V]. For example: DC Chargers might vary the voltage during charging when battery almost full.'),
     'max_amperage': fields.Integer(description='	Maximum amperage of the connector, in ampere [A].'),
     'max_electric_power': fields.Integer(description='Maximum electric power that can be delivered by this connector, in Watts (W). When the maximum electric power is lower than the calculated value from voltage and amperage, this value should be set.'),
     'tariff_ids':  fields.String(max_length=36, required=True, description='Identifiers of the currently valid charging tariffs. Multiple tariffs are possible, but only one of each Tariff.type can be active at the same time.'),

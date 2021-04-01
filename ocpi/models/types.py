@@ -9,6 +9,11 @@ Created on Mon Mar 29 22:24:19 2021
 from flask_restx import fields, Model
 
 
+class CaseInsensitiveString(fields.String):
+    def format(self, value):
+        return super().format(value.lower())
+
+
 DisplayText = Model('DisplayText', {
     'language': fields.String(max_length=2, required=True, description='Language Code ISO 639-1.'),
     'text': fields.String(max_length=512, required=True, description='Text to be displayed to a end user. No markup, html etc. allowed.'),
@@ -19,7 +24,7 @@ Price = Model('Price', {
     'incl_vat': fields.Float(description='Price/Cost including VAT.')
 })
 
-Role = [
+role = [
     'CPO'	,  # Charge Point Operator Role.
     'EMSP'	,  # eMobility Service Provider Role.
     'HUB'	,  # Hub role.

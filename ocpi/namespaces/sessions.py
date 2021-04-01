@@ -41,8 +41,7 @@ class get_session(Resource):
         parser.add_argument('offset', type=int)
         parser.add_argument('limit', type=int)
         args = parser.parse_args()
-
-        return list(self.sessionmanager.sessions.values())[args['offset']:args['offset']+args['limit']]
+        return self.sessionmanager.getSessions(args['from'],args['to'],args['offset'],args['limit'])
 
 
 charging_pref_results = ["ACCEPTED", "DEPARTURE_REQUIRED",
@@ -51,7 +50,7 @@ charging_pref_results = ["ACCEPTED", "DEPARTURE_REQUIRED",
 charging_prefs = {}
 
 
-@sessions_ns.route('/<string:session_id>/charging_preferences', doc={"description": "OCPI CharginPreferences"})
+@sessions_ns.route('/<string:session_id>/charging_preferences', doc={"description": "OCPI ChargingPreferences"})
 @sessions_ns.response(404, 'SessionID not found')
 class charging_preferences(Resource):
 
