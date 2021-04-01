@@ -34,7 +34,7 @@ def createOcpiBlueprint(injected_objects):
     blueprint
 
     '''
-    blueprint = Blueprint("api", __name__, url_prefix="/ocpi/v2")
+    blueprint = Blueprint("ocpi_api", __name__, url_prefix="/ocpi/v2")
     authorizations = {"Bearer": {"type": "apiKey",
                                  "in": "header", "name": "Authorization"}}
 
