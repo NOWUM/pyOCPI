@@ -5,7 +5,7 @@ setuptools.setup(
     version="0.0.1",
     author="Florian Maurer",
     author_email="maurer@fh-aachen.de",
-    description="python package for open charge point interface",
+    description="python package for the open charge point interface",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

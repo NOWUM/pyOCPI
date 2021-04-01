@@ -8,7 +8,7 @@ Created on Sun Mar 21 21:57:33 2021
 Starter class for pyOCPI test
 """
 
-from ocpi import createBlueprint
+from ocpi import createOcpiBlueprint
 from ocpi.managers import cm, SessionManager, LocationManager, ReservationManager, CommandsManager
 
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
                         'commands_manager': commands,
                         }
 
-    blueprint = createBlueprint(injected_objects)
+    blueprint = createOcpiBlueprint(injected_objects)
     app.register_blueprint(blueprint)
 
     app.run()

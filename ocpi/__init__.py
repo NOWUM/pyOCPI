@@ -19,7 +19,7 @@ from ocpi.namespaces.versions import versions_ns
 from ocpi.namespaces.credentials import credentials_ns
 
 
-def createBlueprint(injected_objects):
+def createOcpiBlueprint(injected_objects):
     '''
     Creates API blueprint with injected Objects.
     Must contain a sessionmanager and others
