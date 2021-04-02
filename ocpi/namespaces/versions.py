@@ -18,7 +18,6 @@ add_models_to_version_namespace(versions_ns)
 class get_versions(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.versionsmanager = kwargs['session_manager']
         super().__init__(api, *args, **kwargs)
 
@@ -32,7 +31,6 @@ class get_versions(Resource):
 class get_details(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.versionsmanager = kwargs['session_manager']
         super().__init__(api, *args, **kwargs)
 

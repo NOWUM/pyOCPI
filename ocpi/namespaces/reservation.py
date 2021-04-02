@@ -17,7 +17,6 @@ reservation_ns.models[ReserveNow.name] = ReserveNow
 class reservation(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.resMan = kwargs['res_man']
         super().__init__(api, *args, **kwargs)
 
@@ -40,7 +39,6 @@ class reservation(Resource):
 # @reservation_ns.param('price', 'The given Price')
 class reservation2(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.resMan = kwargs['res_man']
         super().__init__(api, *args, **kwargs)
 

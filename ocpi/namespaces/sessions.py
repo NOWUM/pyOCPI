@@ -19,7 +19,6 @@ add_models_to_session_namespace(sessions_ns)
 class get_session(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.sessionmanager = kwargs['session_manager']
         super().__init__(api, *args, **kwargs)
 
@@ -55,7 +54,6 @@ charging_prefs = {}
 class charging_preferences(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.sessionmanager = kwargs['session_manager']
         super().__init__(api, *args, **kwargs)
 
@@ -94,7 +92,6 @@ class charging_preferences(Resource):
 class start_session(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.session_manager = kwargs['session_manager']
         super().__init__(api, *args, **kwargs)
 

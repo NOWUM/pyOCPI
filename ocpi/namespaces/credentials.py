@@ -24,7 +24,6 @@ parser.add_argument('Authorization', location='headers', required=True)
 class credentials(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.credentials_manager = kwargs['credentials_manager']
         super().__init__(api, *args, **kwargs)
 

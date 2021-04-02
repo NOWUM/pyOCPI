@@ -18,7 +18,6 @@ add_models_to_commands_namespace(commands_ns)
 class start_session(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        # sessions is a black box dependency
         self.command_manager = kwargs['command_manager']
         super().__init__(api, *args, **kwargs)
 
@@ -33,6 +32,10 @@ class start_session(Resource):
 @commands_ns.route('/STOP_SESSION', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')
 class stop_session(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.command_manager = kwargs['command_manager']
+        super().__init__(api, *args, **kwargs)
+
     @commands_ns.expect(StopSession)
     @commands_ns.marshal_with(StopSession, code=201)
     @commands_ns.marshal_with(CommandResult, code=200)
@@ -45,6 +48,10 @@ class stop_session(Resource):
 @commands_ns.route('/UNLOCK_CONNECTOR', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')
 class unlock_connector(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.command_manager = kwargs['command_manager']
+        super().__init__(api, *args, **kwargs)
+
     @commands_ns.expect(UnlockConnector)
     @commands_ns.marshal_with(UnlockConnector, code=201)
     @commands_ns.marshal_with(CommandResponse, code=200)
@@ -56,7 +63,11 @@ class unlock_connector(Resource):
 @commands_ns.route('/CANCEL_RESERVATION', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')
 class cancel_reservation(Resource):
-    @commands_ns.expect(UnlockConnector)
+    def __init__(self, api=None, *args, **kwargs):
+        self.command_manager = kwargs['command_manager']
+        super().__init__(api, *args, **kwargs)
+
+    @commands_ns.expect(CancelReservation)
     @commands_ns.marshal_with(CancelReservation, code=201)
     @commands_ns.marshal_with(CommandResponse, code=200)
     def post(self):
@@ -66,8 +77,12 @@ class cancel_reservation(Resource):
 
 @commands_ns.route('/RESERVE_NOW', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')
-class resrve_now(Resource):
-    @commands_ns.expect(UnlockConnector)
+class reserve_now(Resource):
+    def __init__(self, api=None, *args, **kwargs):
+        self.command_manager = kwargs['command_manager']
+        super().__init__(api, *args, **kwargs)
+
+    @commands_ns.expect(ReserveNow)
     @commands_ns.marshal_with(ReserveNow, code=201)
     @commands_ns.marshal_with(CommandResponse, code=200)
     def post(self):
