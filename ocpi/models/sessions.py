@@ -63,9 +63,9 @@ Session = Model('Session', {
     'location_id': fields.String(max_length=36, required=True, description='Location.id of the Location object of this CPO, on which the charging session is/was happening.'),
     'evse_uid': fields.String(max_length=36, required=True, description='EVSE.uid of the EVSE of this Location on which the charging session is/was happening.'),
     'connector_id': fields.String(max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
-    'meter_id': fields.String(max_length=255, description='ISO 4217 code of the currency used for this session.', required=False),
-    'currency': fields.String(max_length=3, required=True, description='Optional identification of the kWh meter.'),
-    'charging_periods': fields.String(description='An optional list of Charging Periods that can be used to calculate and verify the total cost.', required=False),
+    'meter_id': fields.String(max_length=255, required=True, description='Optional identification of the kWh meter.'),
+    'currency': fields.String(max_length=3, description='ISO 4217 code of the currency used for this session.'),
+    'charging_periods': fields.List(fields.Nested(ChargingPeriod), description='An optional list of Charging Periods that can be used to calculate and verify the total cost.', required=False),
     'total_cost': fields.Float(description='The total cost of the session in the specified currency. This is the price that the eMSP will have to pay to the CPO.'),
     'status': fields.String(enum=session_status, default="PENDING", description='The status of the session.'),
     'last_updated': fields.DateTime(description='Timestamp when this Session was last updated (or created).')

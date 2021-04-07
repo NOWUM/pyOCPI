@@ -252,7 +252,7 @@ EVSE = Model('EVSE', {
     'physical_reference':  fields.String(max_length=16, description='A number/string printed on the outside of the EVSE for visual identification.'),
     'directions':   fields.List(fields.Nested(DisplayText), description='Multi-language human-readable directions when more detailed information on how to reach the EVSE from the Location is required.'),
     'parking_restrictions': fields.List(fields.String(enum=parking_restrictions), description='The restrictions that apply to the parking spot.'),
-    'images':       fields.List(fields.Nested(Image),description='Links to images related to the EVSE such as photos or logos.'),
+    'images':       fields.List(fields.Nested(Image), description='Links to images related to the EVSE such as photos or logos.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this EVSE or one of its Connectors were last updated (or created).')
 })
 
@@ -280,7 +280,7 @@ Location = Model('Location', {
     'time_zone':    fields.DateTime(description='One of IANA tzdata’s TZ-values representing the time zone of the location.'),
     'opening_times': fields.Nested(Hours, description='The times when the EVSEs at the location can be accessed for charging.'),
     'charging_when_closed': fields.Boolean(default=True, description='Indicates if the EVSEs are still charging outside the opening hours of the location.'),
-    'images':       fields.List(fields.Nested(Image),description='Links to images related to the location such as photos or logos.'),
+    'images':       fields.List(fields.Nested(Image), description='Links to images related to the location such as photos or logos.'),
     'energy_mix':   fields.String(description='Details on the energy supplied at this location.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this Location or one of its EVSEs or Connectors were last updated (or created).')
 })

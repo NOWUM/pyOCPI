@@ -16,7 +16,6 @@ locations_ns = Namespace(name="locations", validate=True)
 add_models_to_location_namespace(locations_ns)
 
 
-
 @locations_ns.route('/', doc={"description": "API Endpoint for Locations management"})
 class get_locations(Resource):
 
@@ -55,7 +54,7 @@ class get_location(Resource):
         self.locationmanager = kwargs['location_manager']
         super().__init__(api, *args, **kwargs)
 
-    def get(self, location_id,evse_uid=None,connector_id=None):
+    def get(self, location_id, evse_uid=None, connector_id=None):
         '''
         Filter Locations/EVSEs/Connectors by id
         '''
@@ -64,6 +63,7 @@ class get_location(Resource):
 
 # Receiver interface: eMSP and NSP.
 
+
 @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>')
 class manage_location(Resource):
     def __init__(self, api=None, *args, **kwargs):
@@ -71,7 +71,7 @@ class manage_location(Resource):
         super().__init__(api, *args, **kwargs)
 
     @locations_ns.marshal_with(Location)
-    def get(self, country_code, party_id,location_id):
+    def get(self, country_code, party_id, location_id):
         '''
         Get Location by ID
         '''
@@ -80,7 +80,7 @@ class manage_location(Resource):
 
     @locations_ns.expect(Location)
     @locations_ns.marshal_with(Location)
-    def put(self, country_code, party_id,location_id):
+    def put(self, country_code, party_id, location_id):
         '''
         Add/Replace Location by ID
         '''
@@ -89,12 +89,13 @@ class manage_location(Resource):
 
     @locations_ns.expect(Location)
     @locations_ns.marshal_with(Location)
-    def patch(self, country_code, party_id,location_id):
+    def patch(self, country_code, party_id, location_id):
         '''
         Partially update Location
         '''
 
         return self.locationmanager.sessions[location_id]
+
 
 @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>')
 class manage_evse(Resource):
@@ -103,7 +104,7 @@ class manage_evse(Resource):
         super().__init__(api, *args, **kwargs)
 
     @locations_ns.marshal_with(EVSE)
-    def get(self, country_code, party_id,location_id,evse_uid):
+    def get(self, country_code, party_id, location_id, evse_uid):
         '''
         Get EVSE by ID
         '''
@@ -112,7 +113,7 @@ class manage_evse(Resource):
 
     @locations_ns.expect(EVSE)
     @locations_ns.marshal_with(EVSE)
-    def put(self, country_code, party_id,location_id,evse_uid):
+    def put(self, country_code, party_id, location_id, evse_uid):
         '''
         Add/Replace EVSE by ID
         '''
@@ -121,12 +122,13 @@ class manage_evse(Resource):
 
     @locations_ns.expect(EVSE)
     @locations_ns.marshal_with(EVSE)
-    def patch(self, country_code, party_id,location_id,evse_uid):
+    def patch(self, country_code, party_id, location_id, evse_uid):
         '''
         Partially update EVSE
         '''
 
         return self.locationmanager.sessions[location_id][evse_uid]
+
 
 @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>/<string:connector_id>')
 class manage_connector(Resource):
@@ -135,7 +137,7 @@ class manage_connector(Resource):
         super().__init__(api, *args, **kwargs)
 
     @locations_ns.marshal_with(Connector)
-    def get(self, country_code, party_id,location_id,evse_uid,connector_id):
+    def get(self, country_code, party_id, location_id, evse_uid, connector_id):
         '''
         Get Connector by ID
         '''
@@ -144,7 +146,7 @@ class manage_connector(Resource):
 
     @locations_ns.expect(Connector)
     @locations_ns.marshal_with(Connector)
-    def put(self, country_code, party_id,location_id,evse_uid):
+    def put(self, country_code, party_id, location_id, evse_uid):
         '''
         Add/Replace Connector by ID
         '''
@@ -153,7 +155,7 @@ class manage_connector(Resource):
 
     @locations_ns.expect(Connector)
     @locations_ns.marshal_with(Connector)
-    def patch(self, country_code, party_id,location_id,evse_uid):
+    def patch(self, country_code, party_id, location_id, evse_uid):
         '''
         Partially update Connector
         '''
