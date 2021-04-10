@@ -12,14 +12,14 @@ from flask import Blueprint
 from flask_restx import Api
 
 from ocpi.namespaces.commands import commands_ns
-from ocpi.namespaces.reservation import reservation_ns
 from ocpi.namespaces.sessions import sessions_ns
 from ocpi.namespaces.locations import locations_ns
 from ocpi.namespaces.versions import versions_ns
 from ocpi.namespaces.credentials import credentials_ns
+from ocpi.decorators import SingleCredMan
 
 
-def createOcpiBlueprint(injected_objects):
+def createOcpiBlueprint(injected_objects,namespaces=[versions_ns, credentials_ns, commands_ns, sessions_ns, locations_ns]):
     '''
     Creates API blueprint with injected Objects.
     Must contain a sessionmanager and others
@@ -49,7 +49,11 @@ def createOcpiBlueprint(injected_objects):
         default_label="Beschreibung der API für das App-Framework"
     )
 
-    for namesp in [versions_ns, credentials_ns, commands_ns, reservation_ns, sessions_ns, locations_ns]:
+    if 'credentials_manager' not in injected_objects:
+        raise Exception('a credentials_manager must be injected')
+    SingleCredMan.setInstance(injected_objects['credentials_manager'])
+
+    for namesp in namespaces:
         for res in namesp.resources:
             res.kwargs['resource_class_kwargs'] = injected_objects
         api.add_namespace(namesp, path="/"+namesp.name)

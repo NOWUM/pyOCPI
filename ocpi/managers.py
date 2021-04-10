@@ -7,8 +7,11 @@ Created on Thu Apr  1 12:47:48 2021
 """
 
 
+import ocpi.models.credentials as mc
 from flask import request
 from werkzeug.exceptions import Forbidden, NotFound
+import logging
+import secrets
 
 
 class SessionManager(object):
@@ -17,20 +20,20 @@ class SessionManager(object):
         self.sessions = {}
         self.charging_prefs = {}
 
-    def getSessions(self,begin, end, offset,limit):
+    def getSessions(self, begin, end, offset, limit):
         return list(self.sessions.values())[offset:offset+limit]
 
-    def getSession(self,session_id):
-        ses= self.sessions.get(session_id)
+    def getSession(self, session_id):
+        ses = self.sessions.get(session_id)
         if not ses:
             raise NotFound('session does not exist')
         return ses
 
     def createSession(self, session):
-        self.sessions[session['session_id']]=session
+        self.sessions[session['session_id']] = session
         return 204
 
-    def patchSession(self, session_id,sessionPart):
+    def patchSession(self, session_id, sessionPart):
         ses = self.sessions.get(session_id)
         if not ses:
             raise NotFound('session does not exist')
@@ -38,64 +41,56 @@ class SessionManager(object):
 
     def updateChargingPrefs(self, session_id, prefs):
         #ses = self.sessions.get(session_id)
-        #if 'CHARGING_PROFILE_CAPABLE' in evse[ses['evse_uid']]['capabilities']:
+        # if 'CHARGING_PROFILE_CAPABLE' in evse[ses['evse_uid']]['capabilities']:
         # check if evse is capable of charging prefs
 
-        self.charging_prefs[session_id]=prefs
+        self.charging_prefs[session_id] = prefs
         return {'ACCEPTED'}
-
-
-class ReservationManager(object):
-
-    def __init__(self):
-        self.reservations = []
-
-    def create(self, payload):
-        self.reservations.append(payload)
-        return payload['price']*1.19+3
 
 
 class CredentialsManager(object):
 
-    def __init__(self):
+    def __init__(self, credentials_role: mc.CredentialsRole, url):
         self.credentials = {}
+        self.credentials_role = credentials_role
+        self.url = url
 
-    def createCredentials(self):
+    def createCredentials(self) -> mc.Credentials:
+        token = secrets.token_urlsafe(32)  # tokenB
         c = {
-            "token": "random_id",
-            "url": "http://localhost:5000",
-            "roles": []
+            "token": token,
+            "url": self.url,
+            "roles": [self.credentials_role]
         }
 
-        self.credentials[c['token']] = c
+        # Valid comm token, no token to access client
+        self.credentials[token] = ''
         return c
 
-    def updateRegistration(self, payload):
-        c = {
-            "token": "random_id",
-            "url": "http://localhost:5000",
-            "roles": []
-        }
+    def makeRegistration(self, payload: mc.Credentials):
+        # for initial handshake
+        key = request.headers['Authorization']
+        self.unregister(key)
+        newCredentials = self.createCredentials()  # tokenC
+        self.credentials[newCredentials['token']] = payload
 
-        self.credentials[c['token']] = c
-        return c
+        # TODO fetch endpoints from payload['url']
+        return newCredentials
 
-    def replaceToken(self, payload):
-        self.removeToken(payload)
+    def versionUpdate(self, payload: mc.Credentials):
+        # TODO fetch endpoints from payload['url']
+        return self.makeRegistration(payload)
 
-        return self.createCredentials()
-
-    def removeToken(self, payload):
+    def unregister(self, token):
         try:
-            if request.headers['Authorization'] != payload['token']:
-                raise Forbidden
-            self.credentials.pop(payload['token'])
+            self.credentials.pop(token)
+            # token to access the other system is still valid.
         except:
-            return 405, 'method not allowed'
-        return 200
+            return 'method not allowed', 405
+        return '', 200
 
-
-cm = CredentialsManager()
+    def isAuthenticated(self, token):
+        return token in self.credentials.keys()
 
 
 class LocationManager(object):

@@ -9,8 +9,7 @@ Starter class for pyOCPI test
 """
 
 from ocpi import createOcpiBlueprint
-from ocpi.managers import cm, SessionManager, LocationManager, ReservationManager, CommandsManager
-
+from ocpi.managers import CredentialsManager, SessionManager, LocationManager, CommandsManager
 
 if __name__ == '__main__':
 
@@ -22,18 +21,27 @@ if __name__ == '__main__':
     def home():
         return redirect('/ocpi/v2/ui')
 
+    cred_role = {'role': 'HUB',
+                 'business_details': {
+                     'name': 'SmartChargingHub',
+                     'website': 'https://fh-aachen.de',
+                     # 'logo': ,
+                 },
+                 'party_id': 'SCH',
+                 'country_code': 'DE'}
+
     # inject dependencies here
     # must be as expected
     ses = SessionManager()
-    res = ReservationManager()
     loc = LocationManager()
     commands = CommandsManager()
+    base_url = "http://localhost:5000"
+    cm = CredentialsManager(cred_role, base_url)
     injected_objects = {'db': 'db_test',
                         'session_manager': ses,
-                        'res_man': res,
                         'location_manager': loc,
                         'credentials_manager': cm,
-                        'commands_manager': commands,
+                        'command_manager': commands,
                         }
 
     blueprint = createOcpiBlueprint(injected_objects)

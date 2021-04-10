@@ -12,6 +12,10 @@ from ocpi.models.commands import add_models_to_commands_namespace, StartSession,
 commands_ns = Namespace(name="commands", validate=True)
 add_models_to_commands_namespace(commands_ns)
 
+from ocpi.decorators import token_required,get_header_parser
+
+parser = get_header_parser(commands_ns)
+
 
 @commands_ns.route('/START_SESSION', doc={"description": "OCPI Command API"},)
 @commands_ns.response(404, 'Command not found')
@@ -22,8 +26,9 @@ class start_session(Resource):
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.doc('PostCommand')  # operationId
-    @commands_ns.expect(StartSession)
+    @commands_ns.expect(parser,StartSession)
     @commands_ns.marshal_with(CommandResponse, code=201)
+    @token_required
     def post(self):
         '''Start Charging Session'''
         return self.command_manager.startSession(commands_ns.payload)
@@ -36,10 +41,11 @@ class stop_session(Resource):
         self.command_manager = kwargs['command_manager']
         super().__init__(api, *args, **kwargs)
 
-    @commands_ns.expect(StopSession)
+    @commands_ns.expect(parser,StopSession)
     @commands_ns.marshal_with(StopSession, code=201)
     @commands_ns.marshal_with(CommandResult, code=200)
     @commands_ns.marshal_with(CommandResponse, code=200)
+    @token_required
     def post(self):
         '''Stop Charging Session'''
         return self.command_manager.stopSession(commands_ns.payload)
@@ -52,9 +58,10 @@ class unlock_connector(Resource):
         self.command_manager = kwargs['command_manager']
         super().__init__(api, *args, **kwargs)
 
-    @commands_ns.expect(UnlockConnector)
+    @commands_ns.expect(parser,UnlockConnector)
     @commands_ns.marshal_with(UnlockConnector, code=201)
     @commands_ns.marshal_with(CommandResponse, code=200)
+    @token_required
     def post(self):
         '''Unlock Connector'''
         return self.command_manager.unlockConnector(commands_ns.payload)
@@ -67,9 +74,10 @@ class cancel_reservation(Resource):
         self.command_manager = kwargs['command_manager']
         super().__init__(api, *args, **kwargs)
 
-    @commands_ns.expect(CancelReservation)
+    @commands_ns.expect(parser,CancelReservation)
     @commands_ns.marshal_with(CancelReservation, code=201)
     @commands_ns.marshal_with(CommandResponse, code=200)
+    @token_required
     def post(self):
         '''cancel reservation'''
         return self.command_manager.cancelReservation(commands_ns.payload)
@@ -82,9 +90,10 @@ class reserve_now(Resource):
         self.command_manager = kwargs['command_manager']
         super().__init__(api, *args, **kwargs)
 
-    @commands_ns.expect(ReserveNow)
+    @commands_ns.expect(parser,ReserveNow)
     @commands_ns.marshal_with(ReserveNow, code=201)
     @commands_ns.marshal_with(CommandResponse, code=200)
+    @token_required
     def post(self):
         '''resrve Now'''
         return self.command_manager.reserveNow(commands_ns.payload)

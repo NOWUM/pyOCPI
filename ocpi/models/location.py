@@ -178,8 +178,8 @@ image_category = [
 ]
 
 Image = Model('Image', {
-    'url': fields.Url(required=True, description='URL from where the image data can be fetched through a web browser.'),
-    'thumbnail': fields.Url(),
+    'url': fields.String(required=True, description='URL from where the image data can be fetched through a web browser.'),
+    'thumbnail': fields.String(),
     'category': fields.String(enum=image_category),
     'type': fields.String(max_length=4, required=True, description='Image type like: gif, jpeg, png, svg.'),
     'width': fields.Integer(),
@@ -188,7 +188,7 @@ Image = Model('Image', {
 
 BusinessDetails = Model('BusinessDetails', {
     'name': fields.String(max_length=100, required=True, description='Name of the operator'),
-    'website': fields.Url(description="Link to the operator's website"),
+    'website': fields.String(description="Link to the operator's website"),
     'logo': fields.Nested(Image, description='Image link to the operator’s logo.'),
 })
 
