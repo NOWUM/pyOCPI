@@ -9,6 +9,7 @@ Created on Wed Mar 31 23:45:34 2021
 from ocpi.decorators import token_required, get_header_parser
 from flask_restx import Resource, Namespace
 from ocpi.models.credentials import Credentials, add_models_to_credentials_namespace
+from ocpi.models import resp
 from flask import request
 credentials_ns = Namespace(name="credentials", validate=True)
 add_models_to_credentials_namespace(credentials_ns)
@@ -25,7 +26,7 @@ class credentials(Resource):
         self.credentials_manager = kwargs['credentials_manager']
         super().__init__(api, *args, **kwargs)
 
-    @credentials_ns.marshal_with(Credentials)
+    @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
     def get(self):
         '''
         request new credentials if authenticated
@@ -33,8 +34,8 @@ class credentials(Resource):
         return self.credentials_manager.createCredentials()
 
     @token_required
-    @credentials_ns.marshal_with(Credentials)
-    @credentials_ns.expect(parser,Credentials)
+    @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
+    @credentials_ns.expect(parser, Credentials)
     def post(self):
         '''
         Get new Token, request Sender Token and reply with Token C (for first time auth)
@@ -42,8 +43,8 @@ class credentials(Resource):
         return self.credentials_manager.makeRegistration(credentials_ns.payload)
 
     @token_required
-    @credentials_ns.marshal_with(Credentials)
-    @credentials_ns.expect(parser,Credentials)
+    @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
+    @credentials_ns.expect(parser, Credentials)
     def put(self):
         '''
         replace registration Token for version update

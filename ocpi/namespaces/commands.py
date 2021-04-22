@@ -8,7 +8,7 @@ Created on Thu Mar 18 00:26:15 2021
 
 from flask_restx import Resource, Namespace
 from ocpi.models.commands import add_models_to_commands_namespace, StartSession, StopSession, UnlockConnector, CommandResponse, CommandResult, CancelReservation, ReserveNow
-
+from ocpi.models import resp
 commands_ns = Namespace(name="commands", validate=True)
 add_models_to_commands_namespace(commands_ns)
 
@@ -27,7 +27,7 @@ class start_session(Resource):
 
     @commands_ns.doc('PostCommand')  # operationId
     @commands_ns.expect(parser,StartSession)
-    @commands_ns.marshal_with(CommandResponse, code=201)
+    @commands_ns.marshal_with(resp(commands_ns,CommandResponse), code=201)
     @token_required
     def post(self):
         '''Start Charging Session'''
@@ -42,9 +42,7 @@ class stop_session(Resource):
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,StopSession)
-    @commands_ns.marshal_with(StopSession, code=201)
-    @commands_ns.marshal_with(CommandResult, code=200)
-    @commands_ns.marshal_with(CommandResponse, code=200)
+    @commands_ns.marshal_with(resp(commands_ns,CommandResponse), code=200)
     @token_required
     def post(self):
         '''Stop Charging Session'''
@@ -59,8 +57,7 @@ class unlock_connector(Resource):
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,UnlockConnector)
-    @commands_ns.marshal_with(UnlockConnector, code=201)
-    @commands_ns.marshal_with(CommandResponse, code=200)
+    @commands_ns.marshal_with(resp(commands_ns,CommandResponse), code=200)
     @token_required
     def post(self):
         '''Unlock Connector'''
@@ -75,8 +72,7 @@ class cancel_reservation(Resource):
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,CancelReservation)
-    @commands_ns.marshal_with(CancelReservation, code=201)
-    @commands_ns.marshal_with(CommandResponse, code=200)
+    @commands_ns.marshal_with(resp(commands_ns,CommandResponse), code=200)
     @token_required
     def post(self):
         '''cancel reservation'''
@@ -91,8 +87,7 @@ class reserve_now(Resource):
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,ReserveNow)
-    @commands_ns.marshal_with(ReserveNow, code=201)
-    @commands_ns.marshal_with(CommandResponse, code=200)
+    @commands_ns.marshal_with(resp(commands_ns,CommandResponse), code=200)
     @token_required
     def post(self):
         '''resrve Now'''

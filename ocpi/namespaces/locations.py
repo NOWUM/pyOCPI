@@ -10,7 +10,7 @@ from flask_restx import Resource, Namespace
 from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
 from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
-
+from ocpi.models import resp, respList
 locations_ns = Namespace(name="locations", validate=True)
 
 add_models_to_location_namespace(locations_ns)
@@ -30,7 +30,7 @@ class get_locations(Resource):
         'limit': {'in': 'query', 'description': 'number of entries to get', 'default': '50'},
 
     })
-    @locations_ns.marshal_with(Location)
+    @locations_ns.marshal_with(respList(locations_ns,Location))
     def get(self):
         '''
         Get Location, allows pagination
@@ -54,6 +54,7 @@ class get_location(Resource):
         self.locationmanager = kwargs['location_manager']
         super().__init__(api, *args, **kwargs)
 
+    @locations_ns.marshal_with(resp(locations_ns,Location))
     def get(self, location_id, evse_uid=None, connector_id=None):
         '''
         Filter Locations/EVSEs/Connectors by id
@@ -70,7 +71,7 @@ class manage_location(Resource):
         self.locationmanager = kwargs['location_manager']
         super().__init__(api, *args, **kwargs)
 
-    @locations_ns.marshal_with(Location)
+    @locations_ns.marshal_with(resp(locations_ns,Location))
     def get(self, country_code, party_id, location_id):
         '''
         Get Location by ID
@@ -79,7 +80,7 @@ class manage_location(Resource):
         return self.locationmanager.sessions[location_id]
 
     @locations_ns.expect(Location)
-    @locations_ns.marshal_with(Location)
+    @locations_ns.marshal_with(resp(locations_ns,Location))
     def put(self, country_code, party_id, location_id):
         '''
         Add/Replace Location by ID
@@ -88,7 +89,7 @@ class manage_location(Resource):
         return self.locationmanager.sessions[location_id]
 
     @locations_ns.expect(Location)
-    @locations_ns.marshal_with(Location)
+    @locations_ns.marshal_with(resp(locations_ns,Location))
     def patch(self, country_code, party_id, location_id):
         '''
         Partially update Location
@@ -103,7 +104,7 @@ class manage_evse(Resource):
         self.locationmanager = kwargs['location_manager']
         super().__init__(api, *args, **kwargs)
 
-    @locations_ns.marshal_with(EVSE)
+    @locations_ns.marshal_with(resp(locations_ns,EVSE))
     def get(self, country_code, party_id, location_id, evse_uid):
         '''
         Get EVSE by ID
@@ -112,7 +113,7 @@ class manage_evse(Resource):
         return self.locationmanager.sessions[location_id][evse_uid]
 
     @locations_ns.expect(EVSE)
-    @locations_ns.marshal_with(EVSE)
+    @locations_ns.marshal_with(resp(locations_ns,EVSE))
     def put(self, country_code, party_id, location_id, evse_uid):
         '''
         Add/Replace EVSE by ID
@@ -121,7 +122,7 @@ class manage_evse(Resource):
         return self.locationmanager.sessions[location_id][evse_uid]
 
     @locations_ns.expect(EVSE)
-    @locations_ns.marshal_with(EVSE)
+    @locations_ns.marshal_with(resp(locations_ns,EVSE))
     def patch(self, country_code, party_id, location_id, evse_uid):
         '''
         Partially update EVSE
@@ -136,7 +137,7 @@ class manage_connector(Resource):
         self.locationmanager = kwargs['location_manager']
         super().__init__(api, *args, **kwargs)
 
-    @locations_ns.marshal_with(Connector)
+    @locations_ns.marshal_with(resp(locations_ns,Connector))
     def get(self, country_code, party_id, location_id, evse_uid, connector_id):
         '''
         Get Connector by ID
@@ -145,7 +146,7 @@ class manage_connector(Resource):
         return self.locationmanager.sessions[location_id][evse_uid][connector_id]
 
     @locations_ns.expect(Connector)
-    @locations_ns.marshal_with(Connector)
+    @locations_ns.marshal_with(resp(locations_ns,Connector))
     def put(self, country_code, party_id, location_id, evse_uid):
         '''
         Add/Replace Connector by ID
@@ -154,7 +155,7 @@ class manage_connector(Resource):
         return self.locationmanager.sessions[location_id][evse_uid]
 
     @locations_ns.expect(Connector)
-    @locations_ns.marshal_with(Connector)
+    @locations_ns.marshal_with(resp(locations_ns,Connector))
     def patch(self, country_code, party_id, location_id, evse_uid):
         '''
         Partially update Connector

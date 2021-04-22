@@ -10,7 +10,7 @@ from flask_restx import Resource, Namespace
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences
 from flask_restx import reqparse
-
+from ocpi.models import resp, respList
 sessions_ns = Namespace(name="sessions", validate=True)
 add_models_to_session_namespace(sessions_ns)
 
@@ -29,7 +29,7 @@ class get_session(Resource):
         'limit': {'in': 'query', 'description': 'number of entries to get', 'default': '50'},
 
     })
-    @sessions_ns.marshal_with(Session)
+    @sessions_ns.marshal_with(respList(sessions_ns,Session))
     def get(self):
         '''
         Only Sessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
@@ -59,7 +59,7 @@ class charging_preferences(Resource):
 
     @sessions_ns.doc('PutCommand')
     @sessions_ns.expect(ChargingPreferences)
-    @sessions_ns.marshal_with(ChargingPreferences, code=201)
+    @sessions_ns.marshal_with(resp(sessions_ns,ChargingPreferences), code=201)
     def put(self, session_id):
         '''Update ChargingPreferences'''
         session_id = session_id.lower()  # caseinsensitive
@@ -73,7 +73,7 @@ class charging_preferences(Resource):
 
     @sessions_ns.doc('PatchCommand')
     @sessions_ns.expect(ChargingPreferences)
-    @sessions_ns.marshal_with(ChargingPreferences, code=201)
+    @sessions_ns.marshal_with(resp(sessions_ns,ChargingPreferences), code=201)
     def patch(self, session_id):
         '''Update ChargingPreferences'''
         session_id = session_id.lower()  # caseinsensitive
@@ -96,7 +96,7 @@ class start_session(Resource):
         super().__init__(api, *args, **kwargs)
 
     @sessions_ns.marshal_with(Session, code=200)
-    @sessions_ns.marshal_with(str, code=404)
+    @sessions_ns.marshal_with(resp(sessions_ns,Session), code=404)
     def get(self, country_id, party_id, session_id):
 
         try:
@@ -108,7 +108,7 @@ class start_session(Resource):
         return ses
 
     @sessions_ns.expect(Session)
-    @sessions_ns.marshal_with(Session, code=201)
+    @sessions_ns.marshal_with(resp(sessions_ns,Session), code=201)
     def put(self, country_id, party_id, session_id):
         '''Add new Session'''
         session_id = session_id.lower()  # caseinsensitive
