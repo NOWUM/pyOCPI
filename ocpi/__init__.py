@@ -15,6 +15,7 @@ from ocpi.namespaces.commands import commands_ns
 from ocpi.namespaces.sessions import makeSessionNamespace
 from ocpi.namespaces.locations import makeLocationNamespace
 from ocpi.namespaces.versions import versions_ns
+from ocpi.namespaces.reservation import reservation_ns
 from ocpi.namespaces.credentials import credentials_ns
 from ocpi.decorators import SingleCredMan
 from ocpi.managers import VersionManager
@@ -70,10 +71,15 @@ def createOcpiBlueprint(base_url, injected_objects=injected, role=['SENDER', 'RE
         'versions': versions_ns,
         'commands': commands_ns,
         'sessions': makeSessionNamespace(role),
+        'reservations': reservation_ns,
     }
     endpoint_list= injected_objects.keys()
     injected_objects['versions']=VersionManager(base_url,endpoint_list)
     used_namespaces = list(map(ns_dict.get, endpoint_list))
+
+    # setting custom Namespaces should work too
+    #import numpy as np
+    #used_namespaces = np.logical_or(used_namespaces,injected_objects.values())
 
     for namesp in used_namespaces:
         if namesp is not None:

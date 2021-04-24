@@ -13,90 +13,69 @@ from werkzeug.exceptions import Forbidden, NotFound
 import logging
 import secrets
 
+# sender interface
+class ReservationManager():
 
-class SessionManager(object):
+    def __init__(self):
+        self.reservations = {}
+
+    def getReservations(self, begin, end, offset, limit):
+        return list(self.reservations.values())[offset:offset+limit]
+
+    def getReservation(self, country_id,party_id,reservation_id):
+        return 204
+
+    def addReservation(self, country_id,party_id,reservation):
+        return 204
+
+    def updateReservation(self, country_id,party_id,reservation_id, reservationPart):
+        pass
+
+    def updateChargingPrefs(self, reservation_id, prefs):
+        pass
+
+
+class SessionManager():
 
     def __init__(self):
         self.sessions = {}
-        self.charging_prefs = {}
 
     def getSessions(self, begin, end, offset, limit):
         return list(self.sessions.values())[offset:offset+limit]
 
-    def getSession(self, session_id):
-        ses = self.sessions.get(session_id)
-        if not ses:
-            raise NotFound('session does not exist')
-        return ses
-
-    def createSession(self, session):
-        session_id= session['session_id']
-
-        self.sessions[session_id] = session
-        #self.sessions[session_id]['country_id'] = country_id
-        #self.sessions[session_id]['party_id'] = party_id
+    def getSession(self, country_id,party_id,session_id):
         return 204
 
-    def patchSession(self, session_id, sessionPart):
-        ses = self.sessions.get(session_id)
-        if not ses:
-            raise NotFound('session does not exist')
-        return ses.update(sessionPart)
+    def createSession(self, country_id,party_id,session):
+        return 204
+
+    def patchSession(self, country_id,party_id,session_id, sessionPart):
+        pass
 
     def updateChargingPrefs(self, session_id, prefs):
-        #ses = self.sessions.get(session_id)
-        # if 'CHARGING_PROFILE_CAPABLE' in evse[ses['evse_uid']]['capabilities']:
-        # check if evse is capable of charging prefs
-
-        # return 404 if session does not support charging_prefs
-        self.charging_prefs[session_id] = prefs
-        return {'ACCEPTED'}
+        pass
 
 
-class CredentialsManager(object):
+class CredentialsManager():
 
     def __init__(self, credentials_role: mc.CredentialsRole, url):
-        self.credentials = {}
         self.credentials_role = credentials_role
         self.url = url
 
     def createCredentials(self) -> mc.Credentials:
-        token = secrets.token_urlsafe(32)  # tokenB
-        c = {
-            "token": token,
-            "url": self.url,
-            "roles": [self.credentials_role]
-        }
-
-        # Valid comm token, no token to access client
-        self.credentials[token] = ''
-        return c
+        pass
 
     def makeRegistration(self, payload: mc.Credentials):
-        # for initial handshake
-        key = request.headers['Authorization']
-        self.unregister(key)
-        newCredentials = self.createCredentials()  # tokenC
-        self.credentials[newCredentials['token']] = payload
-
-        # TODO fetch endpoints from payload['url']
-        return newCredentials
+        pass
 
     def versionUpdate(self, payload: mc.Credentials):
-        # TODO fetch endpoints from payload['url']
         return self.makeRegistration(payload)
 
     def unregister(self, token):
-        try:
-            self.credentials.pop(token)
-            # token to access the other system is still valid.
-        except:
-            return 'method not allowed', 405
-        return '', 200
+        pass
 
     def isAuthenticated(self, token):
-        return token in self.credentials.keys()
-
+        return True
 
 class LocationManager(object):
     def __init__(self):
@@ -154,21 +133,22 @@ class CommandsManager(object):
 
 
 class VersionManager():
-    def __init__(self, base_url, endpoints: list, role='SENDER'):
+    def __init__(self, base_url, endpoints: list, roles=['SENDER']):
         self.__base_url = base_url
-        self.__role = role
+        self.__roles = roles
         self.__details = self.__makeDetails(endpoints)
 
 
     def __makeDetails(self, endpoints):
         res = []
-        for key in endpoints:
-            e = {}
-            e['identifier'] = key
-            e['role'] = self.__role
-            e['url'] = self.__base_url+'/'+key
-            res.append(e)
-        return res
+        for role in self.__roles:
+            for key in endpoints:
+                e = {}
+                e['identifier'] = key
+                e['role'] = role
+                e['url'] = self.__base_url+'/'+key
+                res.append(e)
+            return res
 
     def versions(self):
         return{

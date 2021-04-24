@@ -9,7 +9,7 @@ Starter class for pyOCPI test
 """
 
 from ocpi import createOcpiBlueprint
-from ocpi.managers import CredentialsManager, SessionManager, LocationManager, CommandsManager
+from ocpi.managers import CredentialsManager,ReservationManager SessionManager, LocationManager, CommandsManager
 
 if __name__ == '__main__':
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     ses = SessionManager()
     loc = LocationManager()
     commands = CommandsManager()
-    reservations = ''
+    reservations = ReservationManager()
     base_url = "http://localhost:5000/ocpi/v2"
     # TODO maybe provide interface and inject with decorator..?
     cm = CredentialsManager(cred_role, base_url)
