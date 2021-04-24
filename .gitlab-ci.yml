@@ -1,0 +1,26 @@
+default:
+  tags:
+    - test
+
+stages:
+- check
+- build
+
+license-check:
+  image: python:3.8-slim
+  stage: check
+  script:
+    - pip install --no-cache-dir -r requirements.txt
+    - pip install pip-licenses
+    - pip-licenses --fail-on="GNU General Public License (GPL)"
+
+build-docker:
+  image: docker:dind
+  services:
+    - docker:dind
+  stage: build
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push $CI_REGISTRY_IMAGE:latest
