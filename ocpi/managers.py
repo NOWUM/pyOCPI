@@ -14,6 +14,8 @@ import logging
 import secrets
 
 # sender interface
+
+
 class ReservationManager():
 
     def __init__(self):
@@ -22,13 +24,13 @@ class ReservationManager():
     def getReservations(self, begin, end, offset, limit):
         return list(self.reservations.values())[offset:offset+limit]
 
-    def getReservation(self, country_id,party_id,reservation_id):
+    def getReservation(self, country_id, party_id, reservation_id):
         return 204
 
-    def addReservation(self, country_id,party_id,reservation):
+    def addReservation(self, country_id, party_id, reservation):
         return 204
 
-    def updateReservation(self, country_id,party_id,reservation_id, reservationPart):
+    def updateReservation(self, country_id, party_id, reservation_id, reservationPart):
         pass
 
     def updateChargingPrefs(self, reservation_id, prefs):
@@ -43,13 +45,13 @@ class SessionManager():
     def getSessions(self, begin, end, offset, limit):
         return list(self.sessions.values())[offset:offset+limit]
 
-    def getSession(self, country_id,party_id,session_id):
+    def getSession(self, country_id, party_id, session_id):
         return 204
 
-    def createSession(self, country_id,party_id,session):
+    def createSession(self, country_id, party_id, session):
         return 204
 
-    def patchSession(self, country_id,party_id,session_id, sessionPart):
+    def patchSession(self, country_id, party_id, session_id, sessionPart):
         pass
 
     def updateChargingPrefs(self, session_id, prefs):
@@ -76,6 +78,7 @@ class CredentialsManager():
 
     def isAuthenticated(self, token):
         return True
+
 
 class LocationManager(object):
     def __init__(self):
@@ -137,7 +140,6 @@ class VersionManager():
         self.__base_url = base_url
         self.__roles = roles
         self.__details = self.__makeDetails(endpoints)
-
 
     def __makeDetails(self, endpoints):
         res = []

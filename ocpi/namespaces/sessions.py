@@ -11,12 +11,16 @@ from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
 from flask_restx import reqparse
 from ocpi.models import resp, respList
+from ocpi.decorators import get_header_parser
+
 sessions_ns = Namespace(name="sessions", validate=True)
 add_models_to_session_namespace(sessions_ns)
+header_parser = get_header_parser(sessions_ns)
 
 
 def senderNamespace():
     @sessions_ns.route('/', doc={"description": "API Endpoint for Session management"})
+    @sessions_ns.expect(header_parser)
     class get_sessions(Resource):
 
         def __init__(self, api=None, *args, **kwargs):
@@ -45,6 +49,7 @@ def senderNamespace():
 
     @sessions_ns.route('/<string:session_id>/charging_preferences', doc={"description": "OCPI ChargingPreferences"})
     @sessions_ns.response(404, 'SessionID not found')
+    @sessions_ns.expect(header_parser)
     class charging_preferences(Resource):
 
         def __init__(self, api=None, *args, **kwargs):
@@ -67,6 +72,7 @@ def senderNamespace():
 def receiverNamespace():
     @sessions_ns.route('/<string:country_id>/<string:party_id>/<string:session_id>', doc={"description": "API Endpoint for Session management"})
     @sessions_ns.response(404, 'Command not found')
+    @sessions_ns.expect(header_parser)
     class receiver_session(Resource):
 
         def __init__(self, api=None, *args, **kwargs):

@@ -30,7 +30,7 @@ injected = {
 }
 
 
-def createOcpiBlueprint(base_url, injected_objects=injected, role=['SENDER', 'RECEIVER']):
+def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'RECEIVER']):
     '''
     Creates API blueprint with injected Objects.
     Must contain a sessionmanager and others.
@@ -46,6 +46,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, role=['SENDER', 'RE
     blueprint
 
     '''
+    roles = [r.upper() for r in roles]
     blueprint = Blueprint("ocpi_api", __name__, url_prefix="/ocpi/v2")
     authorizations = {"Bearer": {"type": "apiKey",
                                  "in": "header", "name": "Authorization"}}
@@ -66,15 +67,15 @@ def createOcpiBlueprint(base_url, injected_objects=injected, role=['SENDER', 'RE
     SingleCredMan.setInstance(injected_objects['credentials'])
 
     ns_dict = {
-        'locations': makeLocationNamespace(role),
+        'locations': makeLocationNamespace(roles),
         'credentials': credentials_ns,
         'versions': versions_ns,
         'commands': commands_ns,
-        'sessions': makeSessionNamespace(role),
+        'sessions': makeSessionNamespace(roles),
         'reservations': reservation_ns,
     }
-    endpoint_list= injected_objects.keys()
-    injected_objects['versions']=VersionManager(base_url,endpoint_list)
+    endpoint_list = injected_objects.keys()
+    injected_objects['versions'] = VersionManager(base_url, endpoint_list)
     used_namespaces = list(map(ns_dict.get, endpoint_list))
 
     # setting custom Namespaces should work too
@@ -82,6 +83,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, role=['SENDER', 'RE
     #used_namespaces = np.logical_or(used_namespaces,injected_objects.values())
 
     for namesp in used_namespaces:
+        print(namesp.name)
         if namesp is not None:
             for res in namesp.resources:
                 res.kwargs['resource_class_kwargs'] = injected_objects

@@ -16,11 +16,13 @@ from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.reservation import add_models_to_reservation_namespace, Reservation
 from flask_restx import reqparse
 from ocpi.models import resp, respList
-reservation_ns = Namespace(name="Reservations", validate=True)
+from ocpi.decorators import get_header_parser
+reservation_ns = Namespace(name="reservations", validate=True)
 add_models_to_reservation_namespace(reservation_ns)
 
-
+header_parser = get_header_parser(reservation_ns)
 @reservation_ns.route('/', doc={"description": "API Endpoint for Reservation management"})
+@reservation_ns.expect(header_parser)
 class get_reservation(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
@@ -50,6 +52,7 @@ class get_reservation(Resource):
 
 @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
 @reservation_ns.response(404, 'Command not found')
+@reservation_ns.expect(header_parser)
 class start_reservation(Resource):
 
     def __init__(self, api=None, *args, **kwargs):

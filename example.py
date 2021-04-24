@@ -9,7 +9,7 @@ Starter class for pyOCPI test
 """
 
 from ocpi import createOcpiBlueprint
-from ocpi.managers import CredentialsManager,ReservationManager SessionManager, LocationManager, CommandsManager
+from ocpi.managers import CredentialsManager, ReservationManager, SessionManager, LocationManager, CommandsManager
 
 if __name__ == '__main__':
 
@@ -48,7 +48,8 @@ if __name__ == '__main__':
         'reservations': reservations,
     }
 
-    blueprint = createOcpiBlueprint(base_url, injected_objects, role=['sender'])
+    blueprint = createOcpiBlueprint(
+        base_url, injected_objects, roles=['SENDER'])
     app.register_blueprint(blueprint)
 
     app.run()

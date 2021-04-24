@@ -11,16 +11,20 @@ from ocpi.models.location import add_models_to_location_namespace, EVSE, Locatio
 from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
+from ocpi.decorators import get_header_parser
 
 locations_ns = Namespace(name="locations", validate=True)
 
 add_models_to_location_namespace(locations_ns)
+parser = get_header_parser(locations_ns)
+
 
 def receiver():
     # keep in mind: https://stackoverflow.com/a/16569475
     @locations_ns.route('/<string:location_id>',
                         '/<string:location_id>/<string:evse_uid>',
                         '/<string:location_id>/<string:evse_uid>/<string:connector_id>')
+    @locations_ns.expect(parser)
     class get_location(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.locationmanager = kwargs['location_manager']
@@ -32,11 +36,12 @@ def receiver():
             Filter Locations/EVSEs/Connectors by id
             '''
 
-            return self.locationmanager.getLocation('','',location_id)
+            return self.locationmanager.getLocation('', '', location_id)
 
     # Receiver interface: eMSP and NSP.
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>')
+    @locations_ns.expect(parser)
     class manage_location(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.locationmanager = kwargs['locations']
@@ -48,7 +53,7 @@ def receiver():
             Get Location by ID
             '''
 
-            return self.locationmanager.getLocation(country_code,party_id,location_id)
+            return self.locationmanager.getLocation(country_code, party_id, location_id)
 
         @locations_ns.expect(Location)
         @locations_ns.marshal_with(resp(locations_ns, Location))
@@ -57,7 +62,7 @@ def receiver():
             Add/Replace Location by ID
             '''
 
-            return self.locationmanager.putLocation(country_code,party_id,location_id,locations_ns.payload)
+            return self.locationmanager.putLocation(country_code, party_id, location_id, locations_ns.payload)
 
         @locations_ns.expect(Location)
         @locations_ns.marshal_with(resp(locations_ns, Location))
@@ -66,9 +71,10 @@ def receiver():
             Partially update Location
             '''
 
-            return self.locationmanager.patchLocation(country_code,party_id,location_id,locations_ns.payload)
+            return self.locationmanager.patchLocation(country_code, party_id, location_id, locations_ns.payload)
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>')
+    @locations_ns.expect(parser)
     class manage_evse(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.locationmanager = kwargs['locations']
@@ -80,7 +86,7 @@ def receiver():
             Get EVSE by ID
             '''
 
-            return self.locationmanager.getEVSE(country_code,party_id,location_id,evse_uid)
+            return self.locationmanager.getEVSE(country_code, party_id, location_id, evse_uid)
 
         @locations_ns.expect(EVSE)
         @locations_ns.marshal_with(resp(locations_ns, EVSE))
@@ -101,6 +107,7 @@ def receiver():
             return self.locationmanager.patchEVSE[location_id][evse_uid]
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>/<string:connector_id>')
+    @locations_ns.expect(parser)
     class manage_connector(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.locationmanager = kwargs['locations']
@@ -112,7 +119,7 @@ def receiver():
             Get Connector by ID
             '''
 
-            return self.locationmanager.getConnector(country_code,party_id,location_id,evse_uid,connector_id)
+            return self.locationmanager.getConnector(country_code, party_id, location_id, evse_uid, connector_id)
 
         @locations_ns.expect(Connector)
         @locations_ns.marshal_with(resp(locations_ns, Connector))
@@ -121,7 +128,7 @@ def receiver():
             Add/Replace Connector by ID
             '''
 
-            return self.locationmanager.putConnector(country_code,party_id,location_id,evse_uid)
+            return self.locationmanager.putConnector(country_code, party_id, location_id, evse_uid)
 
         @locations_ns.expect(Connector)
         @locations_ns.marshal_with(resp(locations_ns, Connector))
@@ -130,12 +137,14 @@ def receiver():
             Partially update Connector
             '''
 
-            return self.locationmanager.patchConnector(country_code,party_id,location_id,evse_uid)
+            return self.locationmanager.patchConnector(country_code, party_id, location_id, evse_uid)
 
     return locations_ns
 
+
 def sender():
     @locations_ns.route('/', doc={"description": "API Endpoint for Locations management"})
+    @locations_ns.expect(parser)
     class get_locations(Resource):
 
         def __init__(self, api=None, *args, **kwargs):
@@ -149,7 +158,7 @@ def sender():
             'limit': {'in': 'query', 'description': 'number of entries to get', 'default': '50'},
 
         })
-        @locations_ns.marshal_with(respList(locations_ns,Location))
+        @locations_ns.marshal_with(respList(locations_ns, Location))
         def get(self):
             '''
             Get Location, allows pagination
@@ -164,8 +173,8 @@ def sender():
             return self.locationmanager.getLocations(args['from'], args['to'], args['offset'], args['limit'])
 
 
-def makeLocationNamespace(interfaces=['SENDER','RECEIVER']):
-
+def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):
+    print('location interfaces:', interfaces)
     if 'SENDER' in interfaces:
         sender()
     if 'RECEIVER' in interfaces:

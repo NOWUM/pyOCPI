@@ -50,4 +50,7 @@ def _check_access_token():
 def get_header_parser(namespace):
     parser = namespace.parser()
     parser.add_argument('Authorization', location='headers', required=True)
+    parser.add_argument('X-Request-ID', required=True, location='headers')
+    parser.add_argument('X-Correlation-ID', location='headers')
+
     return parser

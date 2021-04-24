@@ -8,10 +8,11 @@ Created on Wed Mar 31 22:48:06 2021
 
 from flask_restx import Resource, Namespace
 from ocpi.models.version import VersionDetailsData, VersionsData, add_models_to_version_namespace
+from ocpi.decorators import get_header_parser
 
 versions_ns = Namespace(name="versions", validate=True)
-
 add_models_to_version_namespace(versions_ns)
+header_parser = get_header_parser(versions_ns)
 
 
 @versions_ns.route('/', doc={"description": "API Endpoint for Session management"})
