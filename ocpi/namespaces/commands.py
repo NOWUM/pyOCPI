@@ -22,7 +22,7 @@ parser = get_header_parser(commands_ns)
 class start_session(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['command_manager']
+        self.command_manager = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.doc('PostCommand')  # operationId
@@ -38,7 +38,7 @@ class start_session(Resource):
 @commands_ns.response(404, 'Command not found')
 class stop_session(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['command_manager']
+        self.command_manager = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,StopSession)
@@ -53,7 +53,7 @@ class stop_session(Resource):
 @commands_ns.response(404, 'Command not found')
 class unlock_connector(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['command_manager']
+        self.command_manager = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,UnlockConnector)
@@ -68,7 +68,7 @@ class unlock_connector(Resource):
 @commands_ns.response(404, 'Command not found')
 class cancel_reservation(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['command_manager']
+        self.command_manager = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,CancelReservation)
@@ -83,7 +83,7 @@ class cancel_reservation(Resource):
 @commands_ns.response(404, 'Command not found')
 class reserve_now(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['command_manager']
+        self.command_manager = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser,ReserveNow)

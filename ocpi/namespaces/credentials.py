@@ -23,7 +23,7 @@ parser = get_header_parser(credentials_ns)
 class credentials(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        self.credentials_manager = kwargs['credentials_manager']
+        self.credentials_manager = kwargs['credentials']
         super().__init__(api, *args, **kwargs)
 
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))

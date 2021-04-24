@@ -30,7 +30,11 @@ class SessionManager(object):
         return ses
 
     def createSession(self, session):
-        self.sessions[session['session_id']] = session
+        session_id= session['session_id']
+
+        self.sessions[session_id] = session
+        #self.sessions[session_id]['country_id'] = country_id
+        #self.sessions[session_id]['party_id'] = party_id
         return 204
 
     def patchSession(self, session_id, sessionPart):
@@ -44,6 +48,7 @@ class SessionManager(object):
         # if 'CHARGING_PROFILE_CAPABLE' in evse[ses['evse_uid']]['capabilities']:
         # check if evse is capable of charging prefs
 
+        # return 404 if session does not support charging_prefs
         self.charging_prefs[session_id] = prefs
         return {'ACCEPTED'}
 
@@ -97,6 +102,9 @@ class LocationManager(object):
     def __init__(self):
         self.locations = {}
 
+    def getLocations(self, begin, end, offset, limit):
+        return list(self.locations.values())[offset:offset+limit]
+
     def getLocation(self, country_id, party_id, location_id):
         return self.locations[location_id]
 
@@ -143,3 +151,35 @@ class CommandsManager(object):
 
     def reserveNow(self, session_info):
         pass
+
+
+class VersionManager():
+    def __init__(self, base_url, endpoints: list, role='SENDER'):
+        self.__base_url = base_url
+        self.__role = role
+        self.__details = self.__makeDetails(endpoints)
+
+
+    def __makeDetails(self, endpoints):
+        res = []
+        for key in endpoints:
+            e = {}
+            e['identifier'] = key
+            e['role'] = self.__role
+            e['url'] = self.__base_url+'/'+key
+            res.append(e)
+        return res
+
+    def versions(self):
+        return{
+            'versions':
+                [
+                    {'version': '2.2', 'url': self.__base_url}
+                ]
+        }
+
+    def details(self):
+        return {
+            'version': '2.2',
+            'endpoints': self.__details
+        }

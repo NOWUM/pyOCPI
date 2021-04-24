@@ -18,20 +18,19 @@ add_models_to_version_namespace(versions_ns)
 class get_versions(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        self.versionsmanager = kwargs['session_manager']
+        self.versionsmanager = kwargs['versions']
         super().__init__(api, *args, **kwargs)
 
     @versions_ns.marshal_with(VersionsData)
     def get(self):
-        return {'versions': [
-            {'version': '2.2', 'url': 'http://localhost:5000/ocpi/v2'}]}
+        return self.versionsmanager.versions()
 
 
 @versions_ns.route('/details', doc={"description": "API Endpoint for Session management"})
 class get_details(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        self.versionsmanager = kwargs['session_manager']
+        self.versionsmanager = kwargs['versions']
         super().__init__(api, *args, **kwargs)
 
     @versions_ns.marshal_with(VersionDetailsData)
@@ -40,8 +39,4 @@ class get_details(Resource):
         Get Version Details
         '''
 
-        return {'version': '2.2', 'endpoints': [
-            {'identifier': 'commands', 'url': 'http://localhost:5000/ocpi/v2/commands/'},
-            {'identifier': 'locations',
-                'url': 'http://localhost:5000/ocpi/v2/locations/'},
-            {'identifier': 'sessions', 'url': 'http://localhost:5000/ocpi/v2/sessions/'}]}
+        return self.versionsmanager.details()

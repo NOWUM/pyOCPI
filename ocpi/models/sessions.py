@@ -80,6 +80,10 @@ ChargingPreferences = Model('ChargingPreferences', {
     'discharge_allowed': fields.Boolean(default=False, description='The driver allows their EV to be discharged when needed, as long as the other preferences are met'),
 })
 
+charging_pref_results = ["ACCEPTED", "DEPARTURE_REQUIRED",
+                             "ENERGY_NEED_REQUIRED", "NOT_POSSIBLE", "PROFILE_TYPE_NOT_SUPPORTED"]
+
+
 
 def add_models_to_session_namespace(namespace):
     for model in [CdrToken, CdrDimension, ChargingPeriod, Session, ChargingPreferences]:

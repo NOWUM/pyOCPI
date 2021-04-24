@@ -35,16 +35,20 @@ if __name__ == '__main__':
     ses = SessionManager()
     loc = LocationManager()
     commands = CommandsManager()
-    base_url = "http://localhost:5000"
+    reservations = ''
+    base_url = "http://localhost:5000/ocpi/v2"
+    # TODO maybe provide interface and inject with decorator..?
     cm = CredentialsManager(cred_role, base_url)
-    injected_objects = {'db': 'db_test',
-                        'session_manager': ses,
-                        'location_manager': loc,
-                        'credentials_manager': cm,
-                        'command_manager': commands,
-                        }
+    injected_objects = {
+        'credentials': cm,
+        'locations': loc,
+        'versions': ses,
+        'commands': commands,
+        'sessions': ses,
+        'reservations': reservations,
+    }
 
-    blueprint = createOcpiBlueprint(injected_objects)
+    blueprint = createOcpiBlueprint(base_url, injected_objects, role=['sender'])
     app.register_blueprint(blueprint)
 
     app.run()
