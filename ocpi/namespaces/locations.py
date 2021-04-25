@@ -6,17 +6,21 @@ Created on Thu Mar 18 18:26:15 2021
 @author: maurer
 """
 
+import logging
 from flask_restx import Resource, Namespace
-from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
 from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser
+from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
+
 
 locations_ns = Namespace(name="locations", validate=True)
 
 add_models_to_location_namespace(locations_ns)
 parser = get_header_parser(locations_ns)
+
+log = logging.getLogger('ocpi')
 
 
 def receiver():
@@ -174,7 +178,7 @@ def sender():
 
 
 def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):
-    print('location interfaces:', interfaces)
+    log.debug('location interfaces:', interfaces)
     if 'SENDER' in interfaces:
         sender()
     if 'RECEIVER' in interfaces:

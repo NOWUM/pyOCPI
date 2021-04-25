@@ -19,6 +19,9 @@ from ocpi.namespaces.reservation import reservation_ns
 from ocpi.namespaces.credentials import credentials_ns
 from ocpi.decorators import SingleCredMan
 from ocpi.managers import VersionManager
+import logging
+
+log = logging.getLogger('ocpi')
 
 injected = {
     'credentials': None,
@@ -83,8 +86,9 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
     #used_namespaces = np.logical_or(used_namespaces,injected_objects.values())
 
     for namesp in used_namespaces:
-        print(namesp.name)
+
         if namesp is not None:
+            log.debug(namesp.name)
             for res in namesp.resources:
                 res.kwargs['resource_class_kwargs'] = injected_objects
             api.add_namespace(namesp, path="/"+namesp.name)
