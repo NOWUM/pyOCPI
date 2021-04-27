@@ -13,6 +13,7 @@ from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser
 from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
+from datetime import datetime
 
 
 locations_ns = Namespace(name="locations", validate=True)
@@ -40,7 +41,12 @@ def receiver():
             Filter Locations/EVSEs/Connectors by id
             '''
 
-            return self.locationmanager.getLocation('', '', location_id)
+            data = self.locationmanager.getLocation('', '', location_id)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
     # Receiver interface: eMSP and NSP.
 
@@ -57,7 +63,13 @@ def receiver():
             Get Location by ID
             '''
 
-            return self.locationmanager.getLocation(country_code, party_id, location_id)
+            data = self.locationmanager.getLocation(
+                country_code, party_id, location_id)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @locations_ns.expect(Location)
         @locations_ns.marshal_with(resp(locations_ns, Location))
@@ -66,7 +78,13 @@ def receiver():
             Add/Replace Location by ID
             '''
 
-            return self.locationmanager.putLocation(country_code, party_id, location_id, locations_ns.payload)
+            data = self.locationmanager.putLocation(
+                country_code, party_id, location_id, locations_ns.payload)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @locations_ns.expect(Location)
         @locations_ns.marshal_with(resp(locations_ns, Location))
@@ -75,7 +93,13 @@ def receiver():
             Partially update Location
             '''
 
-            return self.locationmanager.patchLocation(country_code, party_id, location_id, locations_ns.payload)
+            data = self.locationmanager.patchLocation(
+                country_code, party_id, location_id, locations_ns.payload)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>')
     @locations_ns.expect(parser)
@@ -90,7 +114,13 @@ def receiver():
             Get EVSE by ID
             '''
 
-            return self.locationmanager.getEVSE(country_code, party_id, location_id, evse_uid)
+            data = self.locationmanager.getEVSE(
+                country_code, party_id, location_id, evse_uid)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @locations_ns.expect(EVSE)
         @locations_ns.marshal_with(resp(locations_ns, EVSE))
@@ -99,7 +129,12 @@ def receiver():
             Add/Replace EVSE by ID
             '''
 
-            return self.locationmanager.putEVSE[location_id][evse_uid]
+            data = self.locationmanager.putEVSE[location_id][evse_uid]
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @locations_ns.expect(EVSE)
         @locations_ns.marshal_with(resp(locations_ns, EVSE))
@@ -108,7 +143,12 @@ def receiver():
             Partially update EVSE
             '''
 
-            return self.locationmanager.patchEVSE[location_id][evse_uid]
+            data = self.locationmanager.patchEVSE[location_id][evse_uid]
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>/<string:connector_id>')
     @locations_ns.expect(parser)
@@ -123,7 +163,13 @@ def receiver():
             Get Connector by ID
             '''
 
-            return self.locationmanager.getConnector(country_code, party_id, location_id, evse_uid, connector_id)
+            data = self.locationmanager.getConnector(
+                country_code, party_id, location_id, evse_uid, connector_id)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @locations_ns.expect(Connector)
         @locations_ns.marshal_with(resp(locations_ns, Connector))
@@ -132,7 +178,13 @@ def receiver():
             Add/Replace Connector by ID
             '''
 
-            return self.locationmanager.putConnector(country_code, party_id, location_id, evse_uid)
+            data = self.locationmanager.putConnector(
+                country_code, party_id, location_id, evse_uid)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @locations_ns.expect(Connector)
         @locations_ns.marshal_with(resp(locations_ns, Connector))
@@ -141,7 +193,13 @@ def receiver():
             Partially update Connector
             '''
 
-            return self.locationmanager.patchConnector(country_code, party_id, location_id, evse_uid)
+            data = self.locationmanager.patchConnector(
+                country_code, party_id, location_id, evse_uid)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
     return locations_ns
 
@@ -174,7 +232,13 @@ def sender():
             parser.add_argument('limit', type=int)
             args = parser.parse_args()
 
-            return self.locationmanager.getLocations(args['from'], args['to'], args['offset'], args['limit'])
+            data = self.locationmanager.getLocations(
+                args['from'], args['to'], args['offset'], args['limit'])
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
 
 def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):
