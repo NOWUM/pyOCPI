@@ -178,7 +178,7 @@ def sender():
 
 
 def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):
-    log.debug('location interfaces:', interfaces)
+    log.debug('location interfaces:'+str(interfaces))
     if 'SENDER' in interfaces:
         sender()
     if 'RECEIVER' in interfaces:

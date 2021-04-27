@@ -49,7 +49,7 @@ injected_objects = {
 }
 
 blueprint = createOcpiBlueprint(
-    base_url, injected_objects, roles=['SENDER'])
+    base_url, injected_objects, roles=['RECEIVER'])
 app.register_blueprint(blueprint)
 
 if __name__ == '__main__':

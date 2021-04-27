@@ -17,10 +17,13 @@ from ocpi.models.reservation import add_models_to_reservation_namespace, Reserva
 from flask_restx import reqparse
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser
+from datetime import datetime
+
 reservation_ns = Namespace(name="reservations", validate=True)
 add_models_to_reservation_namespace(reservation_ns)
-
 header_parser = get_header_parser(reservation_ns)
+
+
 @reservation_ns.route('/', doc={"description": "API Endpoint for Reservation management"})
 @reservation_ns.expect(header_parser)
 class get_reservation(Resource):
@@ -47,7 +50,13 @@ class get_reservation(Resource):
         parser.add_argument('offset', type=int)
         parser.add_argument('limit', type=int)
         args = parser.parse_args()
-        return self.reservation_manager.getReservations(args['from'], args['to'], args['offset'], args['limit'])
+        data = self.reservation_manager.getReservations(
+            args['from'], args['to'], args['offset'], args['limit'])
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
 
 @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
@@ -63,12 +72,17 @@ class start_reservation(Resource):
     def get(self, country_id, party_id, reservation_id):
 
         try:
-            ses = self.reservation_manager.getReservation(country_id,party_id,reservation_id)
+            ses = self.reservation_manager.getReservation(
+                country_id, party_id, reservation_id)
             # TODO validate country and party
         except:
             return '', 404
 
-        return ses
+        return {'data': ses,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
     @reservation_ns.expect(Reservation)
     @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
@@ -82,7 +96,12 @@ class start_reservation(Resource):
         country_id = country_id.lower()
         party_id = party_id.lower()
 
-        return self.reservation_manager.addReservation(country_id,party_id,reservation_ns.payload)
+        data= self.reservation_manager.addReservation(country_id, party_id, reservation_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
     @reservation_ns.expect(Reservation, validate=False)
     @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
@@ -96,4 +115,9 @@ class start_reservation(Resource):
         country_id = country_id.lower()
         party_id = party_id.lower()
 
-        return self.reservation_manager.updateReservation(country_id,party_id,reservation_ns.payload)
+        data= self.reservation_manager.updateReservation(country_id, party_id, reservation_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }

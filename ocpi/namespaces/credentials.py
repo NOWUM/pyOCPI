@@ -11,6 +11,7 @@ from flask_restx import Resource, Namespace
 from ocpi.models.credentials import Credentials, add_models_to_credentials_namespace
 from ocpi.models import resp
 from flask import request
+from datetime import datetime
 credentials_ns = Namespace(name="credentials", validate=True)
 add_models_to_credentials_namespace(credentials_ns)
 
@@ -31,7 +32,12 @@ class credentials(Resource):
         '''
         request new credentials if authenticated
         '''
-        return self.credentials_manager.createCredentials()
+        data = self.credentials_manager.createCredentials()
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
     @token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
@@ -40,7 +46,13 @@ class credentials(Resource):
         '''
         Get new Token, request Sender Token and reply with Token C (for first time auth)
         '''
-        return self.credentials_manager.makeRegistration(credentials_ns.payload)
+        data = self.credentials_manager.makeRegistration(
+            credentials_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
     @token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
@@ -49,7 +61,12 @@ class credentials(Resource):
         '''
         replace registration Token for version update
         '''
-        return self.credentials_manager.versionUpdate(credentials_ns.payload)
+        data = self.credentials_manager.versionUpdate(credentials_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
     @token_required
     @credentials_ns.expect(parser)
@@ -58,4 +75,10 @@ class credentials(Resource):
         unregisters from server
         '''
 
-        return self.credentials_manager.unregister(request.headers['Authorization'])
+        data = self.credentials_manager.unregister(
+            request.headers['Authorization'])
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
