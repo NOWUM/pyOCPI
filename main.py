@@ -46,6 +46,7 @@ injected_objects = {
     'commands': commands,
     'sessions': ses,
     'reservations': reservations,
+    'parking': reservations,
 }
 
 blueprint = createOcpiBlueprint(

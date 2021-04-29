@@ -17,6 +17,7 @@ from ocpi.namespaces.locations import makeLocationNamespace
 from ocpi.namespaces.versions import versions_ns
 from ocpi.namespaces.reservation import reservation_ns
 from ocpi.namespaces.credentials import credentials_ns
+from ocpi.namespaces.parking import makeParkingNamespace
 from ocpi.decorators import SingleCredMan
 from ocpi.managers import VersionManager
 import logging
@@ -76,6 +77,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
         'commands': commands_ns,
         'sessions': makeSessionNamespace(roles),
         'reservations': reservation_ns,
+        'parking': makeParkingNamespace(roles)
     }
     endpoint_list = injected_objects.keys()
     injected_objects['versions'] = VersionManager(base_url, endpoint_list)
