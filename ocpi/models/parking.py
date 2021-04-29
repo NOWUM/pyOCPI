@@ -9,7 +9,7 @@ Created on Thu Apr 29 15:03:13 2021
 from flask_restx import Model, fields
 parking_status = ["REQUEST", "ACTIVE",
                       "COMPLETED", "INVALID", "PENDING", "RESERVATION"]
-ParkingSession = Model('Reservation', {
+ParkingSession = Model('ParkingSession', {
     'country_id': fields.String(required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Session."),
     'party_id': fields.String(required=True, description="CPO ID of the CPO that 'owns' this Session (following the ISO-15118 standard)."),
     'id': fields.String(max_length=36, required=True, description='The unique id that identifies the charging session in the CPO platform.'),

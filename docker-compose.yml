@@ -1,0 +1,10 @@
+version: "3"
+services:
+  SmartChargingHub:
+    build: .
+    image: registry.git.fh-aachen.de/smarte_ladesaeulen/pyocpi:latest
+    container_name: ocpi
+    ports:
+      - "8005:8000" # http
+    environment:
+      HOST_URL: "http://localhost:8005"

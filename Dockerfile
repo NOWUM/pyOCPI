@@ -1,8 +1,3 @@
-#FROM alpine as builder
-#WORKDIR /
-#RUN apk add git
-#RUN git clone https://github.com/mobilityhouse/ocpp.git
-
 FROM python:3.8-slim
 RUN pip install --no-cache-dir gunicorn
 COPY requirements.txt ./
@@ -17,4 +12,4 @@ VOLUME /data
 ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:8000 --chdir=./ --worker-tmp-dir /dev/shm --workers=2 --threads=2 --worker-class=gthread"
 EXPOSE 8000
 
-CMD ["gunicorn", "main:app"] #.py"]
+CMD ["gunicorn", "main:app"]
