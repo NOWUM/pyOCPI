@@ -42,7 +42,7 @@ def senderNamespace():
         @parking_ns.marshal_with(respList(parking_ns, ParkingSession))
         def get(self):
             '''
-            Only Reservations with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
+            Only ParkingSessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
             '''
             parser = reqparse.RequestParser()
             parser.add_argument('from', type=datetime_from_iso8601)
@@ -50,7 +50,7 @@ def senderNamespace():
             parser.add_argument('offset', type=int)
             parser.add_argument('limit', type=int)
             args = parser.parse_args()
-            data = self.parking_manager.getReservations(
+            data = self.parking_manager.getParkingSessions(
                 args['from'], args['to'], args['offset'], args['limit'])
             return {'data': data,
                     'status_code': 1000,
@@ -72,7 +72,7 @@ def senderNamespace():
         def get(self, country_id, party_id, reservation_id):
 
             try:
-                ses = self.parking_manager.getReservation(
+                ses = self.parking_manager.getParkingSession(
                     country_id, party_id, reservation_id)
                 # TODO validate country and party
             except:
@@ -95,7 +95,7 @@ def senderNamespace():
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            data = self.parking_manager.addReservation(
+            data = self.parking_manager.createParkingSession(
                 country_id, party_id, parking_ns.payload)
             return {'data': data,
                     'status_code': 1000,
@@ -115,7 +115,7 @@ def senderNamespace():
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            data = self.parking_manager.updateReservation(
+            data = self.parking_manager.updateParkingSession(
                 country_id, party_id, parking_ns.payload)
             return {'data': data,
                     'status_code': 1000,
@@ -139,7 +139,7 @@ def receiverNamespace():
         def get(self, country_id, party_id, session_id):
 
             # TODO validate country and party
-            return self.parking_manager.getSession(session_id)
+            return self.parking_manager.getParkingSession(session_id)
 
         @parking_ns.expect(ParkingSession)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
@@ -149,7 +149,7 @@ def receiverNamespace():
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            return self.parking_manager.createSession(parking_ns.payload)
+            return self.parking_manager.createParkingSession(parking_ns.payload)
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
@@ -158,7 +158,7 @@ def receiverNamespace():
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            return self.parking_manager.patchSession(session_id, parking_ns.payload)
+            return self.parking_manager.patchParkingSession(session_id, parking_ns.payload)
             # TODO save and process preferences somewhere
     return parking_ns
 
