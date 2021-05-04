@@ -6,6 +6,7 @@ Created on Thu Mar 18 00:26:15 2021
 @author: maurer
 """
 
+from datetime import datetime
 from ocpi.decorators import token_required, get_header_parser
 from flask_restx import Resource, Namespace
 from ocpi.models.commands import (add_models_to_commands_namespace,
@@ -33,7 +34,12 @@ class start_session(Resource):
     @token_required
     def post(self):
         '''Start Charging Session'''
-        return self.command_manager.startSession(commands_ns.payload)
+        data = self.command_manager.startSession(commands_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
 
 @commands_ns.route('/STOP_SESSION', doc={"description": "OCPI Command API"},)
@@ -48,7 +54,12 @@ class stop_session(Resource):
     @token_required
     def post(self):
         '''Stop Charging Session'''
-        return self.command_manager.stopSession(commands_ns.payload)
+        data = self.command_manager.stopSession(commands_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
 
 @commands_ns.route('/UNLOCK_CONNECTOR', doc={"description": "OCPI Command API"},)
@@ -63,7 +74,12 @@ class unlock_connector(Resource):
     @token_required
     def post(self):
         '''Unlock Connector'''
-        return self.command_manager.unlockConnector(commands_ns.payload)
+        data = self.command_manager.unlockConnector(commands_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
 
 @commands_ns.route('/CANCEL_RESERVATION', doc={"description": "OCPI Command API"},)
@@ -78,7 +94,12 @@ class cancel_reservation(Resource):
     @token_required
     def post(self):
         '''cancel reservation'''
-        return self.command_manager.cancelReservation(commands_ns.payload)
+        data = self.command_manager.cancelReservation(commands_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }
 
 
 @commands_ns.route('/RESERVE_NOW', doc={"description": "OCPI Command API"},)
@@ -93,4 +114,9 @@ class reserve_now(Resource):
     @token_required
     def post(self):
         '''resrve Now'''
-        return self.command_manager.reserveNow(commands_ns.payload)
+        data = self.command_manager.reserveNow(commands_ns.payload)
+        return {'data': data,
+                'status_code': 1000,
+                'status_message': 'nothing',
+                'timestamp': datetime.now()
+                }

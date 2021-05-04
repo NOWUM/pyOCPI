@@ -81,8 +81,7 @@ ChargingPreferences = Model('ChargingPreferences', {
 })
 
 charging_pref_results = ["ACCEPTED", "DEPARTURE_REQUIRED",
-                             "ENERGY_NEED_REQUIRED", "NOT_POSSIBLE", "PROFILE_TYPE_NOT_SUPPORTED"]
-
+                         "ENERGY_NEED_REQUIRED", "NOT_POSSIBLE", "PROFILE_TYPE_NOT_SUPPORTED"]
 
 
 def add_models_to_session_namespace(namespace):

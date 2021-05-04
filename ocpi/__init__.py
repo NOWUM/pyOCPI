@@ -57,7 +57,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
 
     api = Api(
         blueprint,
-        version="1.0",
+        version="2.0",
         title="OCPI OpenAPI Documentation",
         description="Welcome to the OpenAPI documentation site!",
         doc="/ui",
@@ -87,10 +87,10 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
     #import numpy as np
     #used_namespaces = np.logical_or(used_namespaces,injected_objects.values())
 
+    log.debug(list(map(lambda x: x.name if x else '', used_namespaces)))
     for namesp in used_namespaces:
 
         if namesp is not None:
-            log.debug(namesp.name)
             for res in namesp.resources:
                 res.kwargs['resource_class_kwargs'] = injected_objects
             api.add_namespace(namesp, path="/"+namesp.name)

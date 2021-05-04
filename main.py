@@ -10,7 +10,7 @@ Starter class for pyOCPI test
 
 import os
 from ocpi import createOcpiBlueprint
-from ocpi.managers import CredentialsManager, ReservationManager, SessionManager, LocationManager, CommandsManager
+import ocpi.managers as om
 from flask import Flask, redirect
 
 app = Flask(__name__)
@@ -33,20 +33,20 @@ cred_role = {'role': 'HUB',
 
 # inject dependencies here
 # must be as expected
-ses = SessionManager()
-loc = LocationManager()
-commands = CommandsManager()
-reservations = ReservationManager()
+ses = om.SessionManager()
+loc = om.LocationManager()
+commands = om.CommandsManager()
+reservations = om.ReservationManager()
 HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/v2"
 # TODO maybe provide interface and inject with decorator..?
-cm = CredentialsManager(cred_role, HOST_URL)
+cm = om.CredentialsManager(cred_role, HOST_URL)
 injected_objects = {
     'credentials': cm,
-    #'locations': loc,
+    # 'locations': loc,
     'versions': ses,
-    #'commands': commands,
+    # 'commands': commands,
     'sessions': ses,
-    #'reservations': reservations,
+    # 'reservations': reservations,
     'parking': reservations,
 }
 
