@@ -39,7 +39,7 @@ commands = om.CommandsManager()
 reservations = om.ReservationManager()
 HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/v2"
 # TODO maybe provide interface and inject with decorator..?
-cm = om.CredentialsManager(cred_role, HOST_URL,om.CredentialPersistor())
+cm = om.CredentialsManager(cred_role, HOST_URL, om.CredentialPersistor())
 injected_objects = {
     'credentials': cm,
     # 'locations': loc,

@@ -16,6 +16,7 @@ import logging
 
 log = logging.getLogger('ocpi')
 
+
 class SingleCredMan:
     __instance = None
 

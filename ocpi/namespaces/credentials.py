@@ -68,7 +68,8 @@ class credentials(Resource):
         replace registration Token for version update
         '''
         decodedToken = base64.b64decode(request.headers['Authorization'])
-        data = self.credentials_manager.versionUpdate(credentials_ns.payload,decodedToken)
+        data = self.credentials_manager.versionUpdate(
+            credentials_ns.payload, decodedToken)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
