@@ -6,6 +6,7 @@ Created on Wed Mar 31 23:45:34 2021
 @author: maurer
 """
 
+import base64
 from ocpi.decorators import token_required, get_header_parser
 from flask_restx import Resource, Namespace
 from ocpi.models.credentials import Credentials, add_models_to_credentials_namespace
@@ -27,12 +28,16 @@ class credentials(Resource):
         self.credentials_manager = kwargs['credentials']
         super().__init__(api, *args, **kwargs)
 
+    # TODO in production
+    #@token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
     def get(self):
         '''
         request new credentials if authenticated
         '''
-        data = self.credentials_manager.createCredentials()
+
+        #decodedToken = base64.b64decode(request.headers['Authorization'])
+        data = self.credentials_manager.createCredentials('')
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -46,8 +51,9 @@ class credentials(Resource):
         '''
         Get new Token, request Sender Token and reply with Token C (for first time auth)
         '''
+        decodedToken = base64.b64decode(request.headers['Authorization'])
         data = self.credentials_manager.makeRegistration(
-            credentials_ns.payload)
+            credentials_ns.payload, decodedToken)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -61,7 +67,8 @@ class credentials(Resource):
         '''
         replace registration Token for version update
         '''
-        data = self.credentials_manager.versionUpdate(credentials_ns.payload)
+        decodedToken = base64.b64decode(request.headers['Authorization'])
+        data = self.credentials_manager.versionUpdate(credentials_ns.payload,decodedToken)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -74,9 +81,8 @@ class credentials(Resource):
         '''
         unregisters from server
         '''
-
-        data = self.credentials_manager.unregister(
-            request.headers['Authorization'])
+        decodedToken = base64.b64decode(request.headers['Authorization'])
+        data = self.credentials_manager.unregister(decodedToken)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',

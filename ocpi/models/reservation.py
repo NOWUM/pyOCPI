@@ -22,7 +22,8 @@ Reservation = Model('Reservation', {
     'currency': fields.String(max_length=3, description='ISO 4217 code of the currency used for this session.'),
     'total_cost': fields.Float(description='The total cost of the session in the specified currency. This is the price that the eMSP will have to pay to the CPO.'),
     'status': fields.String(enum=reservation_status, default="REQUEST", description='The status of the reservation.'),
-    'last_updated': fields.DateTime(description='Timestamp when this Session was last updated (or created).')
+    'last_updated': fields.DateTime(description='Timestamp when this Session was last updated (or created).'),
+    'license_plate': fields.String(description='The optional license plate for recognition at a car park'),
 })
 
 

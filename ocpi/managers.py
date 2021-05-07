@@ -5,11 +5,7 @@ Created on Thu Apr  1 12:47:48 2021
 
 @author: maurer
 """
-
-
 import ocpi.models.credentials as mc
-from flask import request
-from werkzeug.exceptions import Forbidden, NotFound
 import logging
 import secrets
 
@@ -109,44 +105,65 @@ class CredentialsManagerStub():
         return True
 
 
+class CredentialPersistor():
+    def __init__(self):
+        self.tokens = {}
+
+    def addToken(self, token, data):
+        self.tokens[token] = data
+
+    def updateToken(self, token, client_url, client_token):
+        data = {
+            'client_url': client_url, 'client_token': client_token}
+        self.addToken(token, data)
+
+    def deleteToken(self, token):
+        return self.tokens.pop(token, None)
+
+    def tokenExists(self, token):
+        return token in self.tokens
+
+
 class CredentialsManager():
 
-    def __init__(self, credentials_role: mc.CredentialsRole, url):
+    def __init__(self, credentials_role: mc.CredentialsRole, url, persistor):
         self.credentials_role = credentials_role
         self.url = url
-        self.tokens={}
+        self.persistor = persistor
 
-    def createCredentials(self) -> mc.Credentials:
+    def createCredentials(self, token: str) -> mc.Credentials:
+        # TODO token a must have been used to get here
+        # self.persistor.deleteToken(token)
         token = secrets.token_urlsafe(32)  # tokenB
         c = {
-            "token": token,
+            "token": 'Token '+token,  # this is plain text and not base64
             "url": self.url,
             "roles": [self.credentials_role]
         }
-        self.tokens[token]=c
+        self.persistor.addToken(token, c)
         # Valid comm token, no token to access client
         return c
 
-    def makeRegistration(self, payload: mc.Credentials):
+    def makeRegistration(self, payload: mc.Credentials, token: str):
         # for initial handshake
-        key = request.headers['Authorization']
-        self.unregister(key)
+        self.unregister(token)
         newCredentials = self.createCredentials()  # tokenC
-
-        self.tokens[newCredentials['token']]={'client_url':payload['url'],'client_token':payload['token']}
+        newToken = newCredentials['token'].replace('Token ','') # this is always plain
+        self.persistor.updateToken(newToken, payload['url'],payload['token'])
         return newCredentials
 
-    def versionUpdate(self, payload: mc.Credentials):
-        return self.makeRegistration(payload)
+    def versionUpdate(self, payload: mc.Credentials, token: str):
+        return self.makeRegistration(payload, token)
 
     def unregister(self, token):
-        res = self.tokens.pop(token, None)
+        res = self.persistor.deleteToken(token)
         if res is None:
             return 'method not allowed', 405
         return '', 200
 
     def isAuthenticated(self, token):
-        return token in self.tokens.keys()
+        return self.persistor.tokenExists(token)
+
 
 class LocationManager(object):
     def __init__(self):

@@ -11,7 +11,7 @@ from flask_restx import Resource, Namespace
 from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser
+from ocpi.decorators import get_header_parser, token_required
 from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
 from datetime import datetime
 
@@ -221,9 +221,10 @@ def sender():
 
         })
         @locations_ns.marshal_with(respList(locations_ns, Location))
+        @token_required
         def get(self):
             '''
-            Get Location, allows pagination
+            Get Locations, allows pagination
             '''
             parser = reqparse.RequestParser()
             parser.add_argument('from', type=datetime_from_iso8601)
