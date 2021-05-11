@@ -11,12 +11,12 @@ from flask_restx import fields, Model
 
 
 CancelReservation = Model('CancelReservation', {
-    'response_url': fields.String(required=True, readonly=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StopSession requests.'),
+    'response_url': fields.String(required=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StopSession requests.'),
     'reservation_id': fields.String(required=True, description='Reservation id, unique for this reservation. If the Receiver (typically CPO) Point already has a reservation that matches this reservationId for that Location it will replace the reservation.'),
 })
 
 ReserveNow = Model('ReserveNow', {
-    'response_url': fields.String(required=True, readonly=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StartSession requests.'),
+    'response_url': fields.String(required=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StartSession requests.'),
     'token': fields.String(required=True, description='Token object the Charge Point has to use to start a new session. The Token provided in this request is authorized by the eMSP.'),
     'expiry_date': fields.DateTime(description='Timestamp when this Session was last updated (or created).'),
     'reservation_id': fields.String(required=True, description='Reservation id, unique for this reservation. If the Receiver (typically CPO) Point already has a reservation that matches this reservationId for that Location it will replace the reservation.'),
@@ -26,7 +26,7 @@ ReserveNow = Model('ReserveNow', {
 })
 
 StartSession = Model('StartSession', {
-    'response_url': fields.String(required=True, readonly=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StartSession requests.'),
+    'response_url': fields.String(required=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StartSession requests.'),
     'token': fields.String(required=True, description='Token object the Charge Point has to use to start a new session. The Token provided in this request is authorized by the eMSP.'),
     'location_id': fields.String(required=True, description='Location.id of the Location (belonging to the CPO this request is send to) on which a session is to be started.'),
     'evse_uid': fields.String(description='Optional EVSE.uid of the EVSE of this Location on which a session is to be started.'),
@@ -34,12 +34,12 @@ StartSession = Model('StartSession', {
 })
 
 StopSession = Model('StopSession', {
-    'response_url': fields.String(required=True, readonly=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StopSession requests.'),
+    'response_url': fields.String(required=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between StopSession requests.'),
     'session_id': fields.String(required=True, description='Session.id of the Session that is requested to be stopped.'),
 })
 
 UnlockConnector = Model('UnlockConnector', {
-    'response_url': fields.String(required=True, readonly=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between UnlockConnector requests.'),
+    'response_url': fields.String(required=True, description='URL that the CommandResult POST should be sent to. This URL might contain an unique ID to be able to distinguish between UnlockConnector requests.'),
     'location_id': fields.String(required=True, description='Location.id of the Location (belonging to the CPO this request is send to) of which it is requested to unlock the connector.'),
     'evse_uid': fields.String(description='EVSE.uid of the EVSE of this Location of which it is requested to unlock the connector.'),
     'connector_id': fields.String(default=True, description='Connector.id of the Connector of this Location of which it is requested to unlock.')
