@@ -83,53 +83,11 @@ class ParkingSessionManager():
         pass
 
 
-class CredentialsManagerStub():
+class CredentialsManager():
 
     def __init__(self, credentials_role: mc.CredentialsRole, url):
         self.credentials_role = credentials_role
         self.url = url
-
-    def createCredentials(self) -> mc.Credentials:
-        pass
-
-    def makeRegistration(self, payload: mc.Credentials):
-        pass
-
-    def versionUpdate(self, payload: mc.Credentials):
-        return self.makeRegistration(payload)
-
-    def unregister(self, token):
-        pass
-
-    def isAuthenticated(self, token):
-        return True
-
-
-class CredentialPersistor():
-    def __init__(self):
-        self.tokens = {}
-
-    def addToken(self, token, data):
-        self.tokens[token] = data
-
-    def updateToken(self, token, client_url, client_token):
-        data = {
-            'client_url': client_url, 'client_token': client_token}
-        self.addToken(token, data)
-
-    def deleteToken(self, token):
-        return self.tokens.pop(token, None)
-
-    def tokenExists(self, token):
-        return token in self.tokens
-
-
-class CredentialsManager():
-
-    def __init__(self, credentials_role: mc.CredentialsRole, url, persistor):
-        self.credentials_role = credentials_role
-        self.url = url
-        self.persistor = persistor
 
     def createCredentials(self, token: str) -> mc.Credentials:
         # TODO token a must have been used to get here
@@ -140,7 +98,7 @@ class CredentialsManager():
             "url": self.url,
             "roles": [self.credentials_role]
         }
-        self.persistor.addToken(token, c)
+        self._addToken(token, c)
         # Valid comm token, no token to access client
         return c
 
@@ -149,20 +107,49 @@ class CredentialsManager():
         self.unregister(token)
         newCredentials = self.createCredentials()  # tokenC
         newToken = newCredentials['token'].replace('Token ','') # this is always plain
-        self.persistor.updateToken(newToken, payload['url'],payload['token'])
+        self._updateToken(newToken, payload['url'],payload['token'])
         return newCredentials
 
     def versionUpdate(self, payload: mc.Credentials, token: str):
         return self.makeRegistration(payload, token)
 
     def unregister(self, token):
-        res = self.persistor.deleteToken(token)
+        res = self._deleteToken(token)
         if res is None:
             return 'method not allowed', 405
         return '', 200
 
     def isAuthenticated(self, token):
-        return self.persistor.tokenExists(token)
+        raise NotImplementedError()
+
+    def _addToken(self, token, data):
+        raise NotImplementedError()
+
+    def _updateToken(self, token, client_url, client_token):
+        raise NotImplementedError()
+
+    def _deleteToken(self, token):
+        raise NotImplementedError()
+
+
+class CredentialsDictMan(CredentialsManager):
+    def __init__(self, credentials_role: mc.CredentialsRole, url):
+        self.tokens = {}
+        super().__init__(credentials_role, url)
+
+    def isAuthenticated(self, token):
+        return token in self.tokens
+
+    def _addToken(self, token, data):
+        self.tokens[token] = data
+
+    def _updateToken(self, token, client_url, client_token):
+        data = {
+            'client_url': client_url, 'client_token': client_token}
+        self._addToken(token, data)
+
+    def _deleteToken(self, token):
+        return self.tokens.pop(token, None)
 
 
 class LocationManager(object):
