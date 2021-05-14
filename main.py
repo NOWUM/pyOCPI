@@ -19,17 +19,22 @@ app.config['RESTX_MASK_SWAGGER'] = False
 
 @app.route('/', methods=['POST', 'GET'])
 def home():
-    return redirect('/ocpi/v2/ui')
+    return redirect('/ocpi/ui')
 
 
-cred_role = {'role': 'HUB',
-             'business_details': {
-                 'name': 'SmartChargingHub',
-                 'website': 'https://fh-aachen.de',
-                 # 'logo': ,
-             },
-             'party_id': 'SCH',
-             'country_code': 'DE'}
+cred_roles = [{
+    'role': 'HUB',
+    'business_details': {
+        'name': 'SmartChargingHub',
+        'website': 'https://fh-aachen.de',
+        'logo': {
+            'url': 'https://urll',
+            'category': 'OPERATOR',
+            'type': 'jpeg'
+        },
+    },
+    'party_id': 'FHAC',
+    'country_code': 'DE'}]
 
 # inject dependencies here
 # must be as expected
@@ -39,11 +44,10 @@ commands = om.CommandsManager()
 reservations = om.ReservationManager()
 HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/v2"
 # TODO maybe provide interface and inject with decorator..?
-cm = om.CredentialsDictMan(cred_role, HOST_URL)
+cm = om.CredentialsDictMan(cred_roles, HOST_URL)
 injected_objects = {
     'credentials': cm,
     # 'locations': loc,
-    'versions': ses,
     # 'commands': commands,
     'sessions': ses,
     # 'reservations': reservations,

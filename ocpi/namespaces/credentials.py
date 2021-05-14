@@ -13,6 +13,7 @@ from ocpi.models.credentials import Credentials, add_models_to_credentials_names
 from ocpi.models import resp
 from flask import request
 from datetime import datetime
+from ocpi.managers import CredentialsManager
 credentials_ns = Namespace(name="credentials", validate=True)
 add_models_to_credentials_namespace(credentials_ns)
 
@@ -25,26 +26,25 @@ parser = get_header_parser(credentials_ns)
 class credentials(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        self.credentials_manager = kwargs['credentials']
+        self.credentials_manager = kwargs['credentials'] # type: CredentialsManager
         super().__init__(api, *args, **kwargs)
 
-    # TODO in production
-    #@token_required
+    @token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
     def get(self):
         '''
-        request new credentials if authenticated
+        request the credentials object if authenticated
         '''
-
-        #decodedToken = base64.b64decode(request.headers['Authorization'])
-        data = self.credentials_manager.createCredentials('')
+        decodedToken = base64.b64decode(request.headers['Authorization'])
+        data = self.credentials_manager.getCredentials(decodedToken)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
                 'timestamp': datetime.now()
                 }
 
-    @token_required
+    # TODO in production
+    #@token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
     @credentials_ns.expect(parser, Credentials)
     def post(self):

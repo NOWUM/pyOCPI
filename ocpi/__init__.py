@@ -34,7 +34,7 @@ injected = {
 }
 
 
-def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'RECEIVER']):
+def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'RECEIVER'], ocpi_version='2.2'):
     '''
     Creates API blueprint with injected Objects.
     Must contain a sessionmanager and others.
@@ -51,13 +51,13 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
 
     '''
     roles = [r.upper() for r in roles]
-    blueprint = Blueprint("ocpi_api", __name__, url_prefix="/ocpi/v2")
+    blueprint = Blueprint("ocpi_api", __name__, url_prefix="/ocpi")
     authorizations = {"Bearer": {"type": "apiKey",
                                  "in": "header", "name": "Authorization"}}
 
     api = Api(
         blueprint,
-        version="2.0",
+        version=ocpi_version,
         title="OCPI OpenAPI Documentation",
         description="Welcome to the OpenAPI documentation site!",
         doc="/ui",
@@ -79,9 +79,11 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
         'reservations': reservation_ns,
         'parking': makeParkingNamespace(roles)
     }
+
     endpoint_list = injected_objects.keys()
-    injected_objects['versions'] = VersionManager(base_url, endpoint_list)
     used_namespaces = list(map(ns_dict.get, endpoint_list))
+    injected_objects['versions'] = VersionManager(base_url, endpoint_list)
+
 
     # setting custom Namespaces should work too
     #import numpy as np
@@ -93,5 +95,10 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
         if namesp is not None:
             for res in namesp.resources:
                 res.kwargs['resource_class_kwargs'] = injected_objects
-            api.add_namespace(namesp, path="/"+namesp.name)
+            api.add_namespace(namesp, path=f"/{ocpi_version}/"+namesp.name)
+
+    # versions endpoint doe not include version
+    for res in versions_ns.resources:
+            res.kwargs['resource_class_kwargs'] = injected_objects
+    api.add_namespace(versions_ns, path="/"+versions_ns.name)
     return blueprint

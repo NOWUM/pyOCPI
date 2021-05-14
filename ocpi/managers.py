@@ -85,29 +85,23 @@ class ParkingSessionManager():
 
 class CredentialsManager():
 
-    def __init__(self, credentials_role: mc.CredentialsRole, url):
-        self.credentials_role = credentials_role
+    def __init__(self, credentials_roles: mc.CredentialsRole, url):
+        self.credentials_roles = credentials_roles
         self.url = url
 
-    def createCredentials(self, token: str) -> mc.Credentials:
-        # TODO token a must have been used to get here
-        # self.persistor.deleteToken(token)
-        token = secrets.token_urlsafe(32)  # tokenB
-        c = {
-            "token": 'Token '+token,  # this is plain text and not base64
-            "url": self.url,
-            "roles": [self.credentials_role]
-        }
-        self._addToken(token, c)
-        # Valid comm token, no token to access client
-        return c
+    def makeRegistration(self, payload: mc.Credentials, tokenA: str):
+        # tokenA used to get here for initial handshake
+        self.unregister(tokenA)
+        tokenB = payload['token']
+        client_url = payload['url']
 
-    def makeRegistration(self, payload: mc.Credentials, token: str):
-        # for initial handshake
-        self.unregister(token)
-        newCredentials = self.createCredentials()  # tokenC
-        newToken = newCredentials['token'].replace('Token ','') # this is always plain
-        self._updateToken(newToken, payload['url'],payload['token'])
+        tokenC = secrets.token_urlsafe(32)  # plain
+        newCredentials = {
+            "token": 'Token '+tokenC,  # this is plain text and not base64
+            "url": self.url,
+            "roles": self.credentials_roles
+        }
+        self._updateToken(tokenC, client_url, tokenB)
         return newCredentials
 
     def versionUpdate(self, payload: mc.Credentials, token: str):
@@ -122,31 +116,32 @@ class CredentialsManager():
     def isAuthenticated(self, token):
         raise NotImplementedError()
 
-    def _addToken(self, token, data):
-        raise NotImplementedError()
-
     def _updateToken(self, token, client_url, client_token):
         raise NotImplementedError()
 
     def _deleteToken(self, token):
         raise NotImplementedError()
 
+    def getCredentials(self, token: str) -> mc.Credentials:
+        return {
+            "token": 'Token '+token,  # this is plain text and not base64
+            "url": self.url,
+            "roles": [self.credentials_roles]
+        }
+
 
 class CredentialsDictMan(CredentialsManager):
-    def __init__(self, credentials_role: mc.CredentialsRole, url):
+    def __init__(self, credentials_roles: mc.CredentialsRole, url):
         self.tokens = {}
-        super().__init__(credentials_role, url)
+        super().__init__(credentials_roles, url)
 
     def isAuthenticated(self, token):
         return token in self.tokens
 
-    def _addToken(self, token, data):
-        self.tokens[token] = data
-
     def _updateToken(self, token, client_url, client_token):
         data = {
             'client_url': client_url, 'client_token': client_token}
-        self._addToken(token, data)
+        self.tokens[token] = data
 
     def _deleteToken(self, token):
         return self.tokens.pop(token, None)
