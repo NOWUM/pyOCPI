@@ -9,15 +9,17 @@ Created on Thu Mar 18 12:32:01 2021
 from flask_restx import Resource, Namespace, fields
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
-from flask_restx import reqparse
+from flask_restx import reqparse, Model
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser, token_required
+from datetime import datetime
 
 sessions_ns = Namespace(name="sessions", validate=True)
 add_models_to_session_namespace(sessions_ns)
 header_parser = get_header_parser(sessions_ns)
 
-
+cp_result = fields.String(enum=charging_pref_results)
+cp_result.name='charg_pref_result'
 def senderNamespace():
     @sessions_ns.route('/', doc={"description": "API Endpoint for Session management"})
     @sessions_ns.expect(header_parser)
@@ -46,7 +48,13 @@ def senderNamespace():
             parser.add_argument('offset', type=int)
             parser.add_argument('limit', type=int)
             args = parser.parse_args()
-            return self.sessionmanager.getSessions(args['from'], args['to'], args['offset'], args['limit'])
+            data = self.sessionmanager.getSessions(
+                args['from'], args['to'], args['offset'], args['limit'])
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
     @sessions_ns.route('/<string:session_id>/charging_preferences', doc={"description": "OCPI ChargingPreferences"})
     @sessions_ns.response(404, 'SessionID not found')
@@ -59,14 +67,20 @@ def senderNamespace():
 
         @sessions_ns.doc('PutCommand')
         @sessions_ns.expect(ChargingPreferences)
-        @sessions_ns.marshal_with(fields.String(enum=charging_pref_results), code=201)
+        @sessions_ns.marshal_with(resp(sessions_ns, cp_result), code=201)
         @sessions_ns.response(404, 'EVSE not capable of smartcharging')
         @token_required
         def put(self, session_id):
             '''Update ChargingPreferences'''
             session_id = session_id.lower()  # caseinsensitive
 
-            return self.sessionmanager.updateChargingPrefs(session_id, sessions_ns.payload)
+            data = self.sessionmanager.updateChargingPrefs(
+                session_id, sessions_ns.payload)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
             # TODO save and process preferences somewhere
     return sessions_ns
 
@@ -86,7 +100,13 @@ def receiverNamespace():
         def get(self, country_id, party_id, session_id):
 
             # TODO validate country and party
-            return self.session_manager.getSession(country_id, party_id, session_id)
+            data = self.session_manager.getSession(
+                country_id, party_id, session_id)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @sessions_ns.expect(Session)
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=201)
@@ -97,7 +117,13 @@ def receiverNamespace():
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            return self.session_manager.createSession(country_id, party_id, sessions_ns.payload)
+            data = self.session_manager.createSession(
+                country_id, party_id, sessions_ns.payload)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
         @sessions_ns.expect(Session, validate=False)
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=201)
@@ -107,7 +133,13 @@ def receiverNamespace():
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            return self.session_manager.patchSession(country_id, party_id, session_id, sessions_ns.payload)
+            data = self.session_manager.patchSession(
+                country_id, party_id, session_id, sessions_ns.payload)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
             # TODO save and process preferences somewhere
     return sessions_ns
 

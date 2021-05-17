@@ -209,10 +209,13 @@ class CommandsManager(object):
 
 
 class VersionManager():
-    def __init__(self, base_url, endpoints: list, roles=['SENDER']):
+    def __init__(self, base_url, endpoints: list, roles=['SENDER'], ocpi_version='2.2'):
         self._base_url = base_url
         self._roles = roles
+        self._ocpi_version = ocpi_version
         self._details = self._makeDetails(endpoints)
+
+        # TODO support multiple Versions
 
     def _makeDetails(self, endpoints):
         res = []
@@ -221,7 +224,7 @@ class VersionManager():
                 e = {}
                 e['identifier'] = key
                 e['role'] = role
-                e['url'] = self._base_url+'/2.2/'+key
+                e['url'] = f'{self._base_url}/{self._ocpi_version}/{key}'
                 res.append(e)
             return res
 
@@ -229,12 +232,13 @@ class VersionManager():
         return{
             'versions':
                 [
-                    {'version': '2.2', 'url': self._base_url+'/2.2'}
+                    {'version': self._ocpi_version,
+                        'url': self._base_url+'/'+self._ocpi_version}
                 ]
         }
 
     def details(self):
         return {
-            'version': '2.2',
+            'version': self._ocpi_version,
             'endpoints': self._details
         }

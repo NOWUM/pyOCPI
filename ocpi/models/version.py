@@ -8,7 +8,7 @@ Created on Wed Mar 31 22:31:18 2021
 
 from flask_restx import fields, Model
 
-version_number = ['2.0', '2.1', '2.1.1', '2.2']
+version_number = ['2.0', '2.1', '2.1.1', '2.2', '3.0']
 
 interface_role = ['SENDER', 'RECEIVER']
 

@@ -82,7 +82,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
 
     endpoint_list = injected_objects.keys()
     used_namespaces = list(map(ns_dict.get, endpoint_list))
-    injected_objects['versions'] = VersionManager(base_url, endpoint_list)
+    injected_objects['versions'] = VersionManager(base_url, endpoint_list, ocpi_version)
 
 
     # setting custom Namespaces should work too
