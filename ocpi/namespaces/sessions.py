@@ -31,7 +31,7 @@ def senderNamespace():
 
         @sessions_ns.doc(params={
             'from': {'in': 'query', 'description': 'declare session start point', 'default': '2021-01-01T13:30:00+02:00', 'required': True},
-            'to': {'in': 'query', 'description': 'declare session end point', 'default': '2021-01-01T15:30:00+02:00', 'required': True},
+            'to': {'in': 'query', 'description': 'declare session end point', 'default': '2038-01-01T15:30:00+02:00', 'required': True},
             'offset': {'in': 'query', 'description': 'id offset for pagination', 'default': '0'},
             'limit': {'in': 'query', 'description': 'number of entries to get', 'default': '50'},
 
