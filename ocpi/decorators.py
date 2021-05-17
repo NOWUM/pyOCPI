@@ -42,9 +42,11 @@ def token_required(f):
 
 
 def _check_access_token():
-    token = request.headers.get("Authorization").replace('Token ', '')
-    if not token:
+    authToken = request.headers.get("Authorization")
+    if not authToken:
         raise Unauthorized(description="Unauthorized")
+
+    token = authToken.replace('Token ', '')
     man = SingleCredMan.getInstance()
     if man == None:
         raise Forbidden(description="not initialized")

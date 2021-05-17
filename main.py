@@ -33,7 +33,7 @@ cred_roles = [{
             'type': 'jpeg'
         },
     },
-    'party_id': 'FHAC',
+    'party_id': 'FHA',
     'country_code': 'DE'}]
 
 # inject dependencies here
@@ -42,7 +42,7 @@ ses = om.SessionManager()
 loc = om.LocationManager()
 commands = om.CommandsManager()
 reservations = om.ReservationManager()
-HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/v2"
+HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/"
 # TODO maybe provide interface and inject with decorator..?
 cm = om.CredentialsDictMan(cred_roles, HOST_URL)
 injected_objects = {
@@ -53,10 +53,12 @@ injected_objects = {
     # 'reservations': reservations,
     'parking': reservations,
 }
+cm._updateToken('TESTTOKEN','','')
 
 blueprint = createOcpiBlueprint(
     HOST_URL, injected_objects, roles=['RECEIVER'])
 app.register_blueprint(blueprint)
 
 if __name__ == '__main__':
+
     app.run()

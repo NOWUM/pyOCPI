@@ -90,15 +90,16 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
     #used_namespaces = np.logical_or(used_namespaces,injected_objects.values())
 
     log.debug(list(map(lambda x: x.name if x else '', used_namespaces)))
+
+    # versions endpoint doe not include version
+    for res in versions_ns.resources:
+            res.kwargs['resource_class_kwargs'] = injected_objects
+    api.add_namespace(versions_ns, path="/"+versions_ns.name)
+
     for namesp in used_namespaces:
 
         if namesp is not None:
             for res in namesp.resources:
                 res.kwargs['resource_class_kwargs'] = injected_objects
             api.add_namespace(namesp, path=f"/{ocpi_version}/"+namesp.name)
-
-    # versions endpoint doe not include version
-    for res in versions_ns.resources:
-            res.kwargs['resource_class_kwargs'] = injected_objects
-    api.add_namespace(versions_ns, path="/"+versions_ns.name)
     return blueprint

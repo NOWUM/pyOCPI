@@ -139,6 +139,7 @@ class CredentialsDictMan(CredentialsManager):
         return token in self.tokens
 
     def _updateToken(self, token, client_url, client_token):
+        log.info(f'current tokens: {self.tokens}')
         data = {
             'client_url': client_url, 'client_token': client_token}
         self.tokens[token] = data
@@ -209,18 +210,18 @@ class CommandsManager(object):
 
 class VersionManager():
     def __init__(self, base_url, endpoints: list, roles=['SENDER']):
-        self.__base_url = base_url
-        self.__roles = roles
-        self.__details = self.__makeDetails(endpoints)
+        self._base_url = base_url
+        self._roles = roles
+        self._details = self._makeDetails(endpoints)
 
-    def __makeDetails(self, endpoints):
+    def _makeDetails(self, endpoints):
         res = []
-        for role in self.__roles:
+        for role in self._roles:
             for key in endpoints:
                 e = {}
                 e['identifier'] = key
                 e['role'] = role
-                e['url'] = self.__base_url+'/'+key
+                e['url'] = self._base_url+'/2.2/'+key
                 res.append(e)
             return res
 
@@ -228,12 +229,12 @@ class VersionManager():
         return{
             'versions':
                 [
-                    {'version': '2.2', 'url': self.__base_url}
+                    {'version': '2.2', 'url': self._base_url+'/2.2'}
                 ]
         }
 
     def details(self):
         return {
             'version': '2.2',
-            'endpoints': self.__details
+            'endpoints': self._details
         }
