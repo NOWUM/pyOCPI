@@ -97,7 +97,7 @@ class CredentialsManager():
 
         tokenC = secrets.token_urlsafe(32)  # plain
         newCredentials = {
-            "token": 'Token '+tokenC,  # this is plain text and not base64
+            "token": tokenC,  # this is plain text and not base64
             "url": self.url,
             "roles": self.credentials_roles
         }
@@ -124,7 +124,7 @@ class CredentialsManager():
 
     def getCredentials(self, token: str) -> mc.Credentials:
         return {
-            "token": 'Token '+token,  # this is plain text and not base64
+            "token": token,  # this is plain text and not base64
             "url": self.url,
             "roles": [self.credentials_roles]
         }
@@ -139,10 +139,10 @@ class CredentialsDictMan(CredentialsManager):
         return token in self.tokens
 
     def _updateToken(self, token, client_url, client_token):
-        log.info(f'current tokens: {self.tokens}')
         data = {
             'client_url': client_url, 'client_token': client_token}
         self.tokens[token] = data
+        log.info(f'current tokens: {self.tokens}')
 
     def _deleteToken(self, token):
         return self.tokens.pop(token, None)
