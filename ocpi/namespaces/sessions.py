@@ -9,8 +9,8 @@ Created on Thu Mar 18 12:32:01 2021
 from flask_restx import Resource, Namespace, fields
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
-from flask_restx import reqparse, Model
-from ocpi.models import resp, respList
+from flask_restx import reqparse
+from ocpi.models import resp, respList, respRaw
 from ocpi.decorators import get_header_parser, token_required
 from datetime import datetime
 
@@ -67,7 +67,7 @@ def senderNamespace():
 
         @sessions_ns.doc('PutCommand')
         @sessions_ns.expect(ChargingPreferences)
-        @sessions_ns.marshal_with(resp(sessions_ns, cp_result), code=201)
+        @sessions_ns.marshal_with(respRaw(sessions_ns, cp_result), code=201)
         @sessions_ns.response(404, 'EVSE not capable of smartcharging')
         @token_required
         def put(self, session_id):
