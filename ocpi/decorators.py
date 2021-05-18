@@ -46,7 +46,7 @@ def _check_access_token():
     if not authToken:
         raise Unauthorized(description="Unauthorized")
 
-    token = authToken.replace('Token ', '')
+    token = authToken.replace('Token ', '').strip()
     man = SingleCredMan.getInstance()
     if man == None:
         raise Forbidden(description="not initialized")
