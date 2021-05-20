@@ -25,10 +25,12 @@ log = logging.getLogger('ocpi')
 
 
 def receiver():
+    #TODO: add receiver endpoints
     return token_ns
 
 
 def sender():
+    # TODO: add sender endpoints
     return token_ns
 
 

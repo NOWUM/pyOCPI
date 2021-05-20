@@ -1,0 +1,1 @@
+#TODO: implement charging_profile models (https://github.com/ocpi/ocpi/blob/master/mod_charging_profiles.asciidoc)
