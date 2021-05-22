@@ -23,6 +23,7 @@ parking_ns = Namespace(name="parking", validate=True)
 add_models_to_parking_namespace(parking_ns)
 header_parser = get_header_parser(parking_ns)
 
+
 def senderNamespace():
     @parking_ns.route('/', doc={"description": "API Endpoint for ParkingSession management"})
     @parking_ns.expect(header_parser)
