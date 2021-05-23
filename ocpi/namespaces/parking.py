@@ -25,12 +25,13 @@ header_parser = get_header_parser(parking_ns)
 
 
 def senderNamespace():
-    @parking_ns.route('/', doc={"description": "API Endpoint for ParkingSession management"})
+    @parking_ns.route(
+        "/", doc={"description": "API Endpoint for ParkingSession management"}
+    )
     @parking_ns.expect(header_parser)
     class get_parking_sessions(Resource):
-
         def __init__(self, api=None, *args, **kwargs):
-            self.parking_manager = kwargs['parking']
+            self.parking_manager = kwargs["parking"]
             super().__init__(api, *args, **kwargs)
 
         @parking_ns.doc(params={
@@ -42,9 +43,9 @@ def senderNamespace():
         })
         @parking_ns.marshal_with(respList(parking_ns, ParkingSession))
         def get(self):
-            '''
-            Only ParkingSessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
-            '''
+            """
+            Only non-complete ParkingSessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
+            """
             parser = reqparse.RequestParser()
             parser.add_argument('from', type=datetime_from_iso8601)
             parser.add_argument('to', type=datetime_from_iso8601)
@@ -52,57 +53,43 @@ def senderNamespace():
             parser.add_argument('limit', type=int)
             args = parser.parse_args()
             data = self.parking_manager.getParkingSessions(
-                args['from'], args['to'], args['offset'], args['limit'])
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+                args["from"], args["to"], args["offset"], args["limit"]
+            )
+            return {
+                "data": data,
+                "status_code": 1000,
+                "status_message": "nothing",
+                "timestamp": datetime.now(),
+            }
 
-
-    @parking_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for ParkingSession management"})
-    @parking_ns.response(404, 'Command not found')
+    @parking_ns.route(
+        "/<string:country_id>/<string:party_id>/<string:reservation_id>",
+        doc={"description": "API Endpoint for ParkingSession management"},
+    )
+    @parking_ns.response(404, "Command not found")
     @parking_ns.expect(header_parser)
-    class start_reservation(Resource):
-
+    class start_parking(Resource):
         def __init__(self, api=None, *args, **kwargs):
-            self.reservation_manager = kwargs['reservations']
+            self.parking_manager = kwargs["parking"]
             super().__init__(api, *args, **kwargs)
 
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=404)
-        def get(self, country_id, party_id, reservation_id):
+        def get(self, country_id, party_id, session_id):
 
             try:
                 ses = self.parking_manager.getParkingSession(
-                    country_id, party_id, reservation_id)
+                    country_id, party_id, session_id
+                )
                 # TODO validate country and party
             except:
-                return '', 404
+                return "", 404
 
-            return {'data': ses,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
-
-        @parking_ns.expect(ParkingSession)
-        @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
-        def put(self, country_id, party_id, reservation_id):
-            '''
-            Add new ParkingSession.
-            ParkingSession can have status REQUEST for price requests.
-            '''
-            reservation_id = reservation_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
-
-            data = self.parking_manager.createParkingSession(
-                country_id, party_id, parking_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return {
+                "data": ses,
+                "status_code": 1000,
+                "status_message": "nothing",
+                "timestamp": datetime.now(),
+            }
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
@@ -127,40 +114,48 @@ def senderNamespace():
 
 
 def receiverNamespace():
-    @parking_ns.route('/<string:country_id>/<string:party_id>/<string:session_id>', doc={"description": "API Endpoint for Session management"})
-    @parking_ns.response(404, 'Command not found')
+    @parking_ns.route(
+        "/<string:country_id>/<string:party_id>/<string:session_id>",
+        doc={"description": "API Endpoint for Session management"},
+    )
+    @parking_ns.response(404, "Command not found")
     @parking_ns.expect(header_parser)
     class receiver_session(Resource):
-
         def __init__(self, api=None, *args, **kwargs):
-            self.session_manager = kwargs['sessions']
+            self.parking_manager = kwargs["parking"]
             super().__init__(api, *args, **kwargs)
 
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=200)
         def get(self, country_id, party_id, session_id):
-
+            """Get current information for Parkingsession"""
             # TODO validate country and party
-            return self.parking_manager.getParkingSession(session_id)
+            return self.parking_manager.getParkingSession(
+                country_id, party_id, session_id
+            )
 
         @parking_ns.expect(ParkingSession)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
         def put(self, country_id, party_id, session_id):
-            '''Add new Session'''
+            """Add new Parkingsession"""
             session_id = session_id.lower()  # caseinsensitive
             country_id = country_id.lower()
             party_id = party_id.lower()
 
-            return self.parking_manager.createParkingSession(parking_ns.payload)
+            return self.parking_manager.createParkingSession(
+                country_id, party_id, session_id, parking_ns.payload
+            )
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
         def patch(self, country_id, party_id, session_id):
+            """Update existing Parkingsession"""
             session_id = session_id.lower()  # caseinsensitive
             country_id = country_id.lower()
             party_id = party_id.lower()
 
             return self.parking_manager.patchParkingSession(session_id, parking_ns.payload)
             # TODO save and process preferences somewhere
+
     return parking_ns
 
 
