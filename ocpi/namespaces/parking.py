@@ -12,11 +12,9 @@ reservations can be
 """
 
 from flask_restx import Resource, Namespace
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.parking import add_models_to_parking_namespace, ParkingSession
-from flask_restx import reqparse
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser
+from ocpi.decorators import get_header_parser, pagination_parser
 from datetime import datetime
 
 parking_ns = Namespace(name="parking", validate=True)
@@ -46,11 +44,7 @@ def senderNamespace():
             """
             Only non-complete ParkingSessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
             """
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
             data = self.parking_manager.getParkingSessions(
                 args["from"], args["to"], args["offset"], args["limit"]
@@ -99,9 +93,9 @@ def senderNamespace():
             ParkingSession can have status REQUEST for price requests.
             Pending Reservations will be turned to Sessions when scheduled
             '''
-            reservation_id = reservation_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            reservation_id = reservation_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             data = self.parking_manager.updateParkingSession(
                 country_id, party_id, parking_ns.payload)
@@ -110,7 +104,6 @@ def senderNamespace():
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
-
 
 
 def receiverNamespace():
@@ -137,9 +130,9 @@ def receiverNamespace():
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
         def put(self, country_id, party_id, session_id):
             """Add new Parkingsession"""
-            session_id = session_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            session_id = session_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             return self.parking_manager.createParkingSession(
                 country_id, party_id, session_id, parking_ns.payload
@@ -149,9 +142,9 @@ def receiverNamespace():
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
         def patch(self, country_id, party_id, session_id):
             """Update existing Parkingsession"""
-            session_id = session_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            session_id = session_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             return self.parking_manager.patchParkingSession(session_id, parking_ns.payload)
             # TODO save and process preferences somewhere

@@ -12,11 +12,9 @@ reservation can be a request query or a reservation, which gets transferred to a
 
 
 from flask_restx import Resource, Namespace
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.reservation import add_models_to_reservation_namespace, Reservation
-from flask_restx import reqparse
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser
+from ocpi.decorators import get_header_parser, pagination_parser
 from datetime import datetime
 
 reservation_ns = Namespace(name="reservations", validate=True)
@@ -58,9 +56,9 @@ def receiverNamespace():
             Reservation can have status REQUEST for price requests.
             Pending Reservations will be turned to Sessions when scheduled
             '''
-            reservation_id = reservation_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            reservation_id = reservation_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             data = self.reservation_manager.updateReservation(
                 country_id, party_id, reservation_ns.payload)
@@ -92,11 +90,7 @@ def senderNamespace():
             '''
             Only Reservations with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
             '''
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
             data = self.reservation_manager.getReservations(
                 args['from'], args['to'], args['offset'], args['limit'])
@@ -139,9 +133,9 @@ def senderNamespace():
             Reservation can have status REQUEST for price requests.
             Pending Reservations will be turned to Sessions when scheduled
             '''
-            reservation_id = reservation_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            reservation_id = reservation_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             data = self.reservation_manager.addReservation(
                 country_id, party_id, reservation_ns.payload)
@@ -159,9 +153,9 @@ def senderNamespace():
             Reservation can have status REQUEST for price requests.
             Pending Reservations will be turned to Sessions when scheduled
             '''
-            reservation_id = reservation_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            reservation_id = reservation_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             data = self.reservation_manager.updateReservation(
                 country_id, party_id, reservation_ns.payload)
