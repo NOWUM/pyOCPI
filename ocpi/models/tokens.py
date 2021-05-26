@@ -22,7 +22,7 @@ EnergyContract = Model('EnergyContract', {
 
 LocationReferences = Model('LocationReferences', {
     'location_id': fields.String(max_length=36, required=True, description='Unique identifier for the location.'),
-    'evse_uids': fields.String(max_length=36, required=False, description='Unique identifiers for EVSEs within the CPO’s platform for the EVSE within the given location.')
+    'evse_uids': fields.List(fields.String(max_length=36), required=False, description='Unique identifiers for EVSEs within the CPO’s platform for the EVSE within the given location.')
 })
 
 DisplayText = Model('DisplayText', {

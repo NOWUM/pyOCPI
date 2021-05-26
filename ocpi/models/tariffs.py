@@ -6,13 +6,13 @@ https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc
 
 from flask_restx import Model, fields
 
-
-tariff_dimension_type = ['ENERGY', 'FLAT', 'PARKING_TIME', 'TIME']
+# Enums:
+tariff_dimension_type = ['ENERGY', 'FLAT', 'PARKING_TIME', 'TIME'] #TariffDimensionType
 tariff_type = ['AD_HOC_PAYMENT','PROFILE_CHEAP','PROFILE_FAST','PROFILE_GREEN','REGULAR'] #TariffType
-day_of_week = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] #DayOfWeek enum
-reservation_restriction_type = ['RESERVATION', 'RESERVATION_EXPIRES']#ReservationRestrictionType enum
+day_of_week = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] #DayOfWeek
+reservation_restriction_type = ['RESERVATION', 'RESERVATION_EXPIRES'] #ReservationRestrictionType
 
-
+# Classes:
 PriceComponent = Model('PriceComponent', {
     'type': fields.String(enum=tariff_dimension_type, reqiored=True, description='Type of tariff dimension.'),
     'price': fields.Float(required=True, description='Price per unit (excl. VAT) for this tariff dimension.'),
