@@ -54,3 +54,7 @@ SetChargingProfile = Model('SetChargingProfile', {
     'response_url': fields.String(required=True, description='URL that the ChargingProfileResult POST should be send to. This URL might contain an unique ID to be able to distinguish between GET ActiveChargingProfile requests.')
 })
 
+def add_models_to_charging_profiles_namespace(namespace):
+    for model in [SetChargingProfile, ClearProfileResult, ChargingProfileResult, ActiveChargingProfileResult, ChargingProfileResponse, ActiveChargingProfile, ChargingProfile, ChargingProfilePeriod]:
+        namespace.models[model.name] = model
+

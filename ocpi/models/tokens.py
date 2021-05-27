@@ -63,6 +63,6 @@ AuthorizationInfo = Model('AuthorizationInfo', {
 })
 
 
-def add_models_to_session_namespace(namespace):
-    for model in [Token, AuthorizationInfo]:
+def add_models_to_tokens_namespace(namespace):
+    for model in [Token, AuthorizationInfo, DisplayText, LocationReferences, EnergyContract]:
         namespace.models[model.name] = model

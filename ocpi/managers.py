@@ -242,3 +242,19 @@ class VersionManager():
             'version': self._ocpi_version,
             'endpoints': self._details
         }
+
+class TokensManager(object):
+    def __init__(self):
+        self.tokens = {}
+
+    def getTokens(self, begin, end, offset, limit):
+        return list(self.tokens.values())[offset:offset+limit]
+
+    def getToken(self, country_code, party_id, token_uid, type=None):
+        return self.tokens[token_uid]
+
+    def putToken(self, country_code, party_id, token_uid, token):
+        self.tokens[token_uid] = token
+
+    def patchToken(self, country_code, party_id, token_uid, token):
+        self.tokens[token_uid].update(token)

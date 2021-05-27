@@ -43,3 +43,7 @@ TariffElement = Model('TariffElement', {
     'price_components': fields.List(fields.Nested(PriceComponent), required=True, description='List of price components that describe the pricing of a tariff.'),
     'restrictions': fields.Nested(TariffRestrictions, description='Restrictions that describe the applicability of a tariff.')
 })
+
+def add_models_to_tariffs_namespace(namespace):
+    for model in [TariffElement, TariffRestrictions, PriceComponent]:
+        namespace.models[model.name] = model
