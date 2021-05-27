@@ -11,12 +11,12 @@ Api definition file
 from flask import Blueprint
 from flask_restx import Api
 
+from ocpi.namespaces.versions import versions_ns
+from ocpi.namespaces.credentials import credentials_ns
 from ocpi.namespaces.commands import commands_ns
 from ocpi.namespaces.sessions import makeSessionNamespace
 from ocpi.namespaces.locations import makeLocationNamespace
-from ocpi.namespaces.versions import versions_ns
-from ocpi.namespaces.reservation import reservation_ns
-from ocpi.namespaces.credentials import credentials_ns
+from ocpi.namespaces.reservation import makeReservationNamespace
 from ocpi.namespaces.parking import makeParkingNamespace
 from ocpi.decorators import SingleCredMan
 from ocpi.managers import VersionManager
@@ -76,7 +76,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
         'versions': versions_ns,
         'commands': commands_ns,
         'sessions': makeSessionNamespace(roles),
-        'reservations': reservation_ns,
+        'reservations': makeReservationNamespace(roles),
         'parking': makeParkingNamespace(roles)
     }
 

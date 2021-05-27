@@ -7,11 +7,9 @@ Created on Thu Mar 18 12:32:01 2021
 """
 
 from flask_restx import Resource, Namespace, fields
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
-from flask_restx import reqparse
 from ocpi.models import resp, respList, respRaw
-from ocpi.decorators import get_header_parser, token_required
+from ocpi.decorators import get_header_parser, token_required, pagination_parser
 from datetime import datetime
 
 sessions_ns = Namespace(name="sessions", validate=True)
@@ -19,7 +17,9 @@ add_models_to_session_namespace(sessions_ns)
 header_parser = get_header_parser(sessions_ns)
 
 cp_result = fields.String(enum=charging_pref_results)
-cp_result.name='charg_pref_result'
+cp_result.name = 'charg_pref_result'
+
+
 def senderNamespace():
     @sessions_ns.route('/', doc={"description": "API Endpoint for Session management"})
     @sessions_ns.expect(header_parser)
@@ -42,11 +42,7 @@ def senderNamespace():
             '''
             Only Sessions with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
             '''
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
             data = self.sessionmanager.getSessions(
                 args['from'], args['to'], args['offset'], args['limit'])
@@ -72,7 +68,7 @@ def senderNamespace():
         @token_required
         def put(self, session_id):
             '''Update ChargingPreferences'''
-            session_id = session_id.lower()  # caseinsensitive
+            session_id = session_id.upper()  # caseinsensitive
 
             data = self.sessionmanager.updateChargingPrefs(
                 session_id, sessions_ns.payload)
@@ -113,9 +109,9 @@ def receiverNamespace():
         @token_required
         def put(self, country_id, party_id, session_id):
             '''Add new Session'''
-            session_id = session_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            session_id = session_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             data = self.session_manager.createSession(
                 country_id, party_id, sessions_ns.payload)
@@ -129,9 +125,9 @@ def receiverNamespace():
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=201)
         @token_required
         def patch(self, country_id, party_id, session_id):
-            session_id = session_id.lower()  # caseinsensitive
-            country_id = country_id.lower()
-            party_id = party_id.lower()
+            session_id = session_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
 
             data = self.session_manager.patchSession(
                 country_id, party_id, session_id, sessions_ns.payload)

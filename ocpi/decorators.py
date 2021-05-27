@@ -11,6 +11,8 @@ import base64
 from werkzeug.exceptions import Unauthorized, Forbidden
 from functools import wraps
 from flask import request
+from flask_restx import reqparse
+from flask_restx.inputs import datetime_from_iso8601
 
 import logging
 
@@ -39,6 +41,15 @@ def token_required(f):
         return f(*args, **kwargs)
 
     return decorated
+
+
+def pagination_parser():
+    parser = reqparse.RequestParser()
+    parser.add_argument('from', type=datetime_from_iso8601, default='2021-01-01T13:30:00+02:00')
+    parser.add_argument('to', type=datetime_from_iso8601, default='2038-01-01T13:30:00+02:00')
+    parser.add_argument('offset', type=int, default=0)
+    parser.add_argument('limit', type=int, default=50)
+    return parser
 
 
 def _check_access_token():

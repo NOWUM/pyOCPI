@@ -8,10 +8,8 @@ Created on Thu Mar 18 18:26:15 2021
 
 import logging
 from flask_restx import Resource, Namespace
-from flask_restx import reqparse
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required
+from ocpi.decorators import get_header_parser, token_required, pagination_parser
 from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
 from datetime import datetime
 
@@ -225,11 +223,7 @@ def sender():
             '''
             Get Locations, allows pagination
             '''
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
 
             data = self.locationmanager.getLocations(
