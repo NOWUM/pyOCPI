@@ -192,13 +192,11 @@ BusinessDetails = Model('BusinessDetails', {
     'logo': fields.Nested(Image, description='Image link to the operator’s logo.'),
 })
 
-
 RegularHours = Model('RegularHours', {
     'weekday': fields.Integer(required=True, description='Number of day in the week, from Monday (1) till Sunday (7)'),
     'period_begin': fields.String(max_length=5, required=True, description='Time; Regex: ([0-1][0-9]|2[0-3]):[0-5][0-9]'),
     'period_end': fields.String(max_length=5, required=True, description='Time; Regex: ([0-1][0-9]|2[0-3]):[0-5][0-9]'),
 })
-
 
 ExceptionalPeriod = Model('ExceptionalPeriod', {
     'period_begin': fields.DateTime(required=True, description='Begin of the exception.'),

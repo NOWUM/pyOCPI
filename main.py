@@ -28,10 +28,14 @@ def home():
     return redirect('/ocpi/ui')
 
 
+# country_code, party_id and role is "username"
+# token is "password"
+# "username" and "password" must be communicated "out of band" (per mail or so)
+# multiple roles could be implemented simultanously
 cred_roles = [{
-    'role': 'HUB',
+    'role': 'CPO',
     'business_details': {
-        'name': 'SmartChargingHub',
+        'name': 'pyOCPI example',
         'website': 'https://fh-aachen.de',
         'logo': {
             'url': 'https://upload.wikimedia.org/wikipedia/commons/5/5b/FHAachen-logo2010.svg',
@@ -53,11 +57,10 @@ HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/"
 cm = om.CredentialsDictMan(cred_roles, HOST_URL)
 injected_objects = {
     'credentials': cm,
-    # 'locations': loc,
-    # 'commands': commands,
+    'locations': loc,
+    'commands': commands,
     'sessions': ses,
-    # 'reservations': reservations,
-    'parking': reservations,
+    'reservations': reservations,
 }
 
 config = 'ocpi.json'
@@ -66,7 +69,9 @@ if os.path.exists(config):
     with open(config, 'r') as f:
         conf = json.load(f)
         cm._updateToken(conf['token'], None, None)
-        cm.credentials_roles[0]['business_details']['name']=conf['name']
+        cm.credentials_roles[0]['business_details']['name'] = conf['name']
+        cm.credentials_roles[0]['party_id']= conf['party_id']
+        cm.credentials_roles[0]['country_code']= conf['country_code']
 else:
     log.info(f'config file {config} does not exist')
     cm._updateToken('TESTTOKEN', None, None)
@@ -76,5 +81,4 @@ blueprint = createOcpiBlueprint(
 app.register_blueprint(blueprint)
 
 if __name__ == '__main__':
-
     app.run()

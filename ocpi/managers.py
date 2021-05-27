@@ -253,8 +253,8 @@ class TokensManager(object):
     def getToken(self, country_code, party_id, token_uid, type=None):
         return self.tokens[token_uid]
 
-    def putToken(self, country_code, party_id, token_uid, token):
+    def putToken(self, country_code, party_id, token_uid, token, type=None):
         self.tokens[token_uid] = token
 
-    def patchToken(self, country_code, party_id, token_uid, token):
+    def patchToken(self, country_code, party_id, token_uid, token, type=None):
         self.tokens[token_uid].update(token)

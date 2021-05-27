@@ -60,7 +60,10 @@ def receiver():
             '''
             Push new/updated Token object to the CPO.
             '''
-            self.tokensmanager.putToken(country_code, party_id, token_uid, tokens_ns.payload)
+            parser = reqparse.RequestParser()
+            parser.add_argument('type', type=str)
+            args = parser.parse_args()
+            self.tokensmanager.putToken(country_code, party_id, token_uid, tokens_ns.payload, args['type'])
             data = 'accepted'
             return {'data': data,
                     'status_code': 1000,
@@ -75,8 +78,11 @@ def receiver():
             '''
             Notify the CPO of partial updates to a Token.
             '''
-            data = self.tokensmanager.patchToken(country_code, party_id, token_uid, tokens_ns.payload)
-            # TODO: return überhaupt benötigt?
+            parser = reqparse.RequestParser()
+            parser.add_argument('type', type=str)
+            args = parser.parse_args()
+            self.tokensmanager.patchToken(country_code, party_id, token_uid, tokens_ns.payload, args['type'])
+            data = 'accepted'
             return {'data': data,
                     'status_code': 1000,
                     'status_message': 'nothing',
@@ -126,19 +132,24 @@ def sender():
                     }
 
 
-    #TODO: how to add Optional Request Body????
-    @tokens_ns.route('/<string:token_uid>/authorize',
-                     '/<string:token_uid>/authorize?<string:type>')
+    @tokens_ns.route('/<string:token_uid>/authorize')
     @tokens_ns.expect(parser)
     class validate_token(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.tokensmanager = kwargs['tokens_manager']
             super().__init__(api, *args, **kwargs)
 
-        @tokens_ns.marshal_with(resp(tokens_ns, Token)) #TODO: was macht diese Zeile?
-        def post(self, token_uid, type=None):
-            #TODO: what to do here?
+        @tokens_ns.expect(LocationReferences) #<--  Optional Request Body TODO: is it optinal like this?
+        @tokens_ns.marshal_with(resp(tokens_ns, Token))
+        def post(self, token_uid):
+            parser = reqparse.RequestParser()
+            parser.add_argument('type', type=str)
+            args = parser.parse_args()
+
+            #TODO logic:
             #When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
+            #If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
+
             pass
 
     return tokens_ns
