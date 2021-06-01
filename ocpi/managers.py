@@ -5,6 +5,8 @@ Created on Thu Apr  1 12:47:48 2021
 
 @author: maurer
 """
+from multiprocessing import Lock
+import json
 import ocpi.models.credentials as mc
 import logging
 import secrets
@@ -130,22 +132,41 @@ class CredentialsManager():
         }
 
 
+lock = Lock()
+
+
 class CredentialsDictMan(CredentialsManager):
-    def __init__(self, credentials_roles: mc.CredentialsRole, url):
-        self.tokens = {}
+    def __init__(self, credentials_roles: mc.CredentialsRole, url, filename='ocpi_creds.json'):
+        self.filename = filename
+        with lock:
+            self.writeJson({})
         super().__init__(credentials_roles, url)
 
+    def readJson(self):
+        with open(self.filename, 'r') as f:
+            return json.load(f)
+
+    def writeJson(self, endpoints):
+        with open(self.filename, 'w') as f:
+            json.dump(endpoints, f, indent=4, sort_keys=False)
+
     def isAuthenticated(self, token):
-        return token in self.tokens
+        return token in self.readJson()
 
     def _updateToken(self, token, client_url, client_token):
         data = {
             'client_url': client_url, 'client_token': client_token}
-        self.tokens[token] = data
-        log.info(f'current tokens: {self.tokens}')
+        with lock:
+            tokens = self.readJson()
+            tokens[token] = data
+            self.writeJson(tokens)
+        log.info(f'current tokens: {tokens}')
 
     def _deleteToken(self, token):
-        return self.tokens.pop(token, None)
+        with lock:
+            tokens = self.readJson()
+            tokens.pop(token, None)
+            self.writeJson(tokens)
 
 
 class LocationManager(object):
