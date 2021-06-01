@@ -232,7 +232,7 @@ Connector = Model('Connector', {
     'max_voltage':  fields.Integer(description='Maximum voltage of the connector (line to neutral for AC_3_PHASE), in volt [V]. For example: DC Chargers might vary the voltage during charging when battery almost full.'),
     'max_amperage': fields.Integer(description='	Maximum amperage of the connector, in ampere [A].'),
     'max_electric_power': fields.Integer(description='Maximum electric power that can be delivered by this connector, in Watts (W). When the maximum electric power is lower than the calculated value from voltage and amperage, this value should be set.'),
-    'tariff_ids':  fields.String(max_length=36, required=True, description='Identifiers of the currently valid charging tariffs. Multiple tariffs are possible, but only one of each Tariff.type can be active at the same time.'),
+    'tariff_ids':  fields.List(fields.String(max_length=36, required=True, description='Identifiers of the currently valid charging tariffs. Multiple tariffs are possible, but only one of each Tariff.type can be active at the same time.')),
     'terms_and_conditions': fields.Url(description='	URL to the operator’s terms and conditions.'),
     'last_updated': fields.DateTime(description='Timestamp when this Connector was last updated (or created).'),
 
