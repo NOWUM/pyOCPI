@@ -23,8 +23,7 @@ parser = get_header_parser(tariffs_ns)
 log = logging.getLogger('ocpi')
 
 def sender():
-    # TODO: add sender endpoints
-    @tariffs_ns.route('/', doc={"description": "API Endpoint for Tokens management"})
+    @tariffs_ns.route('/', doc={"description": "API Endpoint for Tariffs management"})
     @tariffs_ns.expect(parser)
     class get_tariffs(Resource):
         # Returns Tariff objects from the CPO, last updated between the {date_from} and {date_to} (paginated)
@@ -42,10 +41,9 @@ def sender():
             'limit': {'in': 'query', 'description': 'Maximum number of objects to GET.', 'default': '50'},
         })
         @tariffs_ns.marshal_with(respList(tariffs_ns, Tariff))
-        @token_required #TODO: wird diese Zeile hier benötigt?
         def get(self):
             '''
-            Get Tokens, allows pagination
+            Get Tariffs, allows pagination
             '''
             parser = reqparse.RequestParser()
             parser.add_argument('from', type=datetime_from_iso8601)
@@ -61,3 +59,7 @@ def sender():
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
+
+#TODO: add receiver endpoints (https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc#122-receiver-interface)
+def receiver():
+    pass
