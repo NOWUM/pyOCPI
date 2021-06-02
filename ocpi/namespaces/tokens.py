@@ -147,7 +147,6 @@ def sender():
 
             #TODO check logic, add AuthorizationInfo Object:
             #When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
-            #If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
             if token_uid in self.tokensmanager.tokens.keys():
                 data=None
                 #data = AuthorizationInfo #TODO: get AuthorizationInfo Object
@@ -156,14 +155,13 @@ def sender():
                         'status_message': 'nothing',
                         'timestamp': datetime.now()
                         }
+            # If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
             else:
                 return {'data': None,
                         'status_code': 2004,
-                        'status_message': 'nothing',
+                        'status_message': 'Unknown Token',
                         'timestamp': datetime.now()
                         }
-
-            pass
 
     return tokens_ns
 
