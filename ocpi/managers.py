@@ -313,3 +313,19 @@ class TokensManager(object):
 
     def patchToken(self, country_code, party_id, token_uid, token, type=None):
         self.tokens[token_uid].update(token)
+
+class TariffsManager(object):
+    def __init__(self):
+        self.tariffs = {}
+
+    def getTariffs(self, begin, end, offset, limit):
+        return list(self.tariffs.values())[offset:offset+limit]
+
+    def getTariff(self, country_code, party_id, tariff_id):
+        return self.tariffs[tariff_id]
+
+    def putTariff(self, country_code, party_id, tariff_id, tariff):
+        self.tariffs[tariff_id] = tariff
+
+    def deleteTariff(self, country_code, party_id, tariff_id):
+        del self.tariffs[tariff_id]
