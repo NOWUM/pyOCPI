@@ -12,7 +12,7 @@ from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser, token_required
-from ocpi.models.tokens import add_models_to_tokens_namespace, Token, LocationReferences
+from ocpi.models.tokens import add_models_to_tokens_namespace, Token, LocationReferences, AuthorizationInfo
 from datetime import datetime
 
 
@@ -23,9 +23,8 @@ parser = get_header_parser(tokens_ns)
 
 log = logging.getLogger('ocpi')
 
-#TODO: mit Flo besprechen (Code durchgehen, Unklarheiten beseitiggen und prüfen lassen)
-# Routes richtig?
-#
+#TODO: Sender part vollständig?
+
 def receiver():
     @tokens_ns.route('/<string:country_code>/<string:party_id>/<string:token_uid>')
     @tokens_ns.expect(parser)
@@ -146,9 +145,23 @@ def sender():
             parser.add_argument('type', type=str)
             args = parser.parse_args()
 
-            #TODO logic:
+            #TODO check logic, add AuthorizationInfo Object:
             #When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
             #If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
+            if token_uid in self.tokensmanager.tokens.keys():
+                data=None
+                #data = AuthorizationInfo #TODO: get AuthorizationInfo Object
+                return {'data': data,
+                        'status_code': 1000,
+                        'status_message': 'nothing',
+                        'timestamp': datetime.now()
+                        }
+            else:
+                return {'data': None,
+                        'status_code': 2004,
+                        'status_message': 'nothing',
+                        'timestamp': datetime.now()
+                        }
 
             pass
 
