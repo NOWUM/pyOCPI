@@ -97,10 +97,10 @@ class CredentialsManager():
         try:
             response = requests.get(client_url+'/versions/details')
 
-            endpoints = response.json['data']['endpoints']
+            endpoints = response.json()['data']['endpoints']
         except:
             endpoints = []
-            log.error(f'could not get version details from {client_url}')
+            log.exception(f'could not get version details from {client_url}')
         return endpoints
 
     def _sendRegisterResponse(self, url, version, token, access_client):

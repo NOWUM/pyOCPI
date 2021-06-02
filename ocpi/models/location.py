@@ -274,12 +274,12 @@ Location = Model('Location', {
     'operator':     fields.Nested(BusinessDetails, description='Information of the operator. When not specified, the information retrieved from the Credentials module should be used instead.'),
     'suboperator':  fields.Nested(BusinessDetails, description='Information of the suboperator if available.'),
     'owner':        fields.Nested(BusinessDetails, description='Information of the owner if available.'),
-    'facilities':   fields.String(description='Optional list of facilities this charging location directly belongs to.'),
-    'time_zone':    fields.DateTime(description='One of IANA tzdata’s TZ-values representing the time zone of the location.'),
+    'facilities':   fields.List(fields.String(description='Optional list of facilities this charging location directly belongs to.')),
+    'time_zone':    fields.String(description='One of IANA tzdata’s TZ-values representing the time zone of the location.'),
     'opening_times': fields.Nested(Hours, description='The times when the EVSEs at the location can be accessed for charging.'),
     'charging_when_closed': fields.Boolean(default=True, description='Indicates if the EVSEs are still charging outside the opening hours of the location.'),
     'images':       fields.List(fields.Nested(Image), description='Links to images related to the location such as photos or logos.'),
-    'energy_mix':   fields.String(description='Details on the energy supplied at this location.'),
+    'energy_mix':   fields.Nested(EnergyMix,description='Details on the energy supplied at this location.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this Location or one of its EVSEs or Connectors were last updated (or created).')
 })
 
