@@ -5,6 +5,8 @@ https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc
 """
 
 from flask_restx import Model, fields
+from ocpi.models.types import DisplayText, Price
+from ocpi.models.location import EnergyMix
 
 # Enums:
 tariff_dimension_type = ['ENERGY', 'FLAT', 'PARKING_TIME', 'TIME'] #TariffDimensionType
@@ -19,7 +21,6 @@ PriceComponent = Model('PriceComponent', {
     'vat': fields.Float(description='Applicable VAT percentage for this tariff dimension. If omitted, no VAT is applicable. Not providing a VAT is different from 0% VAT, which would be a value of 0.0 here.'),
     'step_size': fields.Integer(required=True, description='Minimum amount to be billed. This unit will be billed in this step_size blocks. Amounts that are less then this step_size are rounded up to the given step_size. For example: if type is TIME and step_size has a value of 300, then time will be billed in blocks of 5 minutes. If 6 minutes were used, 10 minutes (2 blocks of step_size) will be billed.')
 })
-
 
 TariffRestrictions = Model('TariffRestrictions', {
     'start_time': fields.String(max_length=5, description='Start time of day in local time, the time zone is defined in the time_zone field of the Location, for example 13:30, valid from this time of the day. Must be in 24h format with leading zeros. Hour/Minute separator: ":" Regex: ([0-1][0-9]|2[0-3]):[0-5][0-9]'),
@@ -44,6 +45,24 @@ TariffElement = Model('TariffElement', {
     'restrictions': fields.Nested(TariffRestrictions, description='Restrictions that describe the applicability of a tariff.')
 })
 
+# Objects:
+Tariff = Model('Tariff', {
+    'country_code': fields.String(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the CPO that owns this Tariff."),
+    'party_id': fields.String(max_length=3, required=True, description="CPO ID of the CPO that owns this Tariff (following the ISO-15118 standard)."),
+    'id': fields.String(max_length=36, required=True, description='Uniquely identifies the tariff within the CPO’s platform (and suboperator platforms).'),
+    'currency': fields.String(max_length=3, required=True, description='ISO-4217 code of the currency of this tariff.'),
+    'type': fields.Nested(tariff_type, required=False, description='Defines the type of the tariff. This allows for distinction in case of given Charging Preferences. When omitted, this tariff is valid for all sessions.'),
+    'tariff_alt_text': fields.List(fields.Nested(DisplayText), required=False, description='List of multi-language alternative tariff info texts.'),
+    'tariff_alt_url': fields.String(required=False, description='URL to a web page that contains an explanation of the tariff information in human readable form.'),
+    'min_price': fields.Nested(Price, required=False, description='When this field is set, a Charging Session with this tariff will at least cost this amount. This is different from a FLAT fee (Start Tariff, Transaction Fee), as a FLAT fee is a fixed amount that has to be paid for any Charging Session. A minimum price indicates that when the cost of a Charging Session is lower than this amount, the cost of the Session will be equal to this amount. (Also see note below)'),
+    'max_price': fields.Nested(Price, required=False, description='When this field is set, a Charging Session with this tariff will NOT cost more than this amount. (See note below)'),
+    'elements': fields.List(fields.Nested(TariffElement),required=True, description='List of Tariff Elements.'),
+    'start_date_time': fields.datetime(required=False, description='The time when this tariff becomes active, in UTC, time_zone field of the Location can be used to convert to local time. Typically used for a new tariff that is already given with the location, before it becomes active. (See note below)'),
+    'end_date_time': fields.datetime(required=False, description='The time after which this tariff is no longer valid, in UTC, time_zone field if the Location can be used to convert to local time. Typically used when this tariff is going to be replaced with a different tariff in the near future. (See note below)'),
+    'energy_mix': fields.Nested(EnergyMix, required=False, description='Details on the energy supplied with this tariff.'),
+    'last_updated': fields.DateTime(required=True, description='Timestamp when this Token was last updated (or created).')
+})
+
 def add_models_to_tariffs_namespace(namespace):
-    for model in [TariffElement, TariffRestrictions, PriceComponent]:
+    for model in [TariffElement, TariffRestrictions, PriceComponent, Tariff]:
         namespace.models[model.name] = model

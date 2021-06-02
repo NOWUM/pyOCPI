@@ -1,7 +1,63 @@
 """
-Created on Thu May 26 2021
+Created on Thu June 02 2021
 https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc
 @author: gruell
 """
 
 #TODO: implement tariff namespace
+
+import logging
+from flask_restx import Resource, Namespace
+from flask_restx import reqparse
+from flask_restx.inputs import datetime_from_iso8601
+from ocpi.models import resp, respList
+from ocpi.decorators import get_header_parser, token_required
+from ocpi.models.tariffs import add_models_to_tariffs_namespace, Tariff
+from datetime import datetime
+
+tariffs_ns = Namespace(name="tariffs", validate=True)
+
+add_models_to_tariffs_namespace(tariffs_ns)
+parser = get_header_parser(tariffs_ns)
+
+log = logging.getLogger('ocpi')
+
+def sender():
+    # TODO: add sender endpoints
+    @tariffs_ns.route('/', doc={"description": "API Endpoint for Tokens management"})
+    @tariffs_ns.expect(parser)
+    class get_tariffs(Resource):
+        # Returns Tariff objects from the CPO, last updated between the {date_from} and {date_to} (paginated)
+
+        def __init__(self, api=None, *args, **kwargs):
+            self.tariffsmanager = kwargs['tariffs']
+            super().__init__(api, *args, **kwargs)
+
+        @tariffs_ns.doc(params={
+            'date_from': {'in': 'query', 'description': 'Only return Tariffs that have last_updated after or equal to this Date/Time (inclusive).',
+                     'default': '2021-01-01T13:30:00+02:00', 'required': True},
+            'date_to': {'in': 'query', 'description': 'Only return Tariffs that have last_updated up to this Date/Time, but not including (exclusive).', 'default': '2038-01-01T15:30:00+02:00',
+                   'required': True},
+            'offset': {'in': 'query', 'description': 'The offset of the first object returned. Default is 0.', 'default': '0'},
+            'limit': {'in': 'query', 'description': 'Maximum number of objects to GET.', 'default': '50'},
+        })
+        @tariffs_ns.marshal_with(respList(tariffs_ns, Tariff))
+        @token_required #TODO: wird diese Zeile hier benötigt?
+        def get(self):
+            '''
+            Get Tokens, allows pagination
+            '''
+            parser = reqparse.RequestParser()
+            parser.add_argument('from', type=datetime_from_iso8601)
+            parser.add_argument('to', type=datetime_from_iso8601)
+            parser.add_argument('offset', type=int)
+            parser.add_argument('limit', type=int)
+            args = parser.parse_args()
+
+            data = self.tokensmanager.getTokens(
+                args['from'], args['to'], args['offset'], args['limit'])
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
