@@ -43,8 +43,7 @@ class credentials(Resource):
                 'timestamp': datetime.now()
                 }
 
-    # TODO in production
-    # @token_required
+    @token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
     @credentials_ns.expect(parser, Credentials)
     def post(self):

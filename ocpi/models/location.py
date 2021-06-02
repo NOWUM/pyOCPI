@@ -232,7 +232,7 @@ Connector = Model('Connector', {
     'max_voltage':  fields.Integer(description='Maximum voltage of the connector (line to neutral for AC_3_PHASE), in volt [V]. For example: DC Chargers might vary the voltage during charging when battery almost full.'),
     'max_amperage': fields.Integer(description='	Maximum amperage of the connector, in ampere [A].'),
     'max_electric_power': fields.Integer(description='Maximum electric power that can be delivered by this connector, in Watts (W). When the maximum electric power is lower than the calculated value from voltage and amperage, this value should be set.'),
-    'tariff_ids':  fields.String(max_length=36, required=True, description='Identifiers of the currently valid charging tariffs. Multiple tariffs are possible, but only one of each Tariff.type can be active at the same time.'),
+    'tariff_ids':  fields.List(fields.String(max_length=36, required=True, description='Identifiers of the currently valid charging tariffs. Multiple tariffs are possible, but only one of each Tariff.type can be active at the same time.')),
     'terms_and_conditions': fields.Url(description='	URL to the operator’s terms and conditions.'),
     'last_updated': fields.DateTime(description='Timestamp when this Connector was last updated (or created).'),
 
@@ -274,12 +274,12 @@ Location = Model('Location', {
     'operator':     fields.Nested(BusinessDetails, description='Information of the operator. When not specified, the information retrieved from the Credentials module should be used instead.'),
     'suboperator':  fields.Nested(BusinessDetails, description='Information of the suboperator if available.'),
     'owner':        fields.Nested(BusinessDetails, description='Information of the owner if available.'),
-    'facilities':   fields.String(description='Optional list of facilities this charging location directly belongs to.'),
-    'time_zone':    fields.DateTime(description='One of IANA tzdata’s TZ-values representing the time zone of the location.'),
+    'facilities':   fields.List(fields.String(description='Optional list of facilities this charging location directly belongs to.')),
+    'time_zone':    fields.String(description='One of IANA tzdata’s TZ-values representing the time zone of the location.'),
     'opening_times': fields.Nested(Hours, description='The times when the EVSEs at the location can be accessed for charging.'),
     'charging_when_closed': fields.Boolean(default=True, description='Indicates if the EVSEs are still charging outside the opening hours of the location.'),
     'images':       fields.List(fields.Nested(Image), description='Links to images related to the location such as photos or logos.'),
-    'energy_mix':   fields.String(description='Details on the energy supplied at this location.'),
+    'energy_mix':   fields.Nested(EnergyMix,description='Details on the energy supplied at this location.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this Location or one of its EVSEs or Connectors were last updated (or created).')
 })
 

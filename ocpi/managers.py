@@ -5,8 +5,12 @@ Created on Thu Apr  1 12:47:48 2021
 
 @author: maurer
 """
+import requests
+from multiprocessing import Lock
+import json
 import ocpi.models.credentials as mc
 import logging
+import base64
 import secrets
 
 log = logging.getLogger('ocpi')
@@ -89,6 +93,35 @@ class CredentialsManager():
         self.credentials_roles = credentials_roles
         self.url = url
 
+    def _getEndpoints(self,client_url):
+        try:
+            response = requests.get(client_url+'/versions/details')
+
+            endpoints = response.json()['data']['endpoints']
+        except:
+            endpoints = []
+            log.exception(f'could not get version details from {client_url}')
+        return endpoints
+
+    def _sendRegisterResponse(self, url, version, token, access_client):
+        data = {"token": token,
+                "url": self.url,
+                "roles": self.credentials_roles}
+        encToken = base64.b64encode(
+            access_client.encode("utf-8")).decode('utf-8')
+        resp = requests.post(f'{url}/{version}/credentials', json=data, headers={
+            'Authorization': 'Token '+encToken,
+            'X-Request-ID': secrets.token_urlsafe(8)})
+        if resp.status_code == 200:
+
+            data = resp.json()
+            log.info(f'registration successfull: {data}')
+            return data['data']['token']
+            # TODO check roles and business details
+            # data['data']['roles']
+        else:
+            raise Exception(f'{url} - HTTP {resp.status_code} - {resp.text}')
+
     def makeRegistration(self, payload: mc.Credentials, tokenA: str):
         # tokenA used to get here for initial handshake
         self.unregister(tokenA)
@@ -101,7 +134,8 @@ class CredentialsManager():
             "url": self.url,
             "roles": self.credentials_roles
         }
-        self._updateToken(tokenC, client_url, tokenB)
+        endpoints = self._getEndpoints(client_url)
+        self._updateToken(tokenC, client_url, tokenB, endpoints)
         return newCredentials
 
     def versionUpdate(self, payload: mc.Credentials, token: str):
@@ -116,7 +150,7 @@ class CredentialsManager():
     def isAuthenticated(self, token):
         raise NotImplementedError()
 
-    def _updateToken(self, token, client_url, client_token):
+    def _updateToken(self, token, client_url, client_token, endpoint_list=[]):
         raise NotImplementedError()
 
     def _deleteToken(self, token):
@@ -130,22 +164,43 @@ class CredentialsManager():
         }
 
 
+lock = Lock()
+
+
 class CredentialsDictMan(CredentialsManager):
-    def __init__(self, credentials_roles: mc.CredentialsRole, url):
-        self.tokens = {}
+    def __init__(self, credentials_roles: mc.CredentialsRole, url, filename='ocpi_creds.json'):
+        self.filename = filename
+        with lock:
+            self.writeJson({})
         super().__init__(credentials_roles, url)
 
-    def isAuthenticated(self, token):
-        return token in self.tokens
+    def readJson(self):
+        with open(self.filename, 'r') as f:
+            return json.load(f)
 
-    def _updateToken(self, token, client_url, client_token):
+    def writeJson(self, endpoints):
+        with open(self.filename, 'w') as f:
+            json.dump(endpoints, f, indent=4, sort_keys=False)
+
+    def isAuthenticated(self, token):
+        return token in self.readJson()
+
+    def _updateToken(self, token, client_url, client_token, endpoint_list=[]):
         data = {
-            'client_url': client_url, 'client_token': client_token}
-        self.tokens[token] = data
-        log.info(f'current tokens: {self.tokens}')
+            'client_url': client_url,
+            'client_token': client_token,
+            'endpoints': endpoint_list}
+        with lock:
+            tokens = self.readJson()
+            tokens[token] = data
+            self.writeJson(tokens)
+        log.info(f'current tokens: {tokens}')
 
     def _deleteToken(self, token):
-        return self.tokens.pop(token, None)
+        with lock:
+            tokens = self.readJson()
+            tokens.pop(token, None)
+            self.writeJson(tokens)
 
 
 class LocationManager(object):

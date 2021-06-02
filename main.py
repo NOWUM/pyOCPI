@@ -68,7 +68,7 @@ if os.path.exists(config):
     log.info(f'reading config file {config}')
     with open(config, 'r') as f:
         conf = json.load(f)
-        cm._updateToken(conf['token'], None, None)
+        cm._updateToken(conf['token'], None, None, endpoint_list=[])
         cm.credentials_roles[0]['business_details']['name'] = conf['name']
         cm.credentials_roles[0]['party_id']= conf['party_id']
         cm.credentials_roles[0]['country_code']= conf['country_code']

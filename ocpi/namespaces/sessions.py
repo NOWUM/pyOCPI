@@ -77,7 +77,6 @@ def senderNamespace():
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
-            # TODO save and process preferences somewhere
     return sessions_ns
 
 
@@ -136,7 +135,6 @@ def receiverNamespace():
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
-            # TODO save and process preferences somewhere
     return sessions_ns
 
 
