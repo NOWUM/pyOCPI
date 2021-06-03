@@ -10,7 +10,7 @@ from multiprocessing import Lock
 import json
 import ocpi.models.credentials as mc
 import logging
-import base64
+from ocpi.decorators import createOcpiHeader
 import secrets
 
 log = logging.getLogger('ocpi')
@@ -93,7 +93,7 @@ class CredentialsManager():
         self.credentials_roles = credentials_roles
         self.url = url
 
-    def _getEndpoints(self,client_url):
+    def _getEndpoints(self, client_url):
         try:
             response = requests.get(client_url+'/versions/details')
 
@@ -107,11 +107,8 @@ class CredentialsManager():
         data = {"token": token,
                 "url": self.url,
                 "roles": self.credentials_roles}
-        encToken = base64.b64encode(
-            access_client.encode("utf-8")).decode('utf-8')
-        resp = requests.post(f'{url}/{version}/credentials', json=data, headers={
-            'Authorization': 'Token '+encToken,
-            'X-Request-ID': secrets.token_urlsafe(8)})
+        header = createOcpiHeader(access_client)
+        resp = requests.post(f'{url}/{version}/credentials', json=data, headers=header)
         if resp.status_code == 200:
 
             data = resp.json()

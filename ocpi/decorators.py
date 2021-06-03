@@ -51,6 +51,14 @@ def pagination_parser():
     parser.add_argument('limit', type=int, default=50)
     return parser
 
+import secrets
+
+def createOcpiHeader(token):
+    encToken = base64.b64encode(token.encode("utf-8")).decode('utf-8')
+    return {
+        'Authorization': 'Token '+encToken,
+        'X-Request-ID': secrets.token_urlsafe(8)
+    }
 
 def _check_access_token():
     authToken = request.headers.get("Authorization")
