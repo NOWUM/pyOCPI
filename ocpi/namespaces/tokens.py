@@ -113,7 +113,7 @@ def sender():
         @token_required #TODO: wird diese Zeile hier benötigt?
         def get(self):
             '''
-            Get Tokens, allows pagination
+            Get the list of known Tokens, last updated between the {date_from} and {date_to} (paginated)
             '''
             parser = reqparse.RequestParser()
             parser.add_argument('from', type=datetime_from_iso8601)
@@ -148,7 +148,7 @@ def sender():
             #TODO check logic, add AuthorizationInfo Object:
             #When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
             if token_uid in self.tokensmanager.tokens.keys():
-                data=None
+                data=None #TODO: remove line if AuthorizationInfo added
                 #data = AuthorizationInfo #TODO: get AuthorizationInfo Object
                 return {'data': data,
                         'status_code': 1000,
@@ -157,7 +157,7 @@ def sender():
                         }
             # If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
             else:
-                return {'data': None,
+                return {'data': None, #<--TODO: "no data field" like this?
                         'status_code': 2004,
                         'status_message': 'Unknown Token',
                         'timestamp': datetime.now()
