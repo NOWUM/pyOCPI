@@ -341,3 +341,11 @@ class TariffsManager(object):
     def deleteTariff(self, country_code, party_id, tariff_id):
         del self.tariffs[tariff_id]
 
+
+class ChargingProfilesManager(object):
+    def __init__(self):
+        self.ChargingProfiles = {}
+
+    def getChargingProfile(self, session_id, duration, response_url):
+        pass
+

@@ -30,7 +30,7 @@ def receiver():
     @tokens_ns.expect(parser)
     class manage_tokens(Resource):
         def __init__(self, api=None, *args, **kwargs):
-            self.tokensmanager = kwargs['tokens_manager']
+            self.tokensmanager = kwargs['tokens']
             super().__init__(api, *args, **kwargs)
 
         @tokens_ns.doc(params={

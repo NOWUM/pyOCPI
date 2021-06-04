@@ -28,7 +28,7 @@ def receiver():
     @tariffs_ns.expect(parser)
     class manage_tariffs(Resource):
         def __init__(self, api=None, *args, **kwargs):
-            self.tariffsmanager = kwargs['tariffs_manager']
+            self.tariffsmanager = kwargs['tariffs']
             super().__init__(api, *args, **kwargs)
 
         @tariffs_ns.marshal_with(resp(tariffs_ns, Tariff))
