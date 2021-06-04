@@ -311,6 +311,20 @@ class TokensManager(object):
     def patchToken(self, country_code, party_id, token_uid, token, type=None):
         self.tokens[token_uid].update(token)
 
+    def validateToken(self, token_uid, type=None, location=None):
+        # When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
+        if token_uid in self.tokensmanager.tokens.keys():
+            data = None  # TODO: fill data with AuthorizationInfo here
+            statuscode = 1000
+            statusmessage = 'token found'
+            return data, statuscode, statusmessage
+        # If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
+        else:
+            data = None
+            statuscode = 2004
+            statusmessage = 'Unknown Token'
+            return data, statuscode, statusmessage
+
 class TariffsManager(object):
     def __init__(self):
         self.tariffs = {}
@@ -326,3 +340,4 @@ class TariffsManager(object):
 
     def deleteTariff(self, country_code, party_id, tariff_id):
         del self.tariffs[tariff_id]
+

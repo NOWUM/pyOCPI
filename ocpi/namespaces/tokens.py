@@ -135,7 +135,7 @@ def sender():
     @tokens_ns.expect(parser)
     class validate_token(Resource):
         def __init__(self, api=None, *args, **kwargs):
-            self.tokensmanager = kwargs['tokens_manager']
+            self.tokensmanager = kwargs['tokens']
             super().__init__(api, *args, **kwargs)
 
         @tokens_ns.expect(LocationReferences) #<--  Optional Request Body TODO: is it optinal like this?
@@ -146,22 +146,13 @@ def sender():
             args = parser.parse_args()
 
             #TODO check logic, add AuthorizationInfo Object:
-            #When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
-            if token_uid in self.tokensmanager.tokens.keys():
-                data=None #TODO: remove line if AuthorizationInfo added
-                #data = AuthorizationInfo #TODO: get AuthorizationInfo Object
-                return {'data': data,
-                        'status_code': 1000,
-                        'status_message': 'nothing',
-                        'timestamp': datetime.now()
-                        }
-            # If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
-            else:
-                return {'data': None, #<--TODO: "no data field" like this?
-                        'status_code': 2004,
-                        'status_message': 'Unknown Token',
-                        'timestamp': datetime.now()
-                        }
+            data, statuscode, stausmessage = self.tokensmanager.validateToken(token_uid, args['type'], tokens_ns.payload)
+
+            return {'data': data,
+                    'status_code': statuscode,
+                    'status_message': stausmessage,
+                    'timestamp': datetime.now()
+                    }
 
     return tokens_ns
 

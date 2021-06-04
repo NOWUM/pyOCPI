@@ -108,3 +108,12 @@ def sender():
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
+
+def makeTariffNamespace(interfaces=['SENDER', 'RECEIVER']):
+    log.debug('tariffs interfaces:'+str(interfaces))
+    if 'SENDER' in interfaces:
+        sender()
+    if 'RECEIVER' in interfaces:
+        receiver()
+
+    return tariffs_ns
