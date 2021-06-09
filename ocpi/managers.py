@@ -362,3 +362,17 @@ class ChargingProfilesManager(object):
         #return type: ChargingProfileResponse
         pass
 
+class CdrManager(object):
+    def __init__(self):
+        self.cdrs = {}
+
+    def getCdrs(self, begin, end, offset, limit):
+        return list(self.cdrs.values())[offset:offset+limit]
+
+    def getCdr(self, cdr_uid):
+        return self.cdrs[cdr_uid]
+
+    def postCdr(self, cdr):
+        self.cdrs.append(cdr)
+        return self.cdrs[-1] # TODO: The response should contain the URL to the newly created CDR in the eMSP’s system, can be used by the CPO system to perform a GET on the same CDR.
+

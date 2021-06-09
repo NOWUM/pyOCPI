@@ -102,3 +102,7 @@ Cdr = Model('Cdr', {
     'credit_reference_id': fields.String(max_length=39, required=False, description='Is required to be set for a Credit CDR. This SHALL contain the id of the CDR for which this is a Credit CDR.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this CDR was last updated (or created).')
 })
+
+def add_models_to_cdr_namespace(namespace):
+    for model in [Cdr, SignedData, SignedValue, ChargingPeriod, CdrToken, CdrLocation, CdrDimension]:
+        namespace.models[model.name] = model
