@@ -3,9 +3,10 @@ Created on Thu May 26 2021
 https://github.com/ocpi/ocpi/blob/master/mod_charging_profiles.asciidoc
 @author: gruell
 """
-#TODO: implement charging_profile namespace
-# - add missing functions for receiver and sender
 
+#TODO:
+# - check receiver interface
+# - finish sender interface (Florian)
 
 import logging
 from flask_restx import Resource, Namespace
@@ -13,7 +14,7 @@ from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser, token_required
-from ocpi.models.charging_profiles import add_models_to_charging_profiles_namespace, ChargingProfileResponse
+from ocpi.models.charging_profiles import add_models_to_charging_profiles_namespace, ChargingProfileResponse, SetChargingProfile, ActiveChargingProfile
 from datetime import datetime
 
 charging_profiles_ns = Namespace(name="tariffs", validate=True)
@@ -49,20 +50,38 @@ def receiver():
                     'timestamp': datetime.now()
                     }
 
+        @charging_profiles_ns.expect(SetChargingProfile)
+        @charging_profiles_ns.marshal_with(resp(charging_profiles_ns, ChargingProfileResponse))
         def put(self, session_id):
             '''
             Creates/updates a ChargingProfile for a specific charging session.
             '''
-            pass
+            data = self.chargingprofilesmanager.putChargingProfile(session_id, charging_profiles_ns.payload)
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
+        @charging_profiles_ns.marshal_with(resp(charging_profiles_ns, ChargingProfileResponse))
         def delete(self, session_id):
             '''
             Cancels an existing ChargingProfile for a specific charging session.
             '''
-            pass
+            parser = reqparse.RequestParser()
+            parser.add_argument('response_url', type=str)
+            args = parser.parse_args()
+            data = self. chargingprofilesmanager.deleteChargingProfile(session_id, args['response_url'])
+            return {'data': data,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
+#TODO: sender interface prüfen (hab ich nicht wirklich verstanden)
 def sender():
-    class find_class_name(Resource):
+    # There are no URL segment parameters required by OCPI.
+    class todo_find_class_name(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.chargingprofilesmanager = kwargs['charging_profiles']
             super().__init__(api, *args, **kwargs)
@@ -72,7 +91,10 @@ def sender():
             #request body: Choice: one of three (ActiveChargingProfileResult, ChargingProfileResult, ClearProfileResult)
             pass
 
+        @charging_profiles_ns.route('/<string:session_id>')
+        @charging_profiles_ns.expect(ActiveChargingProfile)
         def put(self, session_id):
+            #Updates the Sender (typically SCSP) when the Receiver (typically CPO) knows the ActiveChargingProfile has changed.
             pass
 
 

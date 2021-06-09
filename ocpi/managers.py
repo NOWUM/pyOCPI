@@ -346,6 +346,19 @@ class ChargingProfilesManager(object):
     def __init__(self):
         self.ChargingProfiles = {}
 
+    # Retrieves the ActiveChargingProfile as it is currently planned for the the given session.
     def getChargingProfile(self, session_id, duration, response_url):
+        #return type: ChargingProfileResponse
+        pass
+
+    # Creates a new ChargingProfile on a session, or replaces an existing ChargingProfile on the EVSE.
+    def putChargingProfile(self, session_id, set_charging_profile):
+        self.ChargingProfiles[session_id] = set_charging_profile['charging_profile']
+        #return type: ChargingProfileResponse
+        pass
+
+    # Clears the ChargingProfile set by the eMSP on the given session.
+    def deleteChargingProfile(self, session_id, response_url):
+        #return type: ChargingProfileResponse
         pass
 
