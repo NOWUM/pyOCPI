@@ -23,8 +23,6 @@ parser = get_header_parser(tokens_ns)
 
 log = logging.getLogger('ocpi')
 
-#TODO: Sender part vollständig?
-
 def receiver():
     @tokens_ns.route('/<string:country_code>/<string:party_id>/<string:token_uid>')
     @tokens_ns.expect(parser)
@@ -92,7 +90,6 @@ def receiver():
 
 
 def sender():
-    # TODO: add sender endpoints
     @tokens_ns.route('/', doc={"description": "API Endpoint for Tokens management"})
     @tokens_ns.expect(parser)
     class get_tokens(Resource):

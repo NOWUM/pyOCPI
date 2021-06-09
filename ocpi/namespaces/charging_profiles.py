@@ -14,7 +14,7 @@ from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
 from ocpi.decorators import get_header_parser, token_required
-from ocpi.models.charging_profiles import add_models_to_charging_profiles_namespace, ChargingProfileResponse, SetChargingProfile, ActiveChargingProfile
+from ocpi.models.charging_profiles import add_models_to_charging_profiles_namespace, ChargingProfileResponse, SetChargingProfile, ActiveChargingProfile, ActiveChargingProfileResult, ChargingProfileResult, ClearProfileResult
 from datetime import datetime
 
 charging_profiles_ns = Namespace(name="tariffs", validate=True)
@@ -81,21 +81,67 @@ def receiver():
 #TODO: sender interface prüfen (hab ich nicht wirklich verstanden)
 def sender():
     # There are no URL segment parameters required by OCPI.
-    class todo_find_class_name(Resource):
+    @charging_profiles_ns.route('/active_charging_profile_result/<string:unique_id>')
+    class active_charging_profile_result(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.chargingprofilesmanager = kwargs['charging_profiles']
             super().__init__(api, *args, **kwargs)
 
+        @charging_profiles_ns.expect(ActiveChargingProfileResult)
         def post(self):
-            #There are no URL segment parameters required by OCPI.
-            #request body: Choice: one of three (ActiveChargingProfileResult, ChargingProfileResult, ClearProfileResult)
-            pass
+            # TODO: Was muss hier gemacht werden?
+            return {'data': None,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
-        @charging_profiles_ns.route('/<string:session_id>')
+    @charging_profiles_ns.route('/charging_profile_result/<string:unique_id>')
+    class charging_profile_result(Resource):
+        def __init__(self, api=None, *args, **kwargs):
+            self.chargingprofilesmanager = kwargs['charging_profiles']
+            super().__init__(api, *args, **kwargs)
+
+        @charging_profiles_ns.expect(ChargingProfileResult)
+        def post(self):
+            #TODO: Was muss hier gemacht werden?
+            return {'data': None,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
+
+    @charging_profiles_ns.route('/clear_profile_result/<string:unique_id>')
+    class clear_profile_result(Resource):
+        def __init__(self, api=None, *args, **kwargs):
+            self.chargingprofilesmanager = kwargs['charging_profiles']
+            super().__init__(api, *args, **kwargs)
+
+        @charging_profiles_ns.expect(ClearProfileResult)
+        def post(self):
+            # TODO: Was muss hier gemacht werden?
+            return {'data': None,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
+
+
+    @charging_profiles_ns.route('/<string:session_id>')
+    class update_sender_active_charging_profile(Resource):
+        def __init__(self, api=None, *args, **kwargs):
+            self.chargingprofilesmanager = kwargs['charging_profiles']
+            super().__init__(api, *args, **kwargs)
+
         @charging_profiles_ns.expect(ActiveChargingProfile)
         def put(self, session_id):
             #Updates the Sender (typically SCSP) when the Receiver (typically CPO) knows the ActiveChargingProfile has changed.
-            pass
+            #self.chargingprofilesmanager.putChargingProfile(session_id) #TODO: muss hier der chargingprofilesmanager auch geupdated werden (wie bei Receiver)?
+            return {'data': None,
+                    'status_code': 1000,
+                    'status_message': 'nothing',
+                    'timestamp': datetime.now()
+                    }
 
 
 def makeChargingProfilesNamespace(interfaces=['SENDER', 'RECEIVER']):
