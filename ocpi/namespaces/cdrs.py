@@ -7,10 +7,8 @@ https://github.com/ocpi/ocpi/blob/master/mod_cdrs.asciidoc
 
 import logging
 from flask_restx import Resource, Namespace
-from flask_restx import reqparse
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required
+from ocpi.decorators import get_header_parser, token_required, pagination_parser
 from ocpi.models.cdrs import add_models_to_cdr_namespace, Cdr
 from datetime import datetime
 
@@ -30,6 +28,7 @@ def receiver():
             super().__init__(api, *args, **kwargs)
 
         @cdrs_ns.marshal_with(resp(cdrs_ns, Cdr))
+        @token_required
         def get(self, cdr_uid):
             '''
             Retrieve an existing CDR.
@@ -42,6 +41,7 @@ def receiver():
                     }
 
         @cdrs_ns.expect(Cdr)
+        @token_required
         def post(self):
             '''
             Send a new CDR.
@@ -72,16 +72,14 @@ def sender():
             'limit': {'in': 'query', 'description': 'Maximum number of objects to GET.', 'default': '50'},
         })
         @cdrs_ns.marshal_with(respList(cdrs_ns, Cdr))
+        @token_required
         def get(self):
             '''
             Fetch CDRs last updated (which in the current version of OCPI can only be the creation Date/Time) between the {date_from} and {date_to} (paginated).
             '''
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
+
             data = self.cdrmanager.getCdrs(args['from'], args['to'], args['offset'], args['limit'])
 
             return {'data': data,
@@ -89,3 +87,10 @@ def sender():
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
+
+def makeCdrNamespace(interfaces=['SENDER', 'RECEIVER']):
+    if 'SENDER' in interfaces:
+        sender()
+    if 'RECEIVER' in interfaces:
+        receiver()
+    return cdrs_ns

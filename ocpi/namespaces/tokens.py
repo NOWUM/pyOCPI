@@ -9,10 +9,9 @@ https://github.com/ocpi/ocpi/blob/master/mod_tokens.asciidoc
 import logging
 from flask_restx import Resource, Namespace
 from flask_restx import reqparse
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required
-from ocpi.models.tokens import add_models_to_tokens_namespace, Token, LocationReferences, AuthorizationInfo
+from ocpi.decorators import get_header_parser, token_required, pagination_parser
+from ocpi.models.tokens import add_models_to_tokens_namespace, Token, LocationReferences
 from datetime import datetime
 
 
@@ -34,8 +33,8 @@ def receiver():
         @tokens_ns.doc(params={
             'type': {'in': 'query', 'description': '', 'default': '', 'required': False}
         })
-
         @tokens_ns.marshal_with(resp(tokens_ns, Token))
+        @token_required
         def get(self, country_code, party_id, token_uid):
             '''
             Retrieve a Token as it is stored in the CPO system.
@@ -53,6 +52,7 @@ def receiver():
 
         @tokens_ns.expect(Token) # New or updated Token object. --> expected Type in Request Body
         @tokens_ns.marshal_with(resp(tokens_ns, Token))
+        @token_required
         def put(self, country_code, party_id, token_uid, type=None):
             '''
             Push new/updated Token object to the CPO.
@@ -71,6 +71,7 @@ def receiver():
 
         @tokens_ns.expect(Token)
         @tokens_ns.marshal_with(resp(tokens_ns, Token))
+        @token_required
         def patch(self, country_code, party_id, token_uid, type=None):
             '''
             Notify the CPO of partial updates to a Token.
@@ -107,16 +108,12 @@ def sender():
             'limit': {'in': 'query', 'description': 'Maximum number of objects to GET.', 'default': '50'},
         })
         @tokens_ns.marshal_with(respList(tokens_ns, Token))
-        @token_required #TODO: wird diese Zeile hier benötigt?
+        @token_required
         def get(self):
             '''
             Get the list of known Tokens, last updated between the {date_from} and {date_to} (paginated)
             '''
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
 
             data = self.tokensmanager.getTokens(
@@ -135,15 +132,15 @@ def sender():
             self.tokensmanager = kwargs['tokens']
             super().__init__(api, *args, **kwargs)
 
-        @tokens_ns.expect(LocationReferences) #<--  Optional Request Body TODO: is it optinal like this?
+        @tokens_ns.expect(LocationReferences)
         @tokens_ns.marshal_with(resp(tokens_ns, Token))
+        @token_required
         def post(self, token_uid):
             parser = reqparse.RequestParser()
-            parser.add_argument('type', type=str)
+            parser.add_argument('type', type=str, default=None)
             args = parser.parse_args()
 
-            #TODO check logic, add AuthorizationInfo Object:
-            data, statuscode, stausmessage = self.tokensmanager.validateToken(token_uid, args['type'], tokens_ns.payload)
+            data, statuscode, stausmessage = self.tokensmanager.validateToken(token_uid, args.get('type'), tokens_ns.payload)
 
             return {'data': data,
                     'status_code': statuscode,

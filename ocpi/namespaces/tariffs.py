@@ -3,15 +3,10 @@ Created on Thu June 02 2021
 https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc
 @author: gruell
 """
-
-#TODO: check receiver and sender logic
-
 import logging
 from flask_restx import Resource, Namespace
-from flask_restx import reqparse
-from flask_restx.inputs import datetime_from_iso8601
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required
+from ocpi.decorators import get_header_parser, token_required, pagination_parser
 from ocpi.models.tariffs import add_models_to_tariffs_namespace, Tariff
 from datetime import datetime
 
@@ -32,6 +27,7 @@ def receiver():
             super().__init__(api, *args, **kwargs)
 
         @tariffs_ns.marshal_with(resp(tariffs_ns, Tariff))
+        @token_required
         def get(self, country_code, party_id, tariff_id):
             '''
             Retrieve a Tariff as it is stored in the eMSP’s system.
@@ -45,6 +41,7 @@ def receiver():
 
         @tariffs_ns.expect(Tariff)#Model for New or updated Tariff object.
         @tariffs_ns.marshal_with(resp(tariffs_ns, Tariff))
+        @token_required
         def put(self, country_code, party_id, tariff_id):
             '''
             Push new/updated Tariff object to the eMSP.
@@ -58,6 +55,7 @@ def receiver():
                     }
 
         @tariffs_ns.marshal_with(resp(tariffs_ns, Tariff))
+        @token_required
         def delete(self, country_code, party_id, tariff_id):
             '''
             Remove a Tariff object which is no longer in use and will not be used in future either.
@@ -75,7 +73,6 @@ def sender():
     @tariffs_ns.route('/', doc={"description": "API Endpoint for Tariffs management"})
     @tariffs_ns.expect(parser)
     class get_tariffs(Resource):
-        # Returns Tariff objects from the CPO, last updated between the {date_from} and {date_to} (paginated)
 
         def __init__(self, api=None, *args, **kwargs):
             self.tariffsmanager = kwargs['tariffs']
@@ -90,15 +87,12 @@ def sender():
             'limit': {'in': 'query', 'description': 'Maximum number of objects to GET.', 'default': '50'},
         })
         @tariffs_ns.marshal_with(respList(tariffs_ns, Tariff))
+        @token_required
         def get(self):
             '''
             Returns Tariff objects from the CPO, last updated between the {date_from} and {date_to} (paginated)
             '''
-            parser = reqparse.RequestParser()
-            parser.add_argument('from', type=datetime_from_iso8601)
-            parser.add_argument('to', type=datetime_from_iso8601)
-            parser.add_argument('offset', type=int)
-            parser.add_argument('limit', type=int)
+            parser = pagination_parser()
             args = parser.parse_args()
 
             data = self.tariffsmanager.getTariffs(
