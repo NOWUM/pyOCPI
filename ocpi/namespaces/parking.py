@@ -74,7 +74,6 @@ def senderNamespace():
                 ses = self.parking_manager.getParkingSession(
                     country_id, party_id, session_id
                 )
-                # TODO validate country and party
             except:
                 return "", 404
 
@@ -121,7 +120,6 @@ def receiverNamespace():
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=200)
         def get(self, country_id, party_id, session_id):
             """Get current information for Parkingsession"""
-            # TODO validate country and party
             return self.parking_manager.getParkingSession(
                 country_id, party_id, session_id
             )

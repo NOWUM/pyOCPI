@@ -93,8 +93,6 @@ def receiverNamespace():
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=200)
         @token_required
         def get(self, country_id, party_id, session_id):
-
-            # TODO validate country and party
             data = self.session_manager.getSession(
                 country_id, party_id, session_id)
             return {'data': data,

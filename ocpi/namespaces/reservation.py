@@ -38,7 +38,6 @@ def receiverNamespace():
             try:
                 ses = self.reservation_manager.getReservation(
                     country_id, party_id, reservation_id)
-                # TODO validate country and party
             except:
                 return '', 404
 
@@ -115,7 +114,6 @@ def senderNamespace():
             try:
                 ses = self.reservation_manager.getReservation(
                     country_id, party_id, reservation_id)
-                # TODO validate country and party
             except:
                 return '', 404
 

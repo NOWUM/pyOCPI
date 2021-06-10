@@ -61,6 +61,10 @@ injected_objects = {
     'commands': commands,
     'sessions': ses,
     'reservations': reservations,
+    'tokens': om.TokensManager(),
+    'tariffs': om.TariffsManager(),
+    'charging_profiles': om.ChargingProfilesManager(),
+    'cdrs': om.CdrManager(),
 }
 
 config = 'ocpi.json'

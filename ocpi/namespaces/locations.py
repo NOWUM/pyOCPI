@@ -216,7 +216,6 @@ def sender():
             'to': {'in': 'query', 'description': 'declare location last update', 'default': '2038-01-01T15:30:00+02:00', 'required': True},
             'offset': {'in': 'query', 'description': 'id offset for pagination', 'default': '0'},
             'limit': {'in': 'query', 'description': 'number of entries to get', 'default': '50'},
-
         })
         @locations_ns.marshal_with(respList(locations_ns, Location))
         @token_required

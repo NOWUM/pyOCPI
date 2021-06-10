@@ -294,3 +294,95 @@ class VersionManager():
             'version': self._ocpi_version,
             'endpoints': self._details
         }
+
+class TokensManager(object):
+    def __init__(self):
+        self.tokens = {}
+
+    def getTokens(self, begin, end, offset, limit):
+        return list(self.tokens.values())[offset:offset+limit]
+
+    def getToken(self, country_code, party_id, token_uid, type=None):
+        return self.tokens[token_uid]
+
+    def putToken(self, country_code, party_id, token_uid, token, type=None):
+        self.tokens[token_uid] = token
+
+    def patchToken(self, country_code, party_id, token_uid, token, type=None):
+        self.tokens[token_uid].update(token)
+
+    def validateToken(self, token_uid, type=None, location=None):
+        # When the token is known by the Sender, the response SHALL contain a AuthorizationInfo object.
+        if token_uid in self.tokensmanager.tokens.keys():
+            data = None  # TODO: fill data with AuthorizationInfo here
+            statuscode = 1000
+            statusmessage = 'token found'
+            return data, statuscode, statusmessage
+        # If the token is not known, the response SHALL contain the status code: 2004: Unknown Token, and no data field.
+        else:
+            data = None
+            statuscode = 2004
+            statusmessage = 'Unknown Token'
+            return data, statuscode, statusmessage
+
+class TariffsManager(object):
+    def __init__(self):
+        self.tariffs = {}
+
+    def getTariffs(self, begin, end, offset, limit):
+        return list(self.tariffs.values())[offset:offset+limit]
+
+    def getTariff(self, country_code, party_id, tariff_id):
+        return self.tariffs[tariff_id]
+
+    def putTariff(self, country_code, party_id, tariff_id, tariff):
+        self.tariffs[tariff_id] = tariff
+
+    def deleteTariff(self, country_code, party_id, tariff_id):
+        del self.tariffs[tariff_id]
+
+
+class ChargingProfilesManager(object):
+    def __init__(self):
+        self.ChargingProfiles = {}
+
+    # Retrieves the ActiveChargingProfile as it is currently planned for the the given session.
+    def getChargingProfile(self, session_id, duration, response_url):
+        #return type: ChargingProfileResponse
+        pass
+
+    # Creates a new ChargingProfile on a session, or replaces an existing ChargingProfile on the EVSE.
+    def putChargingProfile(self, session_id, set_charging_profile):
+        self.ChargingProfiles[session_id] = set_charging_profile['charging_profile']
+        #return type: ChargingProfileResponse
+        pass
+
+    def handleActiveChargingProfileResult(self, session_id, charging_profile):
+        pass
+
+    def handleChargingProfileResult(self, session_id, charging_profile):
+        pass
+    def handleClearProfileResult(self, session_id, charging_profile):
+        pass
+
+    # Clears the ChargingProfile set by the eMSP on the given session.
+    def deleteChargingProfile(self, session_id, response_url):
+        #return type: ChargingProfileResponse
+        pass
+
+    def handleUpdateActiveChargingProfile(self,session_id, active_charging_profile):
+        pass
+
+class CdrManager(object):
+    def __init__(self):
+        self.cdrs = {}
+
+    def getCdrs(self, begin, end, offset, limit):
+        return list(self.cdrs.values())[offset:offset+limit]
+
+    def getCdr(self, cdr_uid):
+        return self.cdrs[cdr_uid]
+
+    def postCdr(self, cdr):
+        self.cdrs.append(cdr)
+        return self.cdrs[-1] # TODO: The response should contain the URL to the newly created CDR in the eMSP’s system, can be used by the CPO system to perform a GET on the same CDR.

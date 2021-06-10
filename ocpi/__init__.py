@@ -18,6 +18,9 @@ from ocpi.namespaces.sessions import makeSessionNamespace
 from ocpi.namespaces.locations import makeLocationNamespace
 from ocpi.namespaces.reservation import makeReservationNamespace
 from ocpi.namespaces.parking import makeParkingNamespace
+from ocpi.namespaces.tokens import makeTokenNamespace
+from ocpi.namespaces.cdrs import makeCdrNamespace
+from ocpi.namespaces.charging_profiles import makeChargingProfilesNamespace
 from ocpi.decorators import SingleCredMan
 from ocpi.managers import VersionManager
 import logging
@@ -77,7 +80,10 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'R
         'commands': commands_ns,
         'sessions': makeSessionNamespace(roles),
         'reservations': makeReservationNamespace(roles),
-        'parking': makeParkingNamespace(roles)
+        'parking': makeParkingNamespace(roles),
+        'charging_profiles': makeChargingProfilesNamespace(roles),
+        'tokens': makeTokenNamespace(roles),
+        'cdrs': makeCdrNamespace(roles),
     }
 
     endpoint_list = injected_objects.keys()
