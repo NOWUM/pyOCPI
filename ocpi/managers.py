@@ -357,9 +357,20 @@ class ChargingProfilesManager(object):
         #return type: ChargingProfileResponse
         pass
 
+    def handleActiveChargingProfileResult(self, session_id, charging_profile):
+        pass
+
+    def handleChargingProfileResult(self, session_id, charging_profile):
+        pass
+    def handleClearProfileResult(self, session_id, charging_profile):
+        pass
+
     # Clears the ChargingProfile set by the eMSP on the given session.
     def deleteChargingProfile(self, session_id, response_url):
         #return type: ChargingProfileResponse
+        pass
+
+    def handleUpdateActiveChargingProfile(self,session_id, active_charging_profile):
         pass
 
 class CdrManager(object):
@@ -375,4 +386,3 @@ class CdrManager(object):
     def postCdr(self, cdr):
         self.cdrs.append(cdr)
         return self.cdrs[-1] # TODO: The response should contain the URL to the newly created CDR in the eMSP’s system, can be used by the CPO system to perform a GET on the same CDR.
-

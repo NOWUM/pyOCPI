@@ -4,10 +4,6 @@ https://github.com/ocpi/ocpi/blob/master/mod_charging_profiles.asciidoc
 @author: gruell
 """
 
-#TODO:
-# - check receiver interface
-# - finish sender interface (Florian)
-
 import logging
 from flask_restx import Resource, Namespace
 from flask_restx import reqparse
@@ -78,48 +74,47 @@ def receiver():
                     'timestamp': datetime.now()
                     }
 
-#TODO: sender interface prüfen (hab ich nicht wirklich verstanden)
 def sender():
     # There are no URL segment parameters required by OCPI.
-    @charging_profiles_ns.route('/active_charging_profile_result/<string:unique_id>')
+    @charging_profiles_ns.route('/active_charging_profile_result/<string:session_id>')
     class active_charging_profile_result(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.chargingprofilesmanager = kwargs['charging_profiles']
             super().__init__(api, *args, **kwargs)
 
         @charging_profiles_ns.expect(ActiveChargingProfileResult)
-        def post(self):
-            # TODO: Was muss hier gemacht werden?
+        def post(self, session_id):
+            self.chargingprofilesmanager.handleActiveChargingProfileResult(session_id, charging_profiles_ns.payload)
             return {'data': None,
                     'status_code': 1000,
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
 
-    @charging_profiles_ns.route('/charging_profile_result/<string:unique_id>')
+    @charging_profiles_ns.route('/charging_profile_result/<string:session_id>')
     class charging_profile_result(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.chargingprofilesmanager = kwargs['charging_profiles']
             super().__init__(api, *args, **kwargs)
 
         @charging_profiles_ns.expect(ChargingProfileResult)
-        def post(self):
-            #TODO: Was muss hier gemacht werden?
+        def post(self,session_id):
+            self.chargingprofilesmanager.handleChargingProfileResult(session_id, charging_profiles_ns.payload)
             return {'data': None,
                     'status_code': 1000,
                     'status_message': 'nothing',
                     'timestamp': datetime.now()
                     }
 
-    @charging_profiles_ns.route('/clear_profile_result/<string:unique_id>')
+    @charging_profiles_ns.route('/clear_profile_result/<string:session_id>')
     class clear_profile_result(Resource):
         def __init__(self, api=None, *args, **kwargs):
             self.chargingprofilesmanager = kwargs['charging_profiles']
             super().__init__(api, *args, **kwargs)
 
         @charging_profiles_ns.expect(ClearProfileResult)
-        def post(self):
-            # TODO: Was muss hier gemacht werden?
+        def post(self,session_id):
+            self.chargingprofilesmanager.handleClearProfileResult(session_id, charging_profiles_ns.payload)
             return {'data': None,
                     'status_code': 1000,
                     'status_message': 'nothing',
@@ -135,8 +130,9 @@ def sender():
 
         @charging_profiles_ns.expect(ActiveChargingProfile)
         def put(self, session_id):
-            #Updates the Sender (typically SCSP) when the Receiver (typically CPO) knows the ActiveChargingProfile has changed.
-            #self.chargingprofilesmanager.putChargingProfile(session_id) #TODO: muss hier der chargingprofilesmanager auch geupdated werden (wie bei Receiver)?
+            # should only be sent if the sender received a post to SetChargingProfile
+            # Updates the Sender (typically SCSP) when the Receiver (typically CPO) knows the ActiveChargingProfile has changed.
+            self.chargingprofilesmanager.handleUpdateActiveChargingProfile(session_id, charging_profiles_ns.payload)
             return {'data': None,
                     'status_code': 1000,
                     'status_message': 'nothing',

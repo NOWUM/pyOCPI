@@ -3,8 +3,6 @@ Created on Wed June 09 2021
 https://github.com/ocpi/ocpi/blob/master/mod_cdrs.asciidoc
 @author: gruell
 """
-#TODO: check receiver and sender interface
-
 import logging
 from flask_restx import Resource, Namespace
 from ocpi.models import resp, respList
