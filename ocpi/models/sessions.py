@@ -11,7 +11,7 @@ from flask_restx import fields, Model
 
 ############### Session Models ###############
 
-token_type = ["AD_HOC_USER", "APP_USER", "OTHER", "RFID"]
+from ocpi.models.tokens import token_type
 
 CdrToken = Model('CdrToken', {
     'uid': fields.String(max_length=36, required=True, description="Unique ID by which this Token can be identified."),

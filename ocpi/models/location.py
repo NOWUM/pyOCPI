@@ -9,7 +9,8 @@ Created on Mon Mar 29 23:51:45 2021
 ############### Location Models ###############
 
 from flask_restx import fields, Model
-from ocpi.models.types import DisplayText, TokenType
+from ocpi.models.types import DisplayText
+from ocpi.models.tokens import token_type
 
 AdditionalGeoLocation = Model('AdditionalGeoLocation', {
     'latitude': fields.String(max_length=10, required=True, description='Latitude of the point in decimal degree.'),
@@ -205,7 +206,7 @@ ExceptionalPeriod = Model('ExceptionalPeriod', {
 
 PublishTokenType = Model('PublishTokenType', {
     'id': fields.String(max_length=36),
-    'type': fields.String(enum=TokenType),
+    'type': fields.String(enum=token_type),
     'visual_number': fields.String(max_length=64),
     'issuer': fields.String(max_length=64),
     'group_id': fields.String(max_length=36),

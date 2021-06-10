@@ -19,11 +19,6 @@ DisplayText = Model('DisplayText', {
     'text': fields.String(max_length=512, required=True, description='Text to be displayed to a end user. No markup, html etc. allowed.'),
 })
 
-Price = Model('Price', {
-    'excl_vat': fields.Float(required=True, description='Price/Cost excluding VAT.'),
-    'incl_vat': fields.Float(description='Price/Cost including VAT.')
-})
-
 role = [
     'CPO'	,  # Charge Point Operator Role.
     'EMSP'	,  # eMobility Service Provider Role.
@@ -35,6 +30,3 @@ role = [
     'OTHER'	,  # Other role.
     'SCSP'	,  # Smart Charging Service Provider Role.
 ]
-
-
-TokenType = ['AD_HOC_USER', 'APP_USER', 'OTHER', 'RFID']

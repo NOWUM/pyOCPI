@@ -7,8 +7,7 @@ https://github.com/ocpi/ocpi/blob/master/mod_cdrs.asciidoc
 from flask_restx import fields, Model
 from ocpi.models.location import connector_type, connector_format, power_type, GeoLocation
 from ocpi.models.tokens import token_type
-from ocpi.models.tariffs import Tariff
-from ocpi.models.types import Price
+from ocpi.models.tariffs import Price, Tariff, add_models_to_tariffs_namespace
 
 # Enums:
 auth_method = ['AUTH_REQUEST', 'COMMAND', 'WHITELIST'] #AuthMethod
@@ -16,7 +15,7 @@ cdr_dimension_type= ['CURRENT', 'ENERGY', 'ENERGY_EXPORT', 'ENERGY_IMPORT', 'MAX
 
 # Classes:
 CdrDimension = Model('CdrDimension', {
-    'type': fields.Nested(cdr_dimension_type, required=True, description='Type of CDR dimension.'),
+    'type': fields.String(enum=cdr_dimension_type, required=True, description='Type of CDR dimension.'),
     'volume': fields.Float(required=True, description='Volume of the dimension consumed, measured according to the dimension type.')
 })
 
@@ -31,9 +30,9 @@ CdrLocation = Model('CdrLocation', {
     'evse_uid': fields.String(max_length=36, required=True, description='Uniquely identifies the EVSE within the CPO’s platform (and suboperator platforms). For example a database unique ID or the actual EVSE ID. This field can never be changed, modified or renamed. This is the technical identification of the EVSE, not to be used as human readable identification, use the field: evse_id for that.'),
     'evse_id': fields.String(max_length=48, required=True, description='Compliant with the following specification for EVSE ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects.".'),
     'connector_id': fields.String(max_length=36, required=False, description='Identifier of the connector within the EVSE.'),
-    'connector_standard': fields.Nested(connector_type, required=True, description='The standard of the installed connector.'),
-    'connector_format': fields.Nested(connector_format, required=True, description='The format (socket/cable) of the installed connector.'),
-    'connector_power_type': fields.Nested(power_type, required=True, description='')
+    'connector_standard': fields.String(enum=connector_type, required=True, description='The standard of the installed connector.'),
+    'connector_format': fields.String(enum=connector_format, required=True, description='The format (socket/cable) of the installed connector.'),
+    'connector_power_type': fields.String(enum=power_type, required=True, description='')
 })
 
 CdrToken = Model('CdrToken', {
@@ -41,7 +40,7 @@ CdrToken = Model('CdrToken', {
                                                                     'This is the field used by the CPO’s system (RFID reader on the Charge Point) to identify this token.'
                                                                     'Currently, in most cases: type=RFID, this is the RFID hidden ID as read by the RFID reader, but that is not a requirement.'
                                                                     'If this is a type=APP_USER Token, it will be a unique, by the eMSP, generated ID.'),
-    'type': fields.Nested(token_type, required=True, description='Type of the token'),
+    'type': fields.String(enum=token_type, required=True, description='Type of the token'),
     'contract_id': fields.String(max_length=36, required=True, description='Uniquely identifies the EV driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects."')
 })
 
@@ -79,7 +78,7 @@ Cdr = Model('Cdr', {
     'end_date_time': fields.DateTime(required=True, description='The timestamp when the session was completed/finished, charging might have finished before the session ends, for example: EV is full, but parking cost also has to be paid.'),
     'session_id': fields.String (max_length=36, required=False, description='Unique ID of the Session for which this CDR is sent. Is only allowed to be omitted when the CPO has not implemented the Sessions module or this CDR is the result of a reservation that never became a charging session, thus no OCPI Session.'),
     'cdr_token': fields.Nested(CdrToken, required=True, description='Token used to start this charging session, includes all the relevant information to identify the unique token.'),
-    'auth_method': fields.Nested(auth_method, required=True, description='Method used for authentication.'),
+    'auth_method': fields.String(enum=auth_method, required=True, description='Method used for authentication.'),
     'authorization_reference': fields.String(max_length=36, required=False, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value. When different authorization_reference values have been given by the eMSP that are relevant to this Session, the last given value SHALL be used here.'),
     'cdr_location': fields.Nested(CdrLocation, required=True, description='Location where the charging session took place, including only the relevant EVSE and Connector.'),
     'meter_id': fields.String(max_length=255, required=False, description='Identification of the Meter inside the Charge Point.'),
@@ -104,5 +103,7 @@ Cdr = Model('Cdr', {
 })
 
 def add_models_to_cdr_namespace(namespace):
-    for model in [Cdr, SignedData, SignedValue, ChargingPeriod, CdrToken, CdrLocation, CdrDimension]:
+    add_models_to_tariffs_namespace(namespace)
+    for model in [Cdr, SignedData, SignedValue, ChargingPeriod, CdrToken,
+                  CdrLocation, CdrDimension, ]:
         namespace.models[model.name] = model
