@@ -9,7 +9,8 @@ Created on Thu Mar 18 12:32:01 2021
 from flask_restx import Resource, Namespace, fields
 from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
 from ocpi.models import resp, respList, respRaw
-from ocpi.decorators import get_header_parser, token_required, pagination_parser
+from ocpi.decorators import (get_header_parser, token_required,
+                             pagination_parser, makeResponse)
 from datetime import datetime
 
 sessions_ns = Namespace(name="sessions", validate=True)
@@ -44,13 +45,9 @@ def senderNamespace():
             '''
             parser = pagination_parser()
             args = parser.parse_args()
-            data = self.sessionmanager.getSessions(
+            data, headers = self.sessionmanager.getSessions(
                 args['from'], args['to'], args['offset'], args['limit'])
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return makeResponse(data, headers=headers)
 
     @sessions_ns.route('/<string:session_id>/charging_preferences', doc={"description": "OCPI ChargingPreferences"})
     @sessions_ns.response(404, 'SessionID not found')

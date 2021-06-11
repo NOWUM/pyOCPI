@@ -14,7 +14,8 @@ reservation can be a request query or a reservation, which gets transferred to a
 from flask_restx import Resource, Namespace
 from ocpi.models.reservation import add_models_to_reservation_namespace, Reservation
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, pagination_parser
+from ocpi.decorators import (get_header_parser, token_required,
+                             pagination_parser, makeResponse)
 from datetime import datetime
 
 reservation_ns = Namespace(name="reservations", validate=True)
@@ -33,6 +34,7 @@ def receiverNamespace():
             super().__init__(api, *args, **kwargs)
 
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=404)
+        @token_required
         def get(self, country_id, party_id, reservation_id):
 
             try:
@@ -49,6 +51,7 @@ def receiverNamespace():
 
         @reservation_ns.expect(Reservation, validate=False)
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
+        @token_required
         def patch(self, country_id, party_id, reservation_id):
             '''
             Patch existing Reservation.
@@ -85,19 +88,16 @@ def senderNamespace():
 
         })
         @reservation_ns.marshal_with(respList(reservation_ns, Reservation))
+        @token_required
         def get(self):
             '''
             Only Reservations with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
             '''
             parser = pagination_parser()
             args = parser.parse_args()
-            data = self.reservation_manager.getReservations(
+            data, headers = self.reservation_manager.getReservations(
                 args['from'], args['to'], args['offset'], args['limit'])
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return makeResponse(data, headers=headers)
 
     @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
     @reservation_ns.response(404, 'Command not found')
@@ -109,6 +109,7 @@ def senderNamespace():
             super().__init__(api, *args, **kwargs)
 
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=404)
+        @token_required
         def get(self, country_id, party_id, reservation_id):
 
             try:
@@ -125,6 +126,7 @@ def senderNamespace():
 
         @reservation_ns.expect(Reservation)
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
+        @token_required
         def post(self, country_id, party_id, reservation_id):
             '''
             Add new Reservation.
@@ -145,6 +147,7 @@ def senderNamespace():
 
         @reservation_ns.expect(Reservation, validate=False)
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
+        @token_required
         def patch(self, country_id, party_id, reservation_id):
             '''
             Patch existing Reservation.

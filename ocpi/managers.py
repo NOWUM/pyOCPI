@@ -23,7 +23,7 @@ class ReservationManager():
         self.reservations = {}
 
     def getReservations(self, begin, end, offset, limit):
-        return list(self.reservations.values())[offset:offset+limit]
+        return list(self.reservations.values())[offset:offset+limit], {}
 
     def getReservation(self, country_id, party_id, reservation_id):
         log.debug('got reservation')
@@ -48,7 +48,7 @@ class SessionManager():
 
     def getSessions(self, begin, end, offset, limit):
         log.debug('get sessions')
-        return list(self.sessions.values())[offset:offset+limit]
+        return list(self.sessions.values())[offset:offset+limit], {}
 
     def getSession(self, country_id, party_id, session_id):
         log.debug('get session')
@@ -73,7 +73,7 @@ class ParkingSessionManager():
 
     def getParkingSessions(self, begin, end, offset, limit):
         log.debug('get parking sessions')
-        return list(self.parkingSessions.values())[offset:offset+limit]
+        return list(self.parkingSessions.values())[offset:offset+limit], {}
 
     def getParkingSession(self, country_id, party_id, ParkingSession_id):
         log.debug('get parking session')
@@ -205,7 +205,7 @@ class LocationManager(object):
         self.locations = {}
 
     def getLocations(self, begin, end, offset, limit):
-        return list(self.locations.values())[offset:offset+limit]
+        return list(self.locations.values())[offset:offset+limit], {}
 
     def getLocation(self, country_id, party_id, location_id):
         return self.locations[location_id]
@@ -300,7 +300,7 @@ class TokensManager(object):
         self.tokens = {}
 
     def getTokens(self, begin, end, offset, limit):
-        return list(self.tokens.values())[offset:offset+limit]
+        return list(self.tokens.values())[offset:offset+limit], {}
 
     def getToken(self, country_code, party_id, token_uid, type=None):
         return self.tokens[token_uid]
@@ -330,7 +330,7 @@ class TariffsManager(object):
         self.tariffs = {}
 
     def getTariffs(self, begin, end, offset, limit):
-        return list(self.tariffs.values())[offset:offset+limit]
+        return list(self.tariffs.values())[offset:offset+limit], {}
 
     def getTariff(self, country_code, party_id, tariff_id):
         return self.tariffs[tariff_id]
@@ -378,7 +378,7 @@ class CdrManager(object):
         self.cdrs = {}
 
     def getCdrs(self, begin, end, offset, limit):
-        return list(self.cdrs.values())[offset:offset+limit]
+        return list(self.cdrs.values())[offset:offset+limit], {}
 
     def getCdr(self, cdr_uid):
         return self.cdrs[cdr_uid]

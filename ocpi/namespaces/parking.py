@@ -14,7 +14,8 @@ reservations can be
 from flask_restx import Resource, Namespace
 from ocpi.models.parking import add_models_to_parking_namespace, ParkingSession
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, pagination_parser
+from ocpi.decorators import (get_header_parser, token_required,
+                             pagination_parser, makeResponse)
 from datetime import datetime
 
 parking_ns = Namespace(name="parking", validate=True)
@@ -46,15 +47,10 @@ def senderNamespace():
             """
             parser = pagination_parser()
             args = parser.parse_args()
-            data = self.parking_manager.getParkingSessions(
+            data, headers = self.parking_manager.getParkingSessions(
                 args["from"], args["to"], args["offset"], args["limit"]
             )
-            return {
-                "data": data,
-                "status_code": 1000,
-                "status_message": "nothing",
-                "timestamp": datetime.now(),
-            }
+            return makeResponse(data, headers=headers)
 
     @parking_ns.route(
         "/<string:country_id>/<string:party_id>/<string:reservation_id>",
@@ -68,6 +64,7 @@ def senderNamespace():
             super().__init__(api, *args, **kwargs)
 
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=404)
+        @token_required
         def get(self, country_id, party_id, session_id):
 
             try:
@@ -86,6 +83,7 @@ def senderNamespace():
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
+        @token_required
         def patch(self, country_id, party_id, reservation_id):
             '''
             Patch existing ParkingSession.
@@ -118,6 +116,7 @@ def receiverNamespace():
             super().__init__(api, *args, **kwargs)
 
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=200)
+        @token_required
         def get(self, country_id, party_id, session_id):
             """Get current information for Parkingsession"""
             return self.parking_manager.getParkingSession(
@@ -126,6 +125,7 @@ def receiverNamespace():
 
         @parking_ns.expect(ParkingSession)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
+        @token_required
         def put(self, country_id, party_id, session_id):
             """Add new Parkingsession"""
             session_id = session_id.upper()  # caseinsensitive
@@ -138,6 +138,7 @@ def receiverNamespace():
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
+        @token_required
         def patch(self, country_id, party_id, session_id):
             """Update existing Parkingsession"""
             session_id = session_id.upper()  # caseinsensitive

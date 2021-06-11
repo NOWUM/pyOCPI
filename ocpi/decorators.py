@@ -7,12 +7,14 @@ Created on Thu Apr  1 13:03:35 2021
 """
 
 # https://aaronluna.dev/series/flask-api-tutorial/part-4/
+import secrets
 import base64
 from werkzeug.exceptions import Unauthorized, Forbidden
 from functools import wraps
 from flask import request
 from flask_restx import reqparse
 from flask_restx.inputs import datetime_from_iso8601
+from datetime import datetime
 
 import logging
 
@@ -45,13 +47,14 @@ def token_required(f):
 
 def pagination_parser():
     parser = reqparse.RequestParser()
-    parser.add_argument('from', type=datetime_from_iso8601, default='2021-01-01T13:30:00+02:00')
-    parser.add_argument('to', type=datetime_from_iso8601, default='2038-01-01T13:30:00+02:00')
+    parser.add_argument('from', type=datetime_from_iso8601,
+                        default='2021-01-01T13:30:00+02:00')
+    parser.add_argument('to', type=datetime_from_iso8601,
+                        default='2038-01-01T13:30:00+02:00')
     parser.add_argument('offset', type=int, default=0)
     parser.add_argument('limit', type=int, default=50)
     return parser
 
-import secrets
 
 def createOcpiHeader(token):
     encToken = base64.b64encode(token.encode("utf-8")).decode('utf-8')
@@ -59,6 +62,7 @@ def createOcpiHeader(token):
         'Authorization': 'Token '+encToken,
         'X-Request-ID': secrets.token_urlsafe(8)
     }
+
 
 def _check_access_token():
     authToken = request.headers.get("Authorization")
@@ -89,3 +93,13 @@ def get_header_parser(namespace):
     parser.add_argument('X-Correlation-ID', location='headers')
 
     return parser
+
+
+def makeResponse(data, status_code=1000, message='nothing',
+                 timestamp=datetime.now(), http_code=200,
+                 headers=None):
+    return {'data': data,
+            'status_code': status_code,
+            'status_message': message,
+            'timestamp': timestamp,
+            }, http_code, headers

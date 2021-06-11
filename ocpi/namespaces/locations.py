@@ -9,7 +9,7 @@ Created on Thu Mar 18 18:26:15 2021
 import logging
 from flask_restx import Resource, Namespace
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required, pagination_parser
+from ocpi.decorators import get_header_parser, token_required, pagination_parser, makeResponse
 from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
 from datetime import datetime
 
@@ -219,6 +219,9 @@ def sender():
         })
         @locations_ns.marshal_with(respList(locations_ns, Location))
         @token_required
+        @locations_ns.header('Link', 'Link to the next ressource')
+        @locations_ns.header('X-Total-Count', 'Count of available Ressources with respect to filter but ignoring paginatino')
+        @locations_ns.header('X-Limit', 'The maximum number of objects that the server can return.')
         def get(self):
             '''
             Get Locations, allows pagination
@@ -226,13 +229,10 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
 
-            data = self.locationmanager.getLocations(
+            data, headers = self.locationmanager.getLocations(
                 args['from'], args['to'], args['offset'], args['limit'])
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            # TODO Link Header must contain a full url, which is quite bad abstraction-wise
+            return makeResponse(data, headers=headers)
 
 
 def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):

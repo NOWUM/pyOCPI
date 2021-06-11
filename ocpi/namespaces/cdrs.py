@@ -78,13 +78,8 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
 
-            data = self.cdrmanager.getCdrs(args['from'], args['to'], args['offset'], args['limit'])
-
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            data, headers = self.cdrmanager.getCdrs(args['from'], args['to'], args['offset'], args['limit'])
+            return makeResponse(data, headers=headers)
 
 def makeCdrNamespace(interfaces=['SENDER', 'RECEIVER']):
     if 'SENDER' in interfaces:

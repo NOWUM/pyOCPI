@@ -10,7 +10,8 @@ import logging
 from flask_restx import Resource, Namespace
 from flask_restx import reqparse
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required, pagination_parser
+from ocpi.decorators import (get_header_parser, token_required,
+                             pagination_parser, makeResponse)
 from ocpi.models.tokens import add_models_to_tokens_namespace, Token, LocationReferences
 from datetime import datetime
 
@@ -116,13 +117,9 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
 
-            data = self.tokensmanager.getTokens(
+            data, headers = self.tokensmanager.getTokens(
                 args['from'], args['to'], args['offset'], args['limit'])
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return makeResponse(data, headers=headers)
 
 
     @tokens_ns.route('/<string:token_uid>/authorize')

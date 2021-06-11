@@ -2,6 +2,7 @@
 
 from flask_restx import fields
 
+
 def respRaw(namespace, model):
     return namespace.model(model.name+'Response', {
         'data': model,
@@ -9,6 +10,7 @@ def respRaw(namespace, model):
         'status_message': fields.String(),
         'timestamp': fields.DateTime(required=True),
     })
+
 
 def resp(namespace, model):
     '''
@@ -21,6 +23,7 @@ def resp(namespace, model):
         'status_message': fields.String(),
         'timestamp': fields.DateTime(required=True),
     })
+
 
 def respList(namespace, model):
     '''
