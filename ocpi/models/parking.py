@@ -23,8 +23,8 @@ parking_status = [
 ParkingSession = BaseSession.clone("ParkingSession", {
     "license_plate": fields.String(description="License plate to identify parking session"),
     "status": fields.String(enum=parking_status, default="REQUEST", description="The status of the reservation."),
-    "tariff_elements": fields.List(
-        fields.Nested(TariffElement), description="List of Tariff elements needed to calculate the parking price"),
+    "price_components": fields.List(
+        fields.Nested(PriceComponent), description="List of Price Component elements needed to calculate the parking price"),
 })
 
 

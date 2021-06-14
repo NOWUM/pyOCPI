@@ -125,7 +125,7 @@ def senderNamespace():
                     }
 
         @reservation_ns.expect(Reservation)
-        @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
+        @reservation_ns.marshal_with(respList(reservation_ns, Reservation), code=201)
         @token_required
         def post(self, country_id, party_id, reservation_id):
             '''

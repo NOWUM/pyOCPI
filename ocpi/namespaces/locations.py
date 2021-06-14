@@ -232,6 +232,7 @@ def sender():
             data, headers = self.locationmanager.getLocations(
                 args['from'], args['to'], args['offset'], args['limit'])
             # TODO Link Header must contain a full url, which is quite bad abstraction-wise
+            # use data and headers together in one dictionary returned by every manager function
             return makeResponse(data, headers=headers)
 
 

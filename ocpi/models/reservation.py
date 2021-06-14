@@ -20,7 +20,7 @@ Reservation = BaseSession.clone('Reservation', {
     'connector_type': fields.String(enum=connector_type, max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
     'status': fields.String(enum=reservation_status, default="REQUEST", description='The status of the reservation.'),
     'license_plate': fields.String(description='The optional license plate for recognition at a car park'),
-    'tariff_elements': fields.List(fields.Nested(TariffElement), description="List of Tariff elements needed to calculate the parking price"),
+    'price_components': fields.List(fields.Nested(PriceComponent), description="List of Price Components needed to calculate the charging price"),
     'energy_mix': fields.Nested(EnergyMix, description='Name of the energy supplier, delivering the energy for this location or reservation'),
 })
 
