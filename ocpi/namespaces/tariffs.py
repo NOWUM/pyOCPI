@@ -107,7 +107,7 @@ def sender():
             return makeResponse(data, headers=headers)
 
 
-def makeTariffNamespace(interfaces=['SENDER', 'RECEIVER']):
+def makeTariffsNamespace(interfaces=['SENDER', 'RECEIVER']):
     log.debug('tariffs interfaces:'+str(interfaces))
     if 'SENDER' in interfaces:
         sender()

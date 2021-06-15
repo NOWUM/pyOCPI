@@ -20,6 +20,7 @@ from ocpi.namespaces.reservation import makeReservationNamespace
 from ocpi.namespaces.parking import makeParkingNamespace
 from ocpi.namespaces.tokens import makeTokenNamespace
 from ocpi.namespaces.cdrs import makeCdrNamespace
+from ocpi.namespaces.tariffs import makeTariffsNamespace
 from ocpi.namespaces.charging_profiles import makeChargingProfilesNamespace
 from ocpi.decorators import SingleCredMan
 from ocpi.managers import VersionManager
@@ -83,6 +84,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
         'parking': makeParkingNamespace(roles),
         'charging_profiles': makeChargingProfilesNamespace(roles),
         'tokens': makeTokenNamespace(roles),
+        'tariffs': makeTariffsNamespace(roles),
         'cdrs': makeCdrNamespace(roles),
     }
 
