@@ -146,5 +146,7 @@ def makeChargingProfilesNamespace(interfaces=['SENDER', 'RECEIVER']):
         sender()
     if 'RECEIVER' in interfaces:
         receiver()
+    if 'CPO' in interfaces:
+        receiver()
 
     return charging_profiles_ns

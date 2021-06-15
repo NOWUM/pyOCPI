@@ -138,4 +138,6 @@ def makeSessionNamespace(interfaces=['SENDER', 'RECEIVER']):
         senderNamespace()
     if 'RECEIVER' in interfaces:
         receiverNamespace()
+    if 'CPO' in interfaces:
+        senderNamespace()
     return sessions_ns

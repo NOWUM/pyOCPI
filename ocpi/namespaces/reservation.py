@@ -172,4 +172,6 @@ def makeReservationNamespace(interfaces=["SENDER", "RECEIVER"]):
         senderNamespace()
     if "RECEIVER" in interfaces:
         receiverNamespace()
+    if 'CPO' in interfaces:
+        senderNamespace()
     return reservation_ns

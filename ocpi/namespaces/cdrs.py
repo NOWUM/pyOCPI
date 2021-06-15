@@ -6,7 +6,8 @@ https://github.com/ocpi/ocpi/blob/master/mod_cdrs.asciidoc
 import logging
 from flask_restx import Resource, Namespace
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required, pagination_parser
+from ocpi.decorators import (get_header_parser, token_required,
+                             pagination_parser, makeResponse)
 from ocpi.models.cdrs import add_models_to_cdr_namespace, Cdr
 from datetime import datetime
 
@@ -16,6 +17,7 @@ add_models_to_cdr_namespace(cdrs_ns)
 parser = get_header_parser(cdrs_ns)
 
 log = logging.getLogger('ocpi')
+
 
 def receiver():
     @cdrs_ns.route('/<string:cdr_uid>')
@@ -63,9 +65,9 @@ def sender():
 
         @cdrs_ns.doc(params={
             'date_from': {'in': 'query', 'description': 'Only return CDRs that have last_updated after or equal to this Date/Time (inclusive).',
-                     'default': '2021-01-01T13:30:00+02:00', 'required': True},
+                          'default': '2021-01-01T13:30:00+02:00', 'required': True},
             'date_to': {'in': 'query', 'description': 'Only return CDRs that have last_updated up to this Date/Time, but not including (exclusive).', 'default': '2038-01-01T15:30:00+02:00',
-                   'required': True},
+                        'required': True},
             'offset': {'in': 'query', 'description': 'The offset of the first object returned. Default is 0.', 'default': '0'},
             'limit': {'in': 'query', 'description': 'Maximum number of objects to GET.', 'default': '50'},
         })
@@ -78,12 +80,16 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
 
-            data, headers = self.cdrmanager.getCdrs(args['from'], args['to'], args['offset'], args['limit'])
+            data, headers = self.cdrmanager.getCdrs(
+                args['from'], args['to'], args['offset'], args['limit'])
             return makeResponse(data, headers=headers)
+
 
 def makeCdrNamespace(interfaces=['SENDER', 'RECEIVER']):
     if 'SENDER' in interfaces:
         sender()
     if 'RECEIVER' in interfaces:
         receiver()
+    if 'CPO' in interfaces:
+        sender()
     return cdrs_ns

@@ -242,5 +242,7 @@ def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):
         sender()
     if 'RECEIVER' in interfaces:
         receiver()
+    if 'CPO' in interfaces:
+        sender()
 
     return locations_ns

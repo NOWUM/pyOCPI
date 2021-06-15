@@ -37,7 +37,7 @@ injected = {
 }
 
 
-def createOcpiBlueprint(base_url, injected_objects=injected, roles=['SENDER', 'RECEIVER'], ocpi_version='2.2'):
+def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDER', 'RECEIVER'], ocpi_version='2.2'):
     '''
     Creates API blueprint with injected Objects.
     Must contain a sessionmanager and others.
