@@ -94,12 +94,14 @@ class CredentialsManager():
         self.url = url
 
     def _getEndpoints(self, client_url):
+        endpoints = []
         try:
             response = requests.get(client_url+'/versions/details')
 
             endpoints = response.json()['data']['endpoints']
-        except:
-            endpoints = []
+        except requests.exceptions.ConnectionError:
+            log.error(f"no version details, connection to {client_url} failed")
+        except Exception:
             log.exception(f'could not get version details from {client_url}')
         return endpoints
 
@@ -108,7 +110,8 @@ class CredentialsManager():
                 "url": self.url,
                 "roles": self.credentials_roles}
         header = createOcpiHeader(access_client)
-        resp = requests.post(f'{url}/{version}/credentials', json=data, headers=header)
+        resp = requests.post(
+            f'{url}/{version}/credentials', json=data, headers=header)
         if resp.status_code == 200:
 
             data = resp.json()
@@ -295,6 +298,7 @@ class VersionManager():
             'endpoints': self._details
         }
 
+
 class TokensManager(object):
     def __init__(self):
         self.tokens = {}
@@ -325,6 +329,7 @@ class TokensManager(object):
             statusmessage = 'Unknown Token'
             return data, statuscode, statusmessage
 
+
 class TariffsManager(object):
     def __init__(self):
         self.tariffs = {}
@@ -348,13 +353,13 @@ class ChargingProfilesManager(object):
 
     # Retrieves the ActiveChargingProfile as it is currently planned for the the given session.
     def getChargingProfile(self, session_id, duration, response_url):
-        #return type: ChargingProfileResponse
+        # return type: ChargingProfileResponse
         pass
 
     # Creates a new ChargingProfile on a session, or replaces an existing ChargingProfile on the EVSE.
     def putChargingProfile(self, session_id, set_charging_profile):
         self.ChargingProfiles[session_id] = set_charging_profile['charging_profile']
-        #return type: ChargingProfileResponse
+        # return type: ChargingProfileResponse
         pass
 
     def handleActiveChargingProfileResult(self, session_id, charging_profile):
@@ -362,16 +367,18 @@ class ChargingProfilesManager(object):
 
     def handleChargingProfileResult(self, session_id, charging_profile):
         pass
+
     def handleClearProfileResult(self, session_id, charging_profile):
         pass
 
     # Clears the ChargingProfile set by the eMSP on the given session.
     def deleteChargingProfile(self, session_id, response_url):
-        #return type: ChargingProfileResponse
+        # return type: ChargingProfileResponse
         pass
 
-    def handleUpdateActiveChargingProfile(self,session_id, active_charging_profile):
+    def handleUpdateActiveChargingProfile(self, session_id, active_charging_profile):
         pass
+
 
 class CdrManager(object):
     def __init__(self):
@@ -385,4 +392,5 @@ class CdrManager(object):
 
     def postCdr(self, cdr):
         self.cdrs.append(cdr)
-        return self.cdrs[-1] # TODO: The response should contain the URL to the newly created CDR in the eMSP’s system, can be used by the CPO system to perform a GET on the same CDR.
+        # TODO: The response should contain the URL to the newly created CDR in the eMSP’s system, can be used by the CPO system to perform a GET on the same CDR.
+        return self.cdrs[-1]
