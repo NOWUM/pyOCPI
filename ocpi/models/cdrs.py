@@ -10,8 +10,9 @@ from ocpi.models.tokens import token_type
 from ocpi.models.tariffs import Price, Tariff, add_models_to_tariffs_namespace
 
 # Enums:
-auth_method = ['AUTH_REQUEST', 'COMMAND', 'WHITELIST'] #AuthMethod
-cdr_dimension_type= ['CURRENT', 'ENERGY', 'ENERGY_EXPORT', 'ENERGY_IMPORT', 'MAX_CURRENT', 'MIN_CURRENT', 'MAX_POWER', 'MIN_POWER', 'PARKING_TIME', 'POWER', 'RESERVATION_TIME', 'STATE_OF_CHARGE', 'TIME'] #CdrDimensionType
+auth_method = ['AUTH_REQUEST', 'COMMAND', 'WHITELIST']  # AuthMethod
+cdr_dimension_type = ['CURRENT', 'ENERGY', 'ENERGY_EXPORT', 'ENERGY_IMPORT', 'MAX_CURRENT', 'MIN_CURRENT',
+                      'MAX_POWER', 'MIN_POWER', 'PARKING_TIME', 'POWER', 'RESERVATION_TIME', 'STATE_OF_CHARGE', 'TIME']  # CdrDimensionType
 
 # Classes:
 CdrDimension = Model('CdrDimension', {
@@ -36,10 +37,10 @@ CdrLocation = Model('CdrLocation', {
 })
 
 CdrToken = Model('CdrToken', {
-    'uid': fields.String(max_length=36, required=True, description='Unique ID by which this Token can be identified.'
-                                                                    'This is the field used by the CPO’s system (RFID reader on the Charge Point) to identify this token.'
-                                                                    'Currently, in most cases: type=RFID, this is the RFID hidden ID as read by the RFID reader, but that is not a requirement.'
-                                                                    'If this is a type=APP_USER Token, it will be a unique, by the eMSP, generated ID.'),
+    'uid': fields.String(max_length=36, required=True, description='''Unique ID by which this Token can be identified.
+                         This is the field used by the CPO’s system (RFID reader on the Charge Point) to identify this token.
+                         Currently, in most cases: type=RFID, this is the RFID hidden ID as read by the RFID reader, but that is not a requirement.
+                         If this is a type=APP_USER Token, it will be a unique, by the eMSP, generated ID.'''),
     'type': fields.String(enum=token_type, required=True, description='Type of the token'),
     'contract_id': fields.String(max_length=36, required=True, description='Uniquely identifies the EV driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects."')
 })
@@ -51,12 +52,12 @@ ChargingPeriod = Model('ChargingPeriod', {
 })
 
 SignedValue = Model('SignedValue', {
-    'nature': fields.String(max_length=32, required=True, description='Nature of the value, in other words, the event this value belongs to.'
-                                                                        'Possible values at moment of writing:'
-                                                                        '- Start (value at the start of the Session)'
-                                                                        '- End (signed value at the end of the Session)'
-                                                                        '- Intermediate (signed values take during the Session, after Start, before End)'
-                                                                        'Others might be added later.'),
+    'nature': fields.String(max_length=32, required=True, description='''Nature of the value, in other words, the event this value belongs to.
+                            Possible values at moment of writing:
+                            - Start (value at the start of the Session)
+                            - End (signed value at the end of the Session)
+                            - Intermediate (signed values take during the Session, after Start, before End)
+                            Others might be added later.'''),
     'plain_data': fields.String(max_length=512, required=True, description='The unencoded string of data. The format of the content depends on the EncodingMethod field.'),
     'signed_data': fields.String(max_length=512, required=True, description='Blob of signed data, base64 encoded. The format of the content depends on the EncodingMethod field.')
 })
@@ -76,7 +77,7 @@ Cdr = Model('Cdr', {
     'id': fields.String(max_length=39, required=True, description='Uniquely identifies the CDR within the CPO’s platform (and suboperator platforms). This field is longer than the usual 36 characters to allow for credit CDRs to have something appended to the original ID. Normal (non-credit) CDRs SHALL only have an ID with a maximum length of 36.'),
     'start_date_time': fields.DateTime(required=True, description='Start timestamp of the charging session, or in-case of a reservation (before the start of a session) the start of the reservation.'),
     'end_date_time': fields.DateTime(required=True, description='The timestamp when the session was completed/finished, charging might have finished before the session ends, for example: EV is full, but parking cost also has to be paid.'),
-    'session_id': fields.String (max_length=36, required=False, description='Unique ID of the Session for which this CDR is sent. Is only allowed to be omitted when the CPO has not implemented the Sessions module or this CDR is the result of a reservation that never became a charging session, thus no OCPI Session.'),
+    'session_id': fields.String(max_length=36, required=False, description='Unique ID of the Session for which this CDR is sent. Is only allowed to be omitted when the CPO has not implemented the Sessions module or this CDR is the result of a reservation that never became a charging session, thus no OCPI Session.'),
     'cdr_token': fields.Nested(CdrToken, required=True, description='Token used to start this charging session, includes all the relevant information to identify the unique token.'),
     'auth_method': fields.String(enum=auth_method, required=True, description='Method used for authentication.'),
     'authorization_reference': fields.String(max_length=36, required=False, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value. When different authorization_reference values have been given by the eMSP that are relevant to this Session, the last given value SHALL be used here.'),
@@ -101,6 +102,7 @@ Cdr = Model('Cdr', {
     'credit_reference_id': fields.String(max_length=39, required=False, description='Is required to be set for a Credit CDR. This SHALL contain the id of the CDR for which this is a Credit CDR.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this CDR was last updated (or created).')
 })
+
 
 def add_models_to_cdr_namespace(namespace):
     add_models_to_tariffs_namespace(namespace)

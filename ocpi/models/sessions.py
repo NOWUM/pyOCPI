@@ -63,7 +63,7 @@ BaseSession = Model('BaseSession', {
     'status': fields.String(enum=session_status, default="PENDING", description='The status of the session.'),
     'charging_periods': fields.List(fields.Nested(ChargingPeriod), description='An optional list of Charging Periods that can be used to calculate and verify the total cost.', required=False),
     'last_updated': fields.DateTime(description='Timestamp when this Session was last updated (or created).')
-    })
+})
 
 Session = BaseSession.clone('Session', {
     'cdr_token': fields.Nested(CdrToken, required=True, description='Token used to start this charging session, including all the relevant information to identify the unique token.'),
