@@ -77,8 +77,8 @@ Session = BaseSession.clone('Session', {
 profile_type = ["CHEAP", "FAST", "GREEN", "REGULAR"]
 
 ChargingPreferences = Model('ChargingPreferences', {
-    'profile_type': fields.String(enum=profile_type, readonly=True, description='Type of Smart Charging Profile selected by the driver'),
-    'departure_time': fields.String(required=True, description='Expected departure. The driver has given this Date/Time as expected departure moment. It is only an estimation and not necessarily the Date/Time of the actual departure.'),
+    'profile_type': fields.String(enum=profile_type, description='Type of Smart Charging Profile selected by the driver'),
+    'departure_time': fields.DateTime(required=True, description='Expected departure. The driver has given this Date/Time as expected departure moment. It is only an estimation and not necessarily the Date/Time of the actual departure.'),
     'energy_need': fields.Float(description='Requested amount of energy in kWh. The EV driver wants to have this amount of energy charged.'),
     'discharge_allowed': fields.Boolean(default=False, description='The driver allows their EV to be discharged when needed, as long as the other preferences are met'),
 })
