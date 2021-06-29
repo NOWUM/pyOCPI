@@ -12,6 +12,7 @@ from flask_restx import fields, Model
 ############### Session Models ###############
 
 from ocpi.models.tokens import token_type
+from ocpi.models.tariffs import Price
 
 CdrToken = Model('CdrToken', {
     'uid': fields.String(max_length=36, required=True, description="Unique ID by which this Token can be identified."),
@@ -59,7 +60,7 @@ BaseSession = Model('BaseSession', {
     'location_id': fields.String(max_length=36, required=True, description='Location.id of the Location object of this CPO, on which the charging session is/was happening.'),
     'kWh': fields.Float(default=0, description='How many kWh were charged.'),
     'currency': fields.String(max_length=3, description='ISO 4217 code of the currency used for this session.'),
-    'total_cost': fields.Float(description='The total cost of the session in the specified currency. This is the price that the eMSP will have to pay to the CPO.'),
+    'total_cost': fields.Nested(Price, description='The total cost of the session in the specified currency. This is the price that the eMSP will have to pay to the CPO.'),
     'status': fields.String(enum=session_status, default="PENDING", description='The status of the session.'),
     'charging_periods': fields.List(fields.Nested(ChargingPeriod), description='An optional list of Charging Periods that can be used to calculate and verify the total cost.', required=False),
     'last_updated': fields.DateTime(description='Timestamp when this Session was last updated (or created).')
@@ -77,7 +78,7 @@ Session = BaseSession.clone('Session', {
 profile_type = ["CHEAP", "FAST", "GREEN", "REGULAR"]
 
 ChargingPreferences = Model('ChargingPreferences', {
-    'profile_type': fields.String(enum=profile_type, description='Type of Smart Charging Profile selected by the driver'),
+    'profile_type': fields.String(enum=profile_type, default="REGULAR", description='Type of Smart Charging Profile selected by the driver'),
     'departure_time': fields.DateTime(required=True, description='Expected departure. The driver has given this Date/Time as expected departure moment. It is only an estimation and not necessarily the Date/Time of the actual departure.'),
     'energy_need': fields.Float(description='Requested amount of energy in kWh. The EV driver wants to have this amount of energy charged.'),
     'discharge_allowed': fields.Boolean(default=False, description='The driver allows their EV to be discharged when needed, as long as the other preferences are met'),
@@ -88,5 +89,5 @@ charging_pref_results = ["ACCEPTED", "DEPARTURE_REQUIRED",
 
 
 def add_models_to_session_namespace(namespace):
-    for model in [CdrToken, CdrDimension, ChargingPeriod, Session, ChargingPreferences, BaseSession]:
+    for model in [CdrToken, CdrDimension, ChargingPeriod, Session, ChargingPreferences, BaseSession, Price]:
         namespace.models[model.name] = model
