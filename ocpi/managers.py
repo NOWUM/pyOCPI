@@ -89,9 +89,10 @@ class ParkingSessionManager():
 
 class CredentialsManager():
 
-    def __init__(self, credentials_roles: mc.CredentialsRole, url):
+    def __init__(self, credentials_roles: mc.CredentialsRole, url, **kwds):
         self.credentials_roles = credentials_roles
         self.url = url
+        super().__init__(**kwds)
 
     def _getEndpoints(self, client_url):
         endpoints = []
