@@ -96,10 +96,10 @@ def get_header_parser(namespace):
 
 
 def makeResponse(data, status_code=1000, message='nothing',
-                 timestamp=datetime.now(), http_code=200,
+                 timestamp=None, http_code=200,
                  headers=None):
     return {'data': data,
             'status_code': status_code,
             'status_message': message,
-            'timestamp': timestamp,
+            'timestamp': timestamp or datetime.now(),
             }, http_code, headers

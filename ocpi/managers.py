@@ -151,7 +151,7 @@ class CredentialsManager():
     def isAuthenticated(self, token):
         raise NotImplementedError()
 
-    def _updateToken(self, token, client_url, client_token, endpoint_list=[]):
+    def _updateToken(self, token, client_url, client_token, endpoint_list=None):
         raise NotImplementedError()
 
     def _deleteToken(self, token):
@@ -186,11 +186,11 @@ class CredentialsDictMan(CredentialsManager):
     def isAuthenticated(self, token):
         return token in self.readJson()
 
-    def _updateToken(self, token, client_url, client_token, endpoint_list=[]):
+    def _updateToken(self, token, client_url, client_token, endpoint_list=None):
         data = {
             'client_url': client_url,
             'client_token': client_token,
-            'endpoints': endpoint_list}
+            'endpoints': endpoint_list or []}
         with lock:
             tokens = self.readJson()
             tokens[token] = data
