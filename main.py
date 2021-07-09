@@ -74,8 +74,8 @@ if os.path.exists(config):
         conf = json.load(f)
         cm._updateToken(conf['token'], None, None, endpoint_list=[])
         cm.credentials_roles[0]['business_details']['name'] = conf['name']
-        cm.credentials_roles[0]['party_id']= conf['party_id']
-        cm.credentials_roles[0]['country_code']= conf['country_code']
+        cm.credentials_roles[0]['party_id'] = conf['party_id']
+        cm.credentials_roles[0]['country_code'] = conf['country_code']
 else:
     log.info(f'config file {config} does not exist')
     cm._updateToken('TESTTOKEN', None, None)
