@@ -94,16 +94,16 @@ class CredentialsManager():
         self.url = url
         super().__init__(**kwds)
 
-    def _getEndpoints(self, client_url):
+    def _getEndpoints(self, client_url, client_version= '2.2'):
         endpoints = []
         try:
-            response = requests.get(client_url+'/versions/details')
+            response = requests.get(f'{client_url}/{client_version}')
 
             endpoints = response.json()['data']['endpoints']
         except requests.exceptions.ConnectionError:
             log.error(f"no version details, connection to {client_url} failed")
         except Exception:
-            log.exception(f'could not get version details from {client_url}')
+            log.exception(f'could not get version details from {client_url}, {client_version}')
         return endpoints
 
     def _sendRegisterResponse(self, url, version, token, access_client):

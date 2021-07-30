@@ -17,7 +17,7 @@ add_models_to_version_namespace(versions_ns)
 header_parser = get_header_parser(versions_ns)
 
 
-@versions_ns.route('/', doc={"description": "API Endpoint to get available versions"})
+@versions_ns.route('versions', doc={"description": "API Endpoint to get available versions"})
 class get_versions(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
@@ -33,8 +33,8 @@ class get_versions(Resource):
                 'timestamp': datetime.now()
                 }
 
-
-@versions_ns.route('/details', doc={"description": "API Endpoint for Version details"})
+# TODO flexibel version number
+@versions_ns.route('2.2', doc={"description": "API Endpoint for Version details"})
 class get_details(Resource):
 
     def __init__(self, api=None, *args, **kwargs):

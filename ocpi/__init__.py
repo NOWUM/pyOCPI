@@ -90,7 +90,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
 
     endpoint_list = injected_objects.keys()
     used_namespaces = list(map(ns_dict.get, endpoint_list))
-    injected_objects['versions'] = VersionManager(base_url, endpoint_list, ocpi_version)
+    injected_objects['versions'] = VersionManager(base_url, endpoint_list, ['SENDER'], ocpi_version)
 
 
     # setting custom Namespaces should work too
@@ -102,7 +102,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
     # versions endpoint doe not include version
     for res in versions_ns.resources:
             res.kwargs['resource_class_kwargs'] = injected_objects
-    api.add_namespace(versions_ns, path="/"+versions_ns.name)
+    api.add_namespace(versions_ns, path="/")
 
     for namesp in used_namespaces:
 
