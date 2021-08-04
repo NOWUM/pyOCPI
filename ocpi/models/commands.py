@@ -6,6 +6,7 @@ Created on Thu Mar 18 00:21:29 2021
 @author: maurer
 """
 from flask_restx import fields, Model
+from ocpi.models.types import DisplayText
 
 ############### Command Models ###############
 
@@ -56,7 +57,7 @@ command_result = ['ACCEPTED', 'CANCELED_RESERVATION', 'EVSE_OCCUPIED', 'EVSE_INO
                   'FAILED', 'NOT_SUPPORTED', 'REJECTED', 'TIMEOUT', 'UNKNOWN_RESERVATION']
 CommandResult = Model('CommandResult', {
     'result': fields.String(enum=command_result, readonly=True, description='Result of the command request as sent by the Charge Point to the CPO.'),
-    'message': fields.String(required=True, description='Human-readable description of the result (if one can be provided), multiple languages can be provided.'),
+    'message': fields.List(fields.Nested(DisplayText), required=True, description='Human-readable description of the result (if one can be provided), multiple languages can be provided.'),
 })
 
 
