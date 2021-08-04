@@ -7,7 +7,7 @@ Created on Thu Mar 18 00:26:15 2021
 """
 
 from datetime import datetime
-from ocpi.decorators import token_required, get_header_parser
+from ocpi.decorators import token_required, get_header_parser, _check_access_token
 from flask_restx import Resource, Namespace
 from ocpi.models.commands import (add_models_to_commands_namespace,
                                   StartSession, StopSession, UnlockConnector,
@@ -25,7 +25,7 @@ parser = get_header_parser(commands_ns)
 class start_session(Resource):
 
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['commands']
+        self.cm = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.doc('PostCommand')  # operationId
@@ -34,7 +34,8 @@ class start_session(Resource):
     @token_required
     def post(self):
         '''Start Charging Session'''
-        data = self.command_manager.startSession(commands_ns.payload)
+        token = _check_access_token()
+        data = self.cm.startSession(commands_ns.payload, token)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -46,7 +47,7 @@ class start_session(Resource):
 @commands_ns.response(404, 'Command not found')
 class stop_session(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['commands']
+        self.cm = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser, StopSession)
@@ -54,7 +55,8 @@ class stop_session(Resource):
     @token_required
     def post(self):
         '''Stop Charging Session'''
-        data = self.command_manager.stopSession(commands_ns.payload)
+        token = _check_access_token()
+        data = self.cm.stopSession(commands_ns.payload, token)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -66,7 +68,7 @@ class stop_session(Resource):
 @commands_ns.response(404, 'Command not found')
 class unlock_connector(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['commands']
+        self.cm = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser, UnlockConnector)
@@ -74,7 +76,8 @@ class unlock_connector(Resource):
     @token_required
     def post(self):
         '''Unlock Connector'''
-        data = self.command_manager.unlockConnector(commands_ns.payload)
+        token = _check_access_token()
+        data = self.cm.unlockConnector(commands_ns.payload, token)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -86,7 +89,7 @@ class unlock_connector(Resource):
 @commands_ns.response(404, 'Command not found')
 class cancel_reservation(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['commands']
+        self.cm = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser, CancelReservation)
@@ -94,7 +97,8 @@ class cancel_reservation(Resource):
     @token_required
     def post(self):
         '''cancel reservation'''
-        data = self.command_manager.cancelReservation(commands_ns.payload)
+        token = _check_access_token()
+        data = self.cm.cancelReservation(commands_ns.payload, token)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
@@ -106,15 +110,16 @@ class cancel_reservation(Resource):
 @commands_ns.response(404, 'Command not found')
 class reserve_now(Resource):
     def __init__(self, api=None, *args, **kwargs):
-        self.command_manager = kwargs['commands']
+        self.cm = kwargs['commands']
         super().__init__(api, *args, **kwargs)
 
     @commands_ns.expect(parser, ReserveNow)
     @commands_ns.marshal_with(resp(commands_ns, CommandResponse), code=200)
     @token_required
     def post(self):
-        '''resrve Now'''
-        data = self.command_manager.reserveNow(commands_ns.payload)
+        '''reserve Now'''
+        token = _check_access_token()
+        data = self.cm.reserveNow(commands_ns.payload, token)
         return {'data': data,
                 'status_code': 1000,
                 'status_message': 'nothing',
