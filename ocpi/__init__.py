@@ -13,7 +13,7 @@ from flask_restx import Api
 
 from ocpi.namespaces.versions import versions_ns
 from ocpi.namespaces.credentials import credentials_ns
-from ocpi.namespaces.commands import commands_ns
+from ocpi.namespaces.commands import makeCommandsNamespace
 from ocpi.namespaces.sessions import makeSessionNamespace
 from ocpi.namespaces.locations import makeLocationNamespace
 from ocpi.namespaces.reservation import makeReservationNamespace
@@ -78,7 +78,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
         'locations': makeLocationNamespace(roles),
         'credentials': credentials_ns,
         'versions': versions_ns,
-        'commands': commands_ns,
+        'commands': makeCommandsNamespace(roles),
         'sessions': makeSessionNamespace(roles),
         'reservations': makeReservationNamespace(roles),
         'parking': makeParkingNamespace(roles),

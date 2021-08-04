@@ -243,24 +243,44 @@ class CommandsManager(object):
     def __init__(self):
         self.log = {}
 
-    def startSession(self, session_info):
+    def startSession(self, session_info, token):
         log.debug('start sessions')
         pass
 
-    def stopSession(self, session_info):
+    def stopSession(self, session_info, token):
         log.debug('stop sessions')
         pass
 
-    def unlockConnector(self, session_info):
+    def unlockConnector(self, session_info, token):
         log.debug('unlock connector')
         pass
 
-    def cancelReservation(self, session_info):
+    def cancelReservation(self, session_info, token):
         log.debug('cancel reservation')
         pass
 
-    def reserveNow(self, session_info):
+    def reserveNow(self, session_info, token):
         log.debug('reserve now')
+        pass
+    
+    def startSessionResult(self, session_info, token):
+        log.debug('start sessions result')
+        pass
+
+    def stopSessionResult(self, session_info, token):
+        log.debug('stop sessions result')
+        pass
+
+    def unlockConnectorResult(self, session_info, token):
+        log.debug('unlock connector result')
+        pass
+
+    def cancelReservationResult(self, session_info, token):
+        log.debug('cancel reservation result')
+        pass
+
+    def reserveNowResult(self, session_info, token):
+        log.debug('reserve now result')
         pass
 
 
