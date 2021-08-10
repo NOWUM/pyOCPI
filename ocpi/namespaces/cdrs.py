@@ -6,10 +6,9 @@ https://github.com/ocpi/ocpi/blob/master/mod_cdrs.asciidoc
 import logging
 from flask_restx import Resource, Namespace
 from ocpi.models import resp, respList
-from ocpi.decorators import (get_header_parser, token_required,
-                             pagination_parser, makeResponse)
 from ocpi.models.cdrs import add_models_to_cdr_namespace, Cdr
-from datetime import datetime
+from ocpi.namespaces import (get_header_parser, token_required,
+                             pagination_parser, make_response)
 
 cdrs_ns = Namespace(name="cdrs", validate=True)
 
@@ -33,12 +32,7 @@ def receiver():
             '''
             Retrieve an existing CDR.
             '''
-            data = self.cdrmanager.getCdr(cdr_uid)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.cdrmanager.getCdr, cdr_uid)
 
         @cdrs_ns.expect(Cdr)
         @token_required
@@ -46,12 +40,7 @@ def receiver():
             '''
             Send a new CDR.
             '''
-            data = self.cdrmanager.postCdr(cdrs_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.cdrmanager.postCdr, cdrs_ns.payload)
 
 
 def sender():
@@ -79,10 +68,8 @@ def sender():
             '''
             parser = pagination_parser()
             args = parser.parse_args()
-
-            data, headers = self.cdrmanager.getCdrs(
-                args['from'], args['to'], args['offset'], args['limit'])
-            return makeResponse(data, headers=headers)
+            return make_response(self.cdrmanager.getCdrs,
+                                args['from'], args['to'], args['offset'], args['limit'])
 
 
 def makeCdrNamespace(interfaces=['SENDER', 'RECEIVER']):

@@ -8,9 +8,8 @@ Created on Wed Mar 31 22:48:06 2021
 
 from flask_restx import Resource, Namespace
 from ocpi.models.version import VersionDetailsData, VersionsData, add_models_to_version_namespace
-from ocpi.decorators import get_header_parser
+from ocpi.namespaces import get_header_parser, make_response
 from ocpi.models import resp
-from datetime import datetime
 
 versions_ns = Namespace(name="versions", validate=True)
 add_models_to_version_namespace(versions_ns)
@@ -26,14 +25,11 @@ class get_versions(Resource):
 
     @versions_ns.marshal_with(resp(versions_ns, VersionsData))
     def get(self):
-        data = self.versionsmanager.versions()
-        return {'data': data,
-                'status_code': 1000,
-                'status_message': 'nothing',
-                'timestamp': datetime.now()
-                }
+        return make_response(self.versionsmanager.versions)
 
 # TODO flexibel version number
+
+
 @versions_ns.route('2.2', doc={"description": "API Endpoint for Version details"})
 class get_details(Resource):
 
@@ -47,9 +43,4 @@ class get_details(Resource):
         Get Version Details
         '''
 
-        data = self.versionsmanager.details()
-        return {'data': data,
-                'status_code': 1000,
-                'status_message': 'nothing',
-                'timestamp': datetime.now()
-                }
+        return make_response(self.versionsmanager.details)

@@ -6,10 +6,10 @@ https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc
 import logging
 from flask_restx import Resource, Namespace
 from ocpi.models import resp, respList
-from ocpi.decorators import (get_header_parser, token_required,
-                             pagination_parser, makeResponse)
 from ocpi.models.tariffs import add_models_to_tariffs_namespace, Tariff
-from datetime import datetime
+from ocpi.namespaces import (get_header_parser, token_required,
+                             pagination_parser, make_response)
+
 
 tariffs_ns = Namespace(name="tariffs", validate=True)
 
@@ -35,13 +35,8 @@ def receiver():
             '''
             Retrieve a Tariff as it is stored in the eMSP’s system.
             '''
-            data = self.tariffsmanager.getTariff(
-                country_code, party_id, tariff_id)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.tariffsmanager.getTariff,
+                                 country_code, party_id, tariff_id)
 
         @tariffs_ns.expect(Tariff)  # Model for New or updated Tariff object.
         @tariffs_ns.marshal_with(resp(tariffs_ns, Tariff))
@@ -50,14 +45,8 @@ def receiver():
             '''
             Push new/updated Tariff object to the eMSP.
             '''
-            self.tariffsmanager.putTariff(
-                country_code, party_id, tariff_id, tariffs_ns.payload)
-            data = 'accepted'
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.tariffsmanager.putTariff,
+                                 country_code, party_id, tariff_id, tariffs_ns.payload)
 
         @tariffs_ns.marshal_with(resp(tariffs_ns, Tariff))
         @token_required
@@ -65,13 +54,8 @@ def receiver():
             '''
             Remove a Tariff object which is no longer in use and will not be used in future either.
             '''
-            self.tariffsmanager.deleteTariff(country_code, party_id, tariff_id)
-            data = 'accepted'
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.tariffsmanager.deleteTariff,
+                                 country_code, party_id, tariff_id)
 
 # (https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc#121-sender-interface)
 
@@ -102,9 +86,8 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
 
-            data, headers = self.tariffsmanager.getTariffs(
-                args['from'], args['to'], args['offset'], args['limit'])
-            return makeResponse(data, headers=headers)
+            return make_response(self.tariffsmanager.getTariffs,
+                                 args['from'], args['to'], args['offset'], args['limit'])
 
 
 def makeTariffsNamespace(interfaces=['SENDER', 'RECEIVER']):

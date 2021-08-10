@@ -9,10 +9,9 @@ Created on Thu Mar 18 18:26:15 2021
 import logging
 from flask_restx import Resource, Namespace
 from ocpi.models import resp, respList
-from ocpi.decorators import get_header_parser, token_required, pagination_parser, makeResponse
 from ocpi.models.location import add_models_to_location_namespace, EVSE, Location, Connector
-from datetime import datetime
-
+from ocpi.namespaces import (get_header_parser, token_required,
+                             pagination_parser, make_response)
 
 locations_ns = Namespace(name="locations", validate=True)
 
@@ -39,12 +38,7 @@ def receiver():
             Filter Locations/EVSEs/Connectors by id
             '''
 
-            data = self.locationmanager.getLocation('', '', location_id)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.getLocation, '', '', location_id)
 
     # Receiver interface: eMSP and NSP.
 
@@ -61,13 +55,8 @@ def receiver():
             Get Location by ID
             '''
 
-            data = self.locationmanager.getLocation(
-                country_code, party_id, location_id)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.getLocation,
+                                 country_code, party_id, location_id)
 
         @locations_ns.expect(Location)
         @locations_ns.marshal_with(resp(locations_ns, Location))
@@ -76,13 +65,9 @@ def receiver():
             Add/Replace Location by ID
             '''
 
-            data = self.locationmanager.putLocation(
-                country_code, party_id, location_id, locations_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.putLocation,
+                                 country_code, party_id, location_id,
+                                 locations_ns.payload)
 
         @locations_ns.expect(Location)
         @locations_ns.marshal_with(resp(locations_ns, Location))
@@ -91,13 +76,9 @@ def receiver():
             Partially update Location
             '''
 
-            data = self.locationmanager.patchLocation(
-                country_code, party_id, location_id, locations_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.patchLocation,
+                                 country_code, party_id, location_id,
+                                 locations_ns.payload)
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>')
     @locations_ns.expect(parser)
@@ -112,13 +93,8 @@ def receiver():
             Get EVSE by ID
             '''
 
-            data = self.locationmanager.getEVSE(
-                country_code, party_id, location_id, evse_uid)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.getEVSE,
+                                 country_code, party_id, location_id, evse_uid)
 
         @locations_ns.expect(EVSE)
         @locations_ns.marshal_with(resp(locations_ns, EVSE))
@@ -127,12 +103,9 @@ def receiver():
             Add/Replace EVSE by ID
             '''
 
-            data = self.locationmanager.putEVSE[location_id][evse_uid]
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.putEVSE,
+                                 country_code, party_id, location_id, evse_uid,
+                                 locations_ns.payload)
 
         @locations_ns.expect(EVSE)
         @locations_ns.marshal_with(resp(locations_ns, EVSE))
@@ -141,12 +114,9 @@ def receiver():
             Partially update EVSE
             '''
 
-            data = self.locationmanager.patchEVSE[location_id][evse_uid]
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.patchEVSE,
+                                 country_code, party_id, location_id, evse_uid,
+                                 locations_ns.payload)
 
     @locations_ns.route('/<string:country_code>/<string:party_id>/<string:location_id>/<string:evse_uid>/<string:connector_id>')
     @locations_ns.expect(parser)
@@ -161,43 +131,30 @@ def receiver():
             Get Connector by ID
             '''
 
-            data = self.locationmanager.getConnector(
-                country_code, party_id, location_id, evse_uid, connector_id)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.getConnector,
+                                 country_code, party_id, location_id, evse_uid, connector_id)
 
         @locations_ns.expect(Connector)
         @locations_ns.marshal_with(resp(locations_ns, Connector))
-        def put(self, country_code, party_id, location_id, evse_uid):
+        def put(self, country_code, party_id, location_id, evse_uid, connector_id):
             '''
             Add/Replace Connector by ID
             '''
 
-            data = self.locationmanager.putConnector(
-                country_code, party_id, location_id, evse_uid)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.putConnector,
+                                 country_code, party_id, location_id, evse_uid, connector_id,
+                                 locations_ns.payload)
 
         @locations_ns.expect(Connector)
         @locations_ns.marshal_with(resp(locations_ns, Connector))
-        def patch(self, country_code, party_id, location_id, evse_uid):
+        def patch(self, country_code, party_id, location_id, evse_uid, connector_id):
             '''
             Partially update Connector
             '''
 
-            data = self.locationmanager.patchConnector(
-                country_code, party_id, location_id, evse_uid)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.locationmanager.patchConnector,
+                                 country_code, party_id, location_id, evse_uid,
+                                 locations_ns.payload)
 
     return locations_ns
 
@@ -229,11 +186,10 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
 
-            data, headers = self.locationmanager.getLocations(
-                args['from'], args['to'], args['offset'], args['limit'])
+            return make_response(self.locationmanager.getLocations,
+                                 args['from'], args['to'], args['offset'], args['limit'])
             # TODO Link Header must contain a full url, which is quite bad abstraction-wise
-            # use data and headers together in one dictionary returned by every manager function
-            return makeResponse(data, headers=headers)
+            # as the url should not be known to the managers
 
 
 def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):

@@ -12,11 +12,10 @@ reservation can be a request query or a reservation, which gets transferred to a
 
 
 from flask_restx import Resource, Namespace
-from ocpi.models.reservation import add_models_to_reservation_namespace, Reservation
 from ocpi.models import resp, respList
-from ocpi.decorators import (get_header_parser, token_required,
-                             pagination_parser, makeResponse)
-from datetime import datetime
+from ocpi.models.reservation import add_models_to_reservation_namespace, Reservation
+from ocpi.namespaces import (get_header_parser, token_required,
+                             pagination_parser, make_response)
 
 reservation_ns = Namespace(name="reservations", validate=True)
 add_models_to_reservation_namespace(reservation_ns)
@@ -37,17 +36,8 @@ def receiverNamespace():
         @token_required
         def get(self, country_id, party_id, reservation_id):
 
-            try:
-                ses = self.reservation_manager.getReservation(
-                    country_id, party_id, reservation_id)
-            except:
-                return '', 404
-
-            return {'data': ses,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.reservation_manager.getReservation,
+                                 country_id, party_id, reservation_id)
 
         @reservation_ns.expect(Reservation, validate=False)
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
@@ -62,13 +52,8 @@ def receiverNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            data = self.reservation_manager.updateReservation(
-                country_id, party_id, reservation_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.reservation_manager.updateReservation,
+                                 country_id, party_id, reservation_ns.payload)
 
 
 def senderNamespace():
@@ -95,9 +80,8 @@ def senderNamespace():
             '''
             parser = pagination_parser()
             args = parser.parse_args()
-            data, headers = self.reservation_manager.getReservations(
-                args['from'], args['to'], args['offset'], args['limit'])
-            return makeResponse(data, headers=headers)
+            return make_response(self.reservation_manager.getReservations,
+                                 args['from'], args['to'], args['offset'], args['limit'])
 
     @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
     @reservation_ns.response(404, 'Command not found')
@@ -112,17 +96,8 @@ def senderNamespace():
         @token_required
         def get(self, country_id, party_id, reservation_id):
 
-            try:
-                ses = self.reservation_manager.getReservation(
-                    country_id, party_id, reservation_id)
-            except:
-                return '', 404
-
-            return {'data': ses,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.reservation_manager.getReservation,
+                                 country_id, party_id, reservation_id)
 
         @reservation_ns.expect(Reservation)
         @reservation_ns.marshal_with(respList(reservation_ns, Reservation), code=201)
@@ -137,13 +112,8 @@ def senderNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            data = self.reservation_manager.addReservation(
-                country_id, party_id, reservation_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.reservation_manager.addReservation,
+                                 country_id, party_id, reservation_ns.payload)
 
         @reservation_ns.expect(Reservation, validate=False)
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
@@ -158,13 +128,8 @@ def senderNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            data = self.reservation_manager.updateReservation(
-                country_id, party_id, reservation_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.reservation_manager.updateReservation,
+                                 country_id, party_id, reservation_ns.payload)
 
 
 def makeReservationNamespace(interfaces=["SENDER", "RECEIVER"]):

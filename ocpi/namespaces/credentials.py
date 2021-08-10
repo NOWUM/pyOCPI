@@ -7,12 +7,13 @@ Created on Wed Mar 31 23:45:34 2021
 """
 
 from werkzeug.exceptions import BadRequest
-from ocpi.decorators import token_required, get_header_parser, _check_access_token
 from flask_restx import Resource, Namespace
-from ocpi.models.credentials import Credentials, add_models_to_credentials_namespace
 from ocpi.models import resp
-from datetime import datetime
+from ocpi.models.credentials import Credentials, add_models_to_credentials_namespace
 from ocpi.managers import CredentialsManager
+from ocpi.namespaces import (token_required, get_header_parser,
+                             _check_access_token, make_response)
+
 credentials_ns = Namespace(name="credentials", validate=True)
 add_models_to_credentials_namespace(credentials_ns)
 parser = get_header_parser(credentials_ns)
@@ -36,12 +37,7 @@ class credentials(Resource):
         request the credentials object if authenticated
         '''
         decodedToken = _check_access_token()
-        data = self.credentials_manager.getCredentials(decodedToken)
-        return {'data': data,
-                'status_code': 1000,
-                'status_message': 'nothing',
-                'timestamp': datetime.now()
-                }
+        return make_response(self.credentials_manager.getCredentials, decodedToken)
 
     @token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
@@ -55,13 +51,8 @@ class credentials(Resource):
             decodedToken = _check_access_token()
         except:
             raise BadRequest('Authorization Header must be base64 encoded')
-        data = self.credentials_manager.makeRegistration(
-            credentials_ns.payload, decodedToken)
-        return {'data': data,
-                'status_code': 1000,
-                'status_message': 'nothing',
-                'timestamp': datetime.now()
-                }
+        return make_response(self.credentials_manager.makeRegistration,
+                             credentials_ns.payload, decodedToken)
 
     @token_required
     @credentials_ns.marshal_with(resp(credentials_ns, Credentials))
@@ -71,13 +62,8 @@ class credentials(Resource):
         replace registration Token for version update
         '''
         decodedToken = _check_access_token()
-        data = self.credentials_manager.versionUpdate(
-            credentials_ns.payload, decodedToken)
-        return {'data': data,
-                'status_code': 1000,
-                'status_message': 'nothing',
-                'timestamp': datetime.now()
-                }
+        return make_response(self.credentials_manager.versionUpdate,
+                             credentials_ns.payload, decodedToken)
 
     @token_required
     @credentials_ns.expect(parser)
@@ -86,9 +72,4 @@ class credentials(Resource):
         unregisters from server
         '''
         decodedToken = _check_access_token()
-        data = self.credentials_manager.unregister(decodedToken)
-        return {'data': data,
-                'status_code': 1000,
-                'status_message': 'nothing',
-                'timestamp': datetime.now()
-                }
+        return make_response(self.credentials_manager.unregister, decodedToken)

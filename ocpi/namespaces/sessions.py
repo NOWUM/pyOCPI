@@ -7,11 +7,10 @@ Created on Thu Mar 18 12:32:01 2021
 """
 
 from flask_restx import Resource, Namespace, fields
-from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
 from ocpi.models import resp, respList, respRaw
-from ocpi.decorators import (get_header_parser, token_required,
-                             pagination_parser, makeResponse)
-from datetime import datetime
+from ocpi.models.sessions import add_models_to_session_namespace, Session, ChargingPreferences, charging_pref_results
+from ocpi.namespaces import (get_header_parser, token_required,
+                             pagination_parser, make_response)
 
 sessions_ns = Namespace(name="sessions", validate=True)
 add_models_to_session_namespace(sessions_ns)
@@ -45,9 +44,8 @@ def senderNamespace():
             '''
             parser = pagination_parser()
             args = parser.parse_args()
-            data, headers = self.sessionmanager.getSessions(
-                args['from'], args['to'], args['offset'], args['limit'])
-            return makeResponse(data, headers=headers)
+            return make_response(self.sessionmanager.getSessions,
+                                 args['from'], args['to'], args['offset'], args['limit'])
 
     @sessions_ns.route('/<string:session_id>/charging_preferences', doc={"description": "OCPI ChargingPreferences"})
     @sessions_ns.response(404, 'SessionID not found')
@@ -67,13 +65,8 @@ def senderNamespace():
             '''Update ChargingPreferences'''
             session_id = session_id.upper()  # caseinsensitive
 
-            data = self.sessionmanager.updateChargingPrefs(
-                session_id, sessions_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.sessionmanager.updateChargingPrefs,
+                                 session_id, sessions_ns.payload)
     return sessions_ns
 
 
@@ -90,13 +83,8 @@ def receiverNamespace():
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=200)
         @token_required
         def get(self, country_id, party_id, session_id):
-            data = self.session_manager.getSession(
-                country_id, party_id, session_id)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.session_manager.getSession,
+                                 country_id, party_id, session_id)
 
         @sessions_ns.expect(Session)
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=201)
@@ -107,13 +95,8 @@ def receiverNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            data = self.session_manager.createSession(
-                country_id, party_id, sessions_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.session_manager.createSession,
+                                 country_id, party_id, sessions_ns.payload)
 
         @sessions_ns.expect(Session, validate=False)
         @sessions_ns.marshal_with(resp(sessions_ns, Session), code=201)
@@ -123,13 +106,10 @@ def receiverNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            data = self.session_manager.patchSession(
-                country_id, party_id, session_id, sessions_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.session_manager.patchSession,
+                                 country_id, party_id, session_id,
+                                 sessions_ns.payload)
+
     return sessions_ns
 
 

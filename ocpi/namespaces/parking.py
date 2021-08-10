@@ -12,11 +12,10 @@ reservations can be
 """
 
 from flask_restx import Resource, Namespace
-from ocpi.models.parking import add_models_to_parking_namespace, ParkingSession
 from ocpi.models import resp, respList
-from ocpi.decorators import (get_header_parser, token_required,
-                             pagination_parser, makeResponse)
-from datetime import datetime
+from ocpi.models.parking import add_models_to_parking_namespace, ParkingSession
+from ocpi.namespaces import (get_header_parser, token_required,
+                             pagination_parser, make_response)
 
 parking_ns = Namespace(name="parking", validate=True)
 add_models_to_parking_namespace(parking_ns)
@@ -47,10 +46,9 @@ def senderNamespace():
             """
             parser = pagination_parser()
             args = parser.parse_args()
-            data, headers = self.parking_manager.getParkingSessions(
-                args["from"], args["to"], args["offset"], args["limit"]
-            )
-            return makeResponse(data, headers=headers)
+            return make_response(self.parking_manager.getParkingSessions,
+                                 args["from"], args["to"], args["offset"], args["limit"]
+                                 )
 
     @parking_ns.route(
         "/<string:country_id>/<string:party_id>/<string:reservation_id>",
@@ -67,19 +65,8 @@ def senderNamespace():
         @token_required
         def get(self, country_id, party_id, session_id):
 
-            try:
-                ses = self.parking_manager.getParkingSession(
-                    country_id, party_id, session_id
-                )
-            except:
-                return "", 404
-
-            return {
-                "data": ses,
-                "status_code": 1000,
-                "status_message": "nothing",
-                "timestamp": datetime.now(),
-            }
+            return make_response(self.parking_manager.getParkingSession,
+                                 country_id, party_id, session_id)
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
@@ -94,13 +81,8 @@ def senderNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            data = self.parking_manager.updateParkingSession(
-                country_id, party_id, parking_ns.payload)
-            return {'data': data,
-                    'status_code': 1000,
-                    'status_message': 'nothing',
-                    'timestamp': datetime.now()
-                    }
+            return make_response(self.parking_manager.updateParkingSession,
+                                 country_id, party_id, parking_ns.payload)
 
 
 def receiverNamespace():
@@ -119,9 +101,8 @@ def receiverNamespace():
         @token_required
         def get(self, country_id, party_id, session_id):
             """Get current information for Parkingsession"""
-            return self.parking_manager.getParkingSession(
-                country_id, party_id, session_id
-            )
+            return make_response(self.parking_manager.getParkingSession,
+                                 country_id, party_id, session_id)
 
         @parking_ns.expect(ParkingSession)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
@@ -132,9 +113,9 @@ def receiverNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            return self.parking_manager.createParkingSession(
-                country_id, party_id, session_id, parking_ns.payload
-            )
+            return make_response(self.parking_manager.createParkingSession,
+                                 country_id, party_id, session_id,
+                                 parking_ns.payload)
 
         @parking_ns.expect(ParkingSession, validate=False)
         @parking_ns.marshal_with(resp(parking_ns, ParkingSession), code=201)
@@ -145,7 +126,8 @@ def receiverNamespace():
             country_id = country_id.upper()
             party_id = party_id.upper()
 
-            return self.parking_manager.patchParkingSession(session_id, parking_ns.payload)
+            return make_response(self.parking_manager.patchParkingSession,
+                                 session_id, parking_ns.payload)
             # TODO save and process preferences somewhere
 
     return parking_ns

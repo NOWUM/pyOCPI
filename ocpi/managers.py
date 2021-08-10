@@ -10,9 +10,16 @@ from multiprocessing import RLock
 import json
 import ocpi.models.credentials as mc
 import logging
-from ocpi.decorators import createOcpiHeader
 import secrets
+import base64
 import os
+
+def createOcpiHeader(token):
+    encToken = base64.b64encode(token.encode("utf-8")).decode('utf-8')
+    return {
+        'Authorization': 'Token '+encToken,
+        'X-Request-ID': secrets.token_urlsafe(8)
+    }
 
 log = logging.getLogger('ocpi')
 # sender interface
@@ -95,7 +102,7 @@ class CredentialsManager():
         self.url = url
         super().__init__(**kwds)
 
-    def _getEndpoints(self, client_url, client_version= '2.2'):
+    def _getEndpoints(self, client_url, client_version='2.2'):
         endpoints = []
         try:
             response = requests.get(f'{client_url}/{client_version}')
@@ -104,7 +111,8 @@ class CredentialsManager():
         except requests.exceptions.ConnectionError:
             log.error(f"no version details, connection to {client_url} failed")
         except Exception:
-            log.exception(f'could not get version details from {client_url}, {client_version}')
+            log.exception(
+                f'could not get version details from {client_url}, {client_version}')
         return endpoints
 
     def _sendRegisterResponse(self, url, version, token, access_client):
@@ -166,11 +174,10 @@ class CredentialsManager():
         }
 
 
-
 class CredentialsDictMan(CredentialsManager):
-    
+
     lock = RLock()
-    
+
     def __init__(self, credentials_roles: mc.CredentialsRole, url, filename='ocpi_creds.json'):
         self.filename = filename
         with CredentialsDictMan.lock:
@@ -267,7 +274,7 @@ class CommandsManager(object):
     def reserveNow(self, session_info, token):
         log.debug('reserve now')
         pass
-    
+
     def startSessionResult(self, session_info, token):
         log.debug('start sessions result')
         pass
@@ -368,6 +375,7 @@ class TariffsManager(object):
 
     def putTariff(self, country_code, party_id, tariff_id, tariff):
         self.tariffs[tariff_id] = tariff
+        return 'accepted'
 
     def deleteTariff(self, country_code, party_id, tariff_id):
         del self.tariffs[tariff_id]
