@@ -71,7 +71,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, ocpi_version='2.2')
 
     if 'credentials' not in injected_objects:
         raise Exception('a credentials_manager must be injected')
-    SingleCredMan.setInstance(injected_objects['credentials'])
+    SingleCredMan.setInstance(injected_objects['credentials']['object'])
 
     ns_dict = {
         'locations': makeLocationNamespace,
@@ -114,6 +114,6 @@ def createOcpiBlueprint(base_url, injected_objects=injected, ocpi_version='2.2')
     for namesp in used_namespaces:
         if namesp is not None:
             for res in namesp.resources:
-                res.kwargs['resource_class_kwargs'] = injected_objects
+                res.kwargs['resource_class_kwargs'] = inj_obj
             api.add_namespace(namesp, path=f"/{ocpi_version}/"+namesp.name)
     return blueprint

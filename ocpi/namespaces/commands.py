@@ -182,6 +182,7 @@ def receiver():
 
 
 def makeCommandsNamespace(role):
+    if role == 'SENDER':
         sender()
     elif role == 'RECEIVER':
         receiver()
