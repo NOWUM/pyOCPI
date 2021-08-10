@@ -69,14 +69,15 @@ def sender():
             parser = pagination_parser()
             args = parser.parse_args()
             return make_response(self.cdrmanager.getCdrs,
-                                args['from'], args['to'], args['offset'], args['limit'])
+                                 args['from'], args['to'], args['offset'], args['limit'])
 
 
-def makeCdrNamespace(interfaces=['SENDER', 'RECEIVER']):
-    if 'SENDER' in interfaces:
+def makeCdrNamespace(role):
+    if role == 'SENDER':
         sender()
-    if 'RECEIVER' in interfaces:
+    elif role == 'RECEIVER':
         receiver()
-    if 'CPO' in interfaces:
-        sender()
+    else:
+        raise Exception('invalid role')
+
     return cdrs_ns

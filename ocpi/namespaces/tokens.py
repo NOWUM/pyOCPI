@@ -127,13 +127,12 @@ def sender():
     return tokens_ns
 
 
-def makeTokenNamespace(interfaces=['SENDER', 'RECEIVER']):
-    log.debug('tokens interfaces:'+str(interfaces))
-    if 'SENDER' in interfaces:
+def makeTokenNamespace(role):
+    if role == 'SENDER':
         sender()
-    if 'RECEIVER' in interfaces:
+    elif role == 'RECEIVER':
         receiver()
-    if 'CPO' in interfaces:
-        receiver()
+    else:
+        raise Exception('invalid role')
 
     return tokens_ns

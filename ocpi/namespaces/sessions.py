@@ -20,7 +20,7 @@ cp_result = fields.String(enum=charging_pref_results)
 cp_result.name = 'charg_pref_result'
 
 
-def senderNamespace():
+def sender():
     @sessions_ns.route('/', doc={"description": "API Endpoint for Session management"})
     @sessions_ns.expect(header_parser)
     class get_sessions(Resource):
@@ -70,7 +70,7 @@ def senderNamespace():
     return sessions_ns
 
 
-def receiverNamespace():
+def receiver():
     @sessions_ns.route('/<string:country_id>/<string:party_id>/<string:session_id>', doc={"description": "API Endpoint for Session management"})
     @sessions_ns.response(404, 'Command not found')
     @sessions_ns.expect(header_parser)
@@ -113,11 +113,12 @@ def receiverNamespace():
     return sessions_ns
 
 
-def makeSessionNamespace(interfaces=['SENDER', 'RECEIVER']):
-    if 'SENDER' in interfaces:
-        senderNamespace()
-    if 'RECEIVER' in interfaces:
-        receiverNamespace()
-    if 'CPO' in interfaces:
-        senderNamespace()
+def makeSessionNamespace(role):
+    if role == 'SENDER':
+        sender()
+    elif role == 'RECEIVER':
+        receiver()
+    else:
+        raise Exception('invalid role')
+
     return sessions_ns

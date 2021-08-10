@@ -22,7 +22,7 @@ add_models_to_reservation_namespace(reservation_ns)
 header_parser = get_header_parser(reservation_ns)
 
 
-def receiverNamespace():
+def receiver():
     @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
     @reservation_ns.response(404, 'Command not found')
     @reservation_ns.expect(header_parser)
@@ -56,7 +56,7 @@ def receiverNamespace():
                                  country_id, party_id, reservation_ns.payload)
 
 
-def senderNamespace():
+def sender():
     @reservation_ns.route('/', doc={"description": "API Endpoint for Reservation management"})
     @reservation_ns.expect(header_parser)
     class get_reservation(Resource):
@@ -132,11 +132,11 @@ def senderNamespace():
                                  country_id, party_id, reservation_ns.payload)
 
 
-def makeReservationNamespace(interfaces=["SENDER", "RECEIVER"]):
-    if "SENDER" in interfaces:
-        senderNamespace()
-    if "RECEIVER" in interfaces:
-        receiverNamespace()
-    if 'CPO' in interfaces:
-        senderNamespace()
+def makeReservationNamespace(role):
+    if role == 'SENDER':
+        sender()
+    elif role == 'RECEIVER':
+        receiver()
+    else:
+        raise Exception('invalid role')
     return reservation_ns

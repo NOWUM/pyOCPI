@@ -55,16 +55,18 @@ reservations = om.ReservationManager()
 HOST_URL = os.getenv('HOST_URL', "http://localhost:5000")+"/ocpi/"
 # TODO maybe provide interface and inject with decorator..?
 cm = om.CredentialsDictMan(cred_roles, HOST_URL)
+
+
 injected_objects = {
-    'credentials': cm,
-    'locations': loc,
-    'commands': commands,
-    'sessions': ses,
-    'reservations': reservations,
-    'tokens': om.TokensManager(),
-    'tariffs': om.TariffsManager(),
-    'charging_profiles': om.ChargingProfilesManager(),
-    'cdrs': om.CdrManager(),
+    'credentials': {'role': 'SENDER', 'object': cm},
+    'locations': {'role': 'SENDER', 'object': loc},
+    'commands': {'role': 'SENDER', 'object': commands},
+    'sessions': {'role': 'SENDER', 'object': ses},
+    'reservations': {'role': 'SENDER', 'object': reservations},
+    'tokens': {'role': 'SENDER', 'object': om.TokensManager()},
+    'tariffs': {'role': 'SENDER', 'object': om.TariffsManager()},
+    'charging_profiles': {'role': 'SENDER', 'object': om.ChargingProfilesManager()},
+    'cdrs': {'role': 'SENDER', 'object': om.CdrManager()},
 }
 
 config = 'ocpi.json'
@@ -81,7 +83,7 @@ else:
     cm._updateToken('TESTTOKEN', None, None)
 
 blueprint = createOcpiBlueprint(
-    HOST_URL, injected_objects, roles=['RECEIVER'])
+    HOST_URL, injected_objects)
 app.register_blueprint(blueprint)
 
 if __name__ == '__main__':

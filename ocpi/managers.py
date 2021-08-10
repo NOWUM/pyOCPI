@@ -14,12 +14,14 @@ import secrets
 import base64
 import os
 
+
 def createOcpiHeader(token):
     encToken = base64.b64encode(token.encode("utf-8")).decode('utf-8')
     return {
         'Authorization': 'Token '+encToken,
         'X-Request-ID': secrets.token_urlsafe(8)
     }
+
 
 log = logging.getLogger('ocpi')
 # sender interface
@@ -297,9 +299,8 @@ class CommandsManager(object):
 
 
 class VersionManager():
-    def __init__(self, base_url, endpoints: list, roles=['SENDER'], ocpi_version='2.2'):
+    def __init__(self, base_url, endpoints: dict, ocpi_version='2.2'):
         self._base_url = base_url
-        self._roles = roles
         self._ocpi_version = ocpi_version
         self._details = self._makeDetails(endpoints)
 
@@ -307,14 +308,13 @@ class VersionManager():
 
     def _makeDetails(self, endpoints):
         res = []
-        for role in self._roles:
-            for key in endpoints:
-                e = {}
-                e['identifier'] = key
-                e['role'] = role
-                e['url'] = f'{self._base_url}/{self._ocpi_version}/{key}'
-                res.append(e)
-            return res
+        for ep_name, role in endpoints.items():
+            e = {}
+            e['identifier'] = ep_name
+            e['role'] = role
+            e['url'] = f'{self._base_url}/{self._ocpi_version}/{ep_name}'
+            res.append(e)
+        return res
 
     def versions(self):
         return{

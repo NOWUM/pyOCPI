@@ -181,13 +181,11 @@ def receiver():
             return make_response(self.cm.reserveNowResult, commands_ns.payload, token)
 
 
-def makeCommandsNamespace(interfaces=['SENDER', 'RECEIVER']):
-    log.debug('location interfaces:'+str(interfaces))
-    if 'SENDER' in interfaces:
+def makeCommandsNamespace(role):
         sender()
-    if 'RECEIVER' in interfaces:
+    elif role == 'RECEIVER':
         receiver()
-    if 'CPO' in interfaces:
-        sender()
+    else:
+        raise Exception('invalid role')
 
     return commands_ns

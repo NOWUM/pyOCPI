@@ -121,13 +121,12 @@ def sender():
                                  session_id, charging_profiles_ns.payload)
 
 
-def makeChargingProfilesNamespace(interfaces=['SENDER', 'RECEIVER']):
-    log.debug('charging profiles interfaces:'+str(interfaces))
-    if 'SENDER' in interfaces:
+def makeChargingProfilesNamespace(role):
+    if role == 'SENDER':
         sender()
-    if 'RECEIVER' in interfaces:
+    elif role == 'RECEIVER':
         receiver()
-    if 'CPO' in interfaces:
-        receiver()
+    else:
+        raise Exception('invalid role')
 
     return charging_profiles_ns

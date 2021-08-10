@@ -29,15 +29,16 @@ import logging
 log = logging.getLogger('ocpi')
 
 injected = {
-    'credentials': None,
-    'locations': None,
-    'versions': None,
-    'commands': None,
-    'sessions': None,
-    'reservations': None,
+    'credentials': {'role': 'SENDER', 'object': None},
+    'locations': {'role': 'SENDER', 'object': None},
+    'versions': {'role': 'SENDER', 'object': None},
+    'commands': {'role': 'SENDER', 'object': None},
+    'sessions': {'role': 'SENDER', 'object': None},
+    'reservations': {'role': 'SENDER', 'object': None},
 }
 
-def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDER', 'RECEIVER'], ocpi_version='2.2'):
+
+def createOcpiBlueprint(base_url, injected_objects=injected, ocpi_version='2.2'):
     '''
     Creates API blueprint with injected Objects.
     Must contain a sessionmanager and others.
@@ -45,7 +46,7 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
 
     Parameters
     ----------
-    injected_objects : TYPE
+    injected_objects : dict
         DESCRIPTION.
 
     Returns
@@ -53,7 +54,6 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
     blueprint
 
     '''
-    roles = [r.upper() for r in roles]
     blueprint = Blueprint("ocpi_api", __name__, url_prefix="/ocpi")
     authorizations = {"Bearer": {"type": "apiKey",
                                  "in": "header", "name": "Authorization"}}
@@ -74,37 +74,44 @@ def createOcpiBlueprint(base_url, injected_objects=injected, roles=['CPO','SENDE
     SingleCredMan.setInstance(injected_objects['credentials'])
 
     ns_dict = {
-        'locations': makeLocationNamespace(roles),
-        'credentials': credentials_ns,
-        'versions': versions_ns,
-        'commands': makeCommandsNamespace(roles),
-        'sessions': makeSessionNamespace(roles),
-        'reservations': makeReservationNamespace(roles),
-        'parking': makeParkingNamespace(roles),
-        'charging_profiles': makeChargingProfilesNamespace(roles),
-        'tokens': makeTokenNamespace(roles),
-        'tariffs': makeTariffsNamespace(roles),
-        'cdrs': makeCdrNamespace(roles),
+        'locations': makeLocationNamespace,
+        'credentials': lambda x: credentials_ns,
+        'versions': lambda x: versions_ns,
+        'commands': makeCommandsNamespace,
+        'sessions': makeSessionNamespace,
+        'reservations': makeReservationNamespace,
+        'parking': makeParkingNamespace,
+        'charging_profiles': makeChargingProfilesNamespace,
+        'tokens': makeTokenNamespace,
+        'tariffs': makeTariffsNamespace,
+        'cdrs': makeCdrNamespace,
     }
 
-    endpoint_list = injected_objects.keys()
-    used_namespaces = list(map(ns_dict.get, endpoint_list))
-    injected_objects['versions'] = VersionManager(base_url, endpoint_list, ['SENDER'], ocpi_version)
+    used_namespaces = []
+    inj_obj = {}
+    endpoints = {}
+    for key, value in injected_objects.items():
+        ns = ns_dict[key](value['role'].upper())
+        used_namespaces.append(ns)
 
+        inj_obj[key] = value['object']
+        endpoints[key] = value['role'].upper()
+
+    inj_obj['versions'] = VersionManager(
+        base_url, endpoints, ocpi_version)
 
     # setting custom Namespaces should work too
     #import numpy as np
-    #used_namespaces = np.logical_or(used_namespaces,injected_objects.values())
+    #used_namespaces = np.logical_or(used_namespaces,inj_obj.values())
 
     log.debug(list(map(lambda x: x.name if x else '', used_namespaces)))
 
     # versions endpoint doe not include version
     for res in versions_ns.resources:
-            res.kwargs['resource_class_kwargs'] = injected_objects
+        res.kwargs['resource_class_kwargs'] = inj_obj
     api.add_namespace(versions_ns, path="/")
 
     for namesp in used_namespaces:
-
         if namesp is not None:
             for res in namesp.resources:
                 res.kwargs['resource_class_kwargs'] = injected_objects

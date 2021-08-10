@@ -192,13 +192,11 @@ def sender():
             # as the url should not be known to the managers
 
 
-def makeLocationNamespace(interfaces=['SENDER', 'RECEIVER']):
-    log.debug('location interfaces:'+str(interfaces))
-    if 'SENDER' in interfaces:
+def makeLocationNamespace(role):
+    if role == 'SENDER':
         sender()
-    if 'RECEIVER' in interfaces:
+    elif role == 'RECEIVER':
         receiver()
-    if 'CPO' in interfaces:
-        sender()
-
+    else:
+        raise Exception('invalid role')
     return locations_ns

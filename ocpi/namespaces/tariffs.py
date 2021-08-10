@@ -90,13 +90,12 @@ def sender():
                                  args['from'], args['to'], args['offset'], args['limit'])
 
 
-def makeTariffsNamespace(interfaces=['SENDER', 'RECEIVER']):
-    log.debug('tariffs interfaces:'+str(interfaces))
-    if 'SENDER' in interfaces:
+def makeTariffsNamespace(role):
+    if role == 'SENDER':
         sender()
-    if 'RECEIVER' in interfaces:
+    elif role == 'RECEIVER':
         receiver()
-    if 'CPO' in interfaces:
-        sender()
+    else:
+        raise Exception('invalid role')
 
     return tariffs_ns

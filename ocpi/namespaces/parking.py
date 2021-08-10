@@ -22,7 +22,7 @@ add_models_to_parking_namespace(parking_ns)
 header_parser = get_header_parser(parking_ns)
 
 
-def senderNamespace():
+def sender():
     @parking_ns.route(
         "/", doc={"description": "API Endpoint for ParkingSession management"}
     )
@@ -85,7 +85,7 @@ def senderNamespace():
                                  country_id, party_id, parking_ns.payload)
 
 
-def receiverNamespace():
+def receiver():
     @parking_ns.route(
         "/<string:country_id>/<string:party_id>/<string:session_id>",
         doc={"description": "API Endpoint for Session management"},
@@ -133,11 +133,11 @@ def receiverNamespace():
     return parking_ns
 
 
-def makeParkingNamespace(interfaces=['SENDER', 'RECEIVER']):
-    if 'SENDER' in interfaces:
-        senderNamespace()
-    if 'RECEIVER' in interfaces:
-        receiverNamespace()
-    if 'CPO' in interfaces:
-        senderNamespace()
+def makeParkingNamespace(role):
+    if role == 'SENDER':
+        sender()
+    elif role == 'RECEIVER':
+        receiver()
+    else:
+        raise Exception('invalid role')
     return parking_ns
