@@ -162,6 +162,9 @@ class CredentialsManager():
     def isAuthenticated(self, token):
         raise NotImplementedError()
 
+    def putModule(self, json_objects, module):
+        raise NotImplementedError()
+
     def _updateToken(self, token, client_url, client_token, endpoint_list=None):
         raise NotImplementedError()
 
@@ -199,6 +202,25 @@ class CredentialsDictMan(CredentialsManager):
 
     def isAuthenticated(self, token):
         return token in self.readJson()
+
+    def sendToModule(self, objects, module, method='PUT'):
+        for token in self.readJson().values():
+            actual_module = list(filter(lambda t: t['identifier']==module,token['endpoints']))
+            if actual_module:
+                for r in objects:
+                    headers = createOcpiHeader(token['client_token'])
+                    print('TEST', r)
+                    url = f"{actual_module[0]['url']}/{r['country_id']}/{r['party_id']}/{r['id']}"
+
+                    try:
+                        if method =='PUT':
+                            requests.put(url, headers=headers, json=r)
+                        elif method =='PATCH':
+                            requests.patch(url, headers=headers, json=r)
+                        else:
+                            log.error('invalid method provided: {method}')
+                    except Exception:
+                        log.exception('could not send to {url}')
 
     def _updateToken(self, token, client_url, client_token, endpoint_list=None):
         data = {
