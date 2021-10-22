@@ -162,7 +162,7 @@ class CredentialsManager():
     def isAuthenticated(self, token):
         raise NotImplementedError()
 
-    def putModule(self, json_objects, module):
+    def sendToModule(self, objects, module, method='PUT'):
         raise NotImplementedError()
 
     def _updateToken(self, token, client_url, client_token, endpoint_list=None):
