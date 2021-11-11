@@ -23,7 +23,7 @@ Reservation = BaseSession.clone('Reservation', {
     'license_plate': fields.String(description='The optional license plate for recognition at a car park'),
     'price_components': fields.List(fields.Nested(PriceComponent), description="List of Price Components needed to calculate the charging price"),
     'energy_mix': fields.Nested(EnergyMix, description='Name of the energy supplier, delivering the energy for this location or reservation'),
-
+    'max_charging_speed': fields.Float(description='Maximum charging speed if lower than selected connectors capabilities'),
 })
 
 
