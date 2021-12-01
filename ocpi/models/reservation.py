@@ -18,7 +18,7 @@ Reservation = BaseSession.clone('Reservation', {
     'token_uid': fields.String(required=True, description='The uid of the Token for which this reservation was requested.'),
     'charging_preferences': fields.Nested(ChargingPreferences, required=True, description='Charging Preferences for OCPI'),
     'auth_method': fields.String(enum=auth_method, required=True, description='Method used for authentication.'),
-    'connector_type': fields.String(enum=connector_type, max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
+    'connector_types': fields.List(fields.String(enum=connector_type, max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.')),
     'status': fields.String(enum=reservation_status, default="REQUEST", description='The status of the reservation.'),
     'license_plate': fields.String(description='The optional license plate for recognition at a car park'),
     'price_components': fields.List(fields.Nested(PriceComponent), description="List of Price Components needed to calculate the charging price"),
