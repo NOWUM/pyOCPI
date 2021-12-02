@@ -9,7 +9,7 @@ from flask_restx import fields, Model
 from .sessions import BaseSession, add_models_to_session_namespace
 from .sessions import auth_method, CdrToken, ChargingPeriod, ChargingPreferences
 from .location import connector_type, EnergyMix
-from .tariffs import TariffElement, TariffRestrictions, PriceComponent
+from .tariffs import PriceComponent
 
 reservation_status = ["REQUEST", "ACTIVE",
                       "COMPLETED", "INVALID", "PENDING", "RESERVATION"]
@@ -32,6 +32,6 @@ Reservation = BaseSession.clone('Reservation', {
 
 
 def add_models_to_reservation_namespace(namespace):
-    for model in [CdrToken, ChargingPeriod, ConnectorType, Reservation, TariffElement, TariffRestrictions, PriceComponent]:
+    for model in [CdrToken, ChargingPeriod, ConnectorType, Reservation, PriceComponent]:
         namespace.models[model.name] = model
     add_models_to_session_namespace(namespace)

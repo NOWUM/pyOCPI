@@ -8,7 +8,7 @@ Created on Thu Apr 29 15:03:13 2021
 
 from flask_restx import fields
 from .sessions import BaseSession, add_models_to_session_namespace
-from .tariffs import TariffElement, TariffRestrictions, PriceComponent
+from .tariffs import PriceComponent
 
 
 parking_status = [
@@ -29,6 +29,6 @@ ParkingSession = BaseSession.clone("ParkingSession", {
 
 
 def add_models_to_parking_namespace(namespace):
-    for model in [ParkingSession, TariffElement, TariffRestrictions, PriceComponent]:
+    for model in [ParkingSession, PriceComponent]:
         namespace.models[model.name] = model
     add_models_to_session_namespace(namespace)
