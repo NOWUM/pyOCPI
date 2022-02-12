@@ -52,7 +52,7 @@ auth_method = ["AUTH_REQUEST", "COMMAND", "WHITELIST"]
 session_status = ["ACTIVE", "COMPLETED", "INVALID", "PENDING", "RESERVATION"]
 
 BaseSession = Model('BaseSession', {
-    'country_id': fields.String(required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Session."),
+    'country_code': fields.String(required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Session."),
     'party_id': fields.String(required=True, description="CPO ID of the CPO that 'owns' this Session (following the ISO-15118 standard)."),
     'id': fields.String(max_length=36, required=True, description='The unique id that identifies the charging session in the CPO platform.'),
     'start_date_time': fields.DateTime(required=True, description='The timestamp when the session became ACTIVE in the Charge Point.'),
