@@ -125,6 +125,7 @@ def sender():
             Pending Reservations will be turned to Sessions when scheduled
             '''
             reservation_id = reservation_id.upper()  # caseinsensitive
+            # TODO validate reservation_id with payload
             country_id = country_id.upper()
             party_id = party_id.upper()
 
