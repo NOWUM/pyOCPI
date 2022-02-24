@@ -28,6 +28,8 @@ Reservation = BaseSession.clone('Reservation', {
     'license_plate': fields.String(description='The optional license plate for recognition at a car park'),
     'price_components': fields.List(fields.Nested(PriceComponent), description="List of Price Components needed to calculate the charging price"),
     'energy_mix': fields.Nested(EnergyMix, description='Name of the energy supplier, delivering the energy for this location or reservation'),
+    'connect_date_time' : fields.DateTime(required=False, description='The timestamp when the session was connected to the CS. Can be omitted if same as start_date_time'),
+    'disconnect_date_time' : fields.DateTime(required=False, description='The timestamp when the session was disconnected from the CS. Can be omitted if same as end_date_time'),
 })
 
 
