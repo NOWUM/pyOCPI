@@ -134,6 +134,24 @@ class CredentialsManager():
         else:
             raise Exception(f'{url} - HTTP {resp.status_code} - {resp.text}')
 
+    def _pushObjects(self, objects, method, token, endpoint_url):
+        headers = createOcpiHeader(token)
+        for r in objects:
+            try:
+                url = f"{endpoint_url}/{r['country_code']}/{r['party_id']}/{r['id']}"
+                if method == 'PUT':
+                    res = requests.put(url, headers=headers, json=r)
+                elif method == 'PATCH':
+                    res = requests.patch(url, headers=headers, json=r)
+                elif method == 'POST':
+                    res = requests.post(url, headers=headers, json=r)
+                else:
+                    log.error('invalid method provided: {method}')
+                if res.status_code > 200:
+                    log.warning(f'{res.status_code} - {res.text}')
+            except Exception:
+                log.exception(f'error sending to {url}')
+
     def makeRegistration(self, payload: mc.Credentials, tokenA: str):
         # tokenA used to get here for initial handshake
         self.unregister(tokenA)
@@ -207,20 +225,7 @@ class CredentialsDictMan(CredentialsManager):
         for token in self.readJson().values():
             actual_module = list(filter(lambda t: t['identifier']==module,token['endpoints']))
             if actual_module:
-                for r in objects:
-                    headers = createOcpiHeader(token['client_token'])
-                    print('TEST', r)
-                    url = f"{actual_module[0]['url']}/{r['country_id']}/{r['party_id']}/{r['id']}"
-
-                    try:
-                        if method =='PUT':
-                            requests.put(url, headers=headers, json=r)
-                        elif method =='PATCH':
-                            requests.patch(url, headers=headers, json=r)
-                        else:
-                            log.error('invalid method provided: {method}')
-                    except Exception:
-                        log.exception('could not send to {url}')
+                self._pushObjects(objects, method, token['client_token'], actual_module[0]['url'])
 
     def _updateToken(self, token, client_url, client_token, endpoint_list=None):
         data = {
