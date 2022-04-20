@@ -124,10 +124,10 @@ class CredentialsManager():
         header = createOcpiHeader(access_client)
         resp = requests.post(
             f'{url}/{version}/credentials', json=data, headers=header)
-        if resp.status_code == 200:
+        if resp.status_code > 205:
 
             data = resp.json()
-            log.info(f'registration successfull: {data}')
+            log.info(f'registration successful: {data}')
             return data['data']['token']
             # TODO check roles and business details
             # data['data']['roles']
@@ -147,14 +147,14 @@ class CredentialsManager():
                     res = requests.post(url, headers=headers, json=r)
                 else:
                     log.error('invalid method provided: {method}')
-                if res.status_code > 200:
+                if res.status_code > 205:
                     log.warning(f'{res.status_code} - {res.text}')
             except Exception:
                 log.exception(f'error sending to {url}')
 
     def makeRegistration(self, payload: mc.Credentials, tokenA: str):
         # tokenA used to get here for initial handshake
-        self.unregister(tokenA)
+        self._deleteToken(tokenA)
         tokenB = payload['token']
         client_url = payload['url']
 
