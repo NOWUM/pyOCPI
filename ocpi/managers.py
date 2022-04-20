@@ -125,14 +125,13 @@ class CredentialsManager():
         resp = requests.post(
             f'{url}/{version}/credentials', json=data, headers=header)
         if resp.status_code > 205:
-
+            raise Exception(f'{url} - HTTP {resp.status_code} - {resp.text}')
+        else:
             data = resp.json()
             log.info(f'registration successful: {data}')
             return data['data']['token']
             # TODO check roles and business details
             # data['data']['roles']
-        else:
-            raise Exception(f'{url} - HTTP {resp.status_code} - {resp.text}')
 
     def _pushObjects(self, objects, method, token, endpoint_url):
         headers = createOcpiHeader(token)
