@@ -124,6 +124,10 @@ class CredentialsManager():
         header = createOcpiHeader(access_client)
         resp = requests.post(
             f'{url}/{version}/credentials', json=data, headers=header)
+        if resp.status_code == 405:
+            resp = requests.put(
+                f'{url}/{version}/credentials', json=data, headers=header)
+
         if resp.status_code > 205:
             raise Exception(f'{url} - HTTP {resp.status_code} - {resp.text}')
         else:
