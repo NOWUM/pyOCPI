@@ -49,7 +49,7 @@ class credentials(Resource):
         try:
 
             decodedToken = _check_access_token()
-        except:
+        except Exception:
             raise BadRequest('Authorization Header must be base64 encoded')
         return make_response(self.credentials_manager.makeRegistration,
                              credentials_ns.payload, decodedToken)

@@ -65,7 +65,7 @@ def _check_access_token():
         if not (man.isAuthenticated(decodedToken)):
             raise Forbidden(description="not authorized")
         return decodedToken
-    except:
+    except Exception:
         # accept plain token as token if not base64
         log.error('token was not sent as base64')
         if not man.isAuthenticated(token):

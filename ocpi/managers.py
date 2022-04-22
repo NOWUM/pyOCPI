@@ -127,15 +127,15 @@ class CredentialsManager():
         if resp.status_code == 405:
             resp = requests.put(
                 f'{url}/{version}/credentials', json=data, headers=header)
+        resp.raise_for_status()
+        # catch as requests.exceptions.HTTPError
+        # get e.response.status_code
 
-        if resp.status_code > 205:
-            raise Exception(f'{url} - HTTP {resp.status_code} - {resp.text}')
-        else:
-            data = resp.json()
-            log.info(f'registration successful: {data}')
-            return data['data']['token']
-            # TODO check roles and business details
-            # data['data']['roles']
+        data = resp.json()
+        log.info(f'registration successful: {data}')
+        return data['data']['token']
+        # TODO check roles and business details
+        # data['data']['roles']
 
     def _pushObjects(self, objects, method, token, endpoint_url):
         headers = createOcpiHeader(token)
@@ -149,9 +149,11 @@ class CredentialsManager():
                 elif method == 'POST':
                     res = requests.post(url, headers=headers, json=r)
                 else:
-                    log.error('invalid method provided: {method}')
-                if res.status_code > 205:
-                    log.warning(f'{res.status_code} - {res.text}')
+                    raise Exception('invalid method provided: {method}')
+
+                res.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                log.warning(f'{e.response.status_code} - {e.response.text}')
             except Exception:
                 log.exception(f'error sending to {url}')
 
