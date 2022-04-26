@@ -154,6 +154,8 @@ class CredentialsManager():
                 res.raise_for_status()
             except requests.exceptions.HTTPError as e:
                 log.warning(f'{e.response.status_code} - {e.response.text}')
+            except requests.exceptions.ConnectionError:
+                log.warning(f'could not connect to {url}')
             except Exception:
                 log.exception(f'error sending to {url}')
 
