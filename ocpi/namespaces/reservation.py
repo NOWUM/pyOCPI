@@ -102,7 +102,7 @@ def sender():
         @reservation_ns.expect(Reservation)
         @reservation_ns.marshal_with(respList(reservation_ns, Reservation), code=201)
         @token_required
-        def post(self, country_id, party_id, reservation_id):
+        def put(self, country_id, party_id, reservation_id):
             '''
             Add new Reservation.
             Reservation can have status REQUEST for price requests.
