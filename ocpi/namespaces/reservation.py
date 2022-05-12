@@ -26,7 +26,7 @@ def receiver():
     @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
     @reservation_ns.response(404, 'Command not found')
     @reservation_ns.expect(header_parser)
-    class start_reservation(Resource):
+    class update_reservations(Resource):
 
         def __init__(self, api=None, *args, **kwargs):
             self.reservation_manager = kwargs['reservations']
@@ -35,9 +35,25 @@ def receiver():
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=404)
         @token_required
         def get(self, country_id, party_id, reservation_id):
-
+            '''
+            Get the current reservation from the eMSP.
+            '''
             return make_response(self.reservation_manager.getReservation,
                                  country_id, party_id, reservation_id)
+
+        @reservation_ns.expect(Reservation)
+        @reservation_ns.marshal_with(respList(reservation_ns, Reservation), code=201)
+        @token_required
+        def put(self, country_id, party_id, reservation_id):
+            '''
+            Update the reservation of the CPO at the eMSP to announce a changed state.
+            '''
+            reservation_id = reservation_id.upper()  # caseinsensitive
+            country_id = country_id.upper()
+            party_id = party_id.upper()
+
+            return make_response(self.reservation_manager.addReservation,
+                                 country_id, party_id, reservation_ns.payload)
 
         @reservation_ns.expect(Reservation, validate=False)
         @reservation_ns.marshal_with(resp(reservation_ns, Reservation), code=201)
@@ -76,6 +92,7 @@ def sender():
         @token_required
         def get(self):
             '''
+            Get Reservations from the CPO where the eMSP is responsible for.
             Only Reservations with last_update between the given {date_from} (including) and {date_to} (excluding) will be returned.
             '''
             parser = pagination_parser()
@@ -86,7 +103,7 @@ def sender():
     @reservation_ns.route('/<string:country_id>/<string:party_id>/<string:reservation_id>', doc={"description": "API Endpoint for Reservation management"})
     @reservation_ns.response(404, 'Command not found')
     @reservation_ns.expect(header_parser)
-    class start_reservation(Resource):
+    class add_reservations(Resource):
 
         def __init__(self, api=None, *args, **kwargs):
             self.reservation_manager = kwargs['reservations']
@@ -102,9 +119,9 @@ def sender():
         @reservation_ns.expect(Reservation)
         @reservation_ns.marshal_with(respList(reservation_ns, Reservation), code=201)
         @token_required
-        def put(self, country_id, party_id, reservation_id):
+        def post(self, country_id, party_id, reservation_id):
             '''
-            Add new Reservation.
+            Request new Reservation at the CPO.
             Reservation can have status REQUEST for price requests.
             Pending Reservations will be turned to Sessions when scheduled
             '''
@@ -120,7 +137,7 @@ def sender():
         @token_required
         def patch(self, country_id, party_id, reservation_id):
             '''
-            Patch existing Reservation.
+            Patch existing Reservation at the CPO.
             Reservation can have status REQUEST for price requests.
             Pending Reservations will be turned to Sessions when scheduled
             '''
