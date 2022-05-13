@@ -243,7 +243,7 @@ class CredentialsDictMan(CredentialsManager):
             tokens = self.readJson()
             tokens[token] = data
             self.writeJson(tokens)
-        log.info(f'current tokens: {tokens}')
+        log.debug(f'current tokens: {tokens}')
 
     def _deleteToken(self, token):
         with CredentialsDictMan.lock:
