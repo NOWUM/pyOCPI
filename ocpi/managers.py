@@ -137,11 +137,15 @@ class CredentialsManager():
         # TODO check roles and business details
         # data['data']['roles']
 
-    def _pushObjects(self, objects, method, token, endpoint_url):
+    def _pushObjects(self, objects, method, token, endpoint_url, with_path=True):
         headers = createOcpiHeader(token)
         for r in objects:
             try:
-                url = f"{endpoint_url}/{r['country_code']}/{r['party_id']}/{r['id']}"
+                if with_path:
+                    url = f"{endpoint_url}/{r['country_code']}/{r['party_id']}/{r['id']}"
+                else:
+                    url = endpoint_url
+
                 if method == 'PUT':
                     res = requests.put(url, headers=headers, json=r)
                 elif method == 'PATCH':
@@ -153,7 +157,7 @@ class CredentialsManager():
 
                 res.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                log.warning(f'{e.response.status_code} - {e.response.text}')
+                log.warning(f'ocpi push object {e.response.status_code} - {e.response.text}')
             except requests.exceptions.ConnectionError:
                 log.warning(f'could not connect to {url}')
             except Exception:
@@ -187,7 +191,7 @@ class CredentialsManager():
     def isAuthenticated(self, token):
         raise NotImplementedError()
 
-    def sendToModule(self, objects, module, method='PUT'):
+    def sendToModule(self, objects, module, method='PUT', with_path=True):
         raise NotImplementedError()
 
     def _updateToken(self, token, client_url, client_token, endpoint_list=None):
@@ -228,7 +232,7 @@ class CredentialsDictMan(CredentialsManager):
     def isAuthenticated(self, token):
         return token in self.readJson()
 
-    def sendToModule(self, objects, module, method='PUT'):
+    def sendToModule(self, objects, module, method='PUT', with_path=True):
         for token in self.readJson().values():
             actual_module = list(filter(lambda t: t['identifier']==module,token['endpoints']))
             if actual_module:
