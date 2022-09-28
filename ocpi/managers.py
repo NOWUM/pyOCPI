@@ -157,7 +157,7 @@ class CredentialsManager():
 
                 res.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                log.warning(f'ocpi push object {e.response.status_code} - {e.response.text}')
+                log.warning(f'ocpi {method} object {e.response.status_code} - {e.response.text} - {url}')
             except requests.exceptions.ConnectionError:
                 log.warning(f'could not connect to {url}')
             except Exception:
