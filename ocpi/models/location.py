@@ -9,7 +9,7 @@ Created on Mon Mar 29 23:51:45 2021
 ############### Location Models ###############
 
 from flask_restx import fields, Model
-from ocpi.models.types import DisplayText
+from ocpi.models.types import DisplayText, CaseInsensitiveString
 from ocpi.models.tokens import token_type
 
 AdditionalGeoLocation = Model('AdditionalGeoLocation', {
@@ -255,9 +255,9 @@ EVSE = Model('EVSE', {
 })
 
 Location = Model('Location', {
-    'country_code': fields.String(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Location."),
-    'party_id':     fields.String(max_length=3, required=True, description="CPO ID of the CPO that 'owns' this Location (following the ISO-15118 standard)."),
-    'id':           fields.String(max_length=36, required=True, description='Uniquely identifies the location within the CPOs platform (and suboperator platforms). This field can never be changed, modified or renamed.'),
+    'country_code': CaseInsensitiveString(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Location."),
+    'party_id':     CaseInsensitiveString(max_length=3, required=True, description="CPO ID of the CPO that 'owns' this Location (following the ISO-15118 standard)."),
+    'id':           CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the location within the CPOs platform (and suboperator platforms). This field can never be changed, modified or renamed.'),
     'publish':      fields.Boolean(required=True, default=True, description='Defines if a Location may be published on an website or app etc.'),
     'publish_allowed_to': fields.List(fields.String(description='Only owners of Tokens that match all the set fields of one PublishToken in the list are allowed to be shown this location.')),
     'name':         fields.String(max_length=255, description='Display name of the location.'),

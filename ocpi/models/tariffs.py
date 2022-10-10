@@ -5,7 +5,7 @@ https://github.com/ocpi/ocpi/blob/master/mod_tariffs.asciidoc
 """
 
 from flask_restx import Model, fields
-from ocpi.models.types import DisplayText
+from ocpi.models.types import DisplayText, CaseInsensitiveString
 from ocpi.models.location import EnergyMix
 
 # Enums:
@@ -57,9 +57,9 @@ TariffElement = Model('TariffElement', {
 
 # Objects:
 Tariff = Model('Tariff', {
-    'country_code': fields.String(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the CPO that owns this Tariff."),
-    'party_id': fields.String(max_length=3, required=True, description="CPO ID of the CPO that owns this Tariff (following the ISO-15118 standard)."),
-    'id': fields.String(max_length=36, required=True, description='Uniquely identifies the tariff within the CPO’s platform (and suboperator platforms).'),
+    'country_code': CaseInsensitiveString(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the CPO that owns this Tariff."),
+    'party_id': CaseInsensitiveString(max_length=3, required=True, description="CPO ID of the CPO that owns this Tariff (following the ISO-15118 standard)."),
+    'id': CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the tariff within the CPO’s platform (and suboperator platforms).'),
     'currency': fields.String(max_length=3, required=True, description='ISO-4217 code of the currency of this tariff.'),
     'type': fields.String(enum=tariff_type, required=False, description='Defines the type of the tariff. This allows for distinction in case of given Charging Preferences. When omitted, this tariff is valid for all sessions.'),
     'tariff_alt_text': fields.List(fields.Nested(DisplayText), required=False, description='List of multi-language alternative tariff info texts.'),

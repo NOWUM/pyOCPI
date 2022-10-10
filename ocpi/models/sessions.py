@@ -13,11 +13,14 @@ from flask_restx import fields, Model
 
 from ocpi.models.tokens import token_type
 from ocpi.models.tariffs import Price
+from ocpi.models.types import CaseInsensitiveString
 
 CdrToken = Model('CdrToken', {
-    'uid': fields.String(max_length=36, required=True, description="Unique ID by which this Token can be identified."),
+    'country_code': CaseInsensitiveString(required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Session."),
+    'party_id': CaseInsensitiveString(required=True, description="CPO ID of the CPO that 'owns' this Token (following the ISO-15118 standard)."),
+    'uid': CaseInsensitiveString(max_length=36, required=True, description="Unique ID by which this Token can be identified."),
     'type': fields.String(enum=token_type, required=True, description="Type of the token"),
-    'contract_id': fields.String(max_length=36, required=True, description='Uniquely identifies the EV driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" '),
+    'contract_id': CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the EV driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" '),
 })
 
 cdr_dimension_type = ["CURRENT",
@@ -52,9 +55,9 @@ auth_method = ["AUTH_REQUEST", "COMMAND", "WHITELIST"]
 session_status = ["ACTIVE", "COMPLETED", "INVALID", "PENDING", "RESERVATION"]
 
 BaseSession = Model('BaseSession', {
-    'country_code': fields.String(required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Session."),
-    'party_id': fields.String(required=True, description="CPO ID of the CPO that 'owns' this Session (following the ISO-15118 standard)."),
-    'id': fields.String(max_length=36, required=True, description='The unique id that identifies the charging session in the CPO platform.'),
+    'country_code': CaseInsensitiveString(required=True, description="ISO-3166 alpha-2 country code of the CPO that 'owns' this Session."),
+    'party_id': CaseInsensitiveString(required=True, description="CPO ID of the CPO that 'owns' this Session (following the ISO-15118 standard)."),
+    'id': CaseInsensitiveString(max_length=36, required=True, description='The unique id that identifies the charging session in the CPO platform.'),
     'start_date_time': fields.DateTime(required=True, description='The timestamp when the session became ACTIVE in the Charge Point.'),
     'end_date_time': fields.DateTime(description='The timestamp when the session was completed/finished, charging might have finished before the session ends, for example: EV is full, but parking cost also has to be paid.'),
     'location_id': fields.String(max_length=36, required=True, description='Location.id of the Location object of this CPO, on which the charging session is/was happening.'),
@@ -69,9 +72,9 @@ BaseSession = Model('BaseSession', {
 Session = BaseSession.clone('Session', {
     'cdr_token': fields.Nested(CdrToken, required=True, description='Token used to start this charging session, including all the relevant information to identify the unique token.'),
     'auth_method': fields.String(enum=auth_method, required=True, description='Method used for authentication.'),
-    'authorization_reference': fields.String(max_length=36, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value.', required=False),
-    'evse_uid': fields.String(max_length=36, required=True, description='EVSE.uid of the EVSE of this Location on which the charging session is/was happening.'),
-    'connector_id': fields.String(max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
+    'authorization_reference': CaseInsensitiveString(max_length=36, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value.', required=False),
+    'evse_uid': CaseInsensitiveString(max_length=36, required=True, description='EVSE.uid of the EVSE of this Location on which the charging session is/was happening.'),
+    'connector_id': CaseInsensitiveString(max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
     'meter_id': fields.String(max_length=255, required=True, description='Optional identification of the kWh meter.'),
 })
 

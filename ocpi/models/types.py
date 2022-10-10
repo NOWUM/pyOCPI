@@ -11,7 +11,7 @@ from flask_restx import fields, Model
 
 class CaseInsensitiveString(fields.String):
     def format(self, value):
-        return super().format(value.lower())
+        return super().format(value.upper())
 
 
 DisplayText = Model('DisplayText', {

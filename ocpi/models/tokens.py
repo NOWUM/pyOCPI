@@ -8,6 +8,8 @@ https://github.com/ocpi/ocpi/blob/master/mod_tokens.asciidoc
 
 from flask_restx import fields, Model
 
+from ocpi.models.types import CaseInsensitiveString
+
 # Enums:
 allowed_type = ["ALLOWED", "BLOCKED", "EXPIRED", "NO_CREDIT", "NOT_ALLOWED"] # AllowedType
 token_type = ["AD_HOC_USER", "APP_USER", "OTHER", "RFID"] # TokenType
@@ -21,8 +23,8 @@ EnergyContract = Model('EnergyContract', {
 })
 
 LocationReferences = Model('LocationReferences', {
-    'location_id': fields.String(max_length=36, required=True, description='Unique identifier for the location.'),
-    'evse_uids': fields.List(fields.String(max_length=36), required=False, description='Unique identifiers for EVSEs within the CPO’s platform for the EVSE within the given location.')
+    'location_id': CaseInsensitiveString(max_length=36, required=True, description='Unique identifier for the location.'),
+    'evse_uids': fields.List(CaseInsensitiveString(max_length=36), required=False, description='Unique identifiers for EVSEs within the CPO’s platform for the EVSE within the given location.')
 })
 
 DisplayText = Model('DisplayText', {
@@ -32,18 +34,18 @@ DisplayText = Model('DisplayText', {
 
 # Objects:
 Token = Model('Token', {
-    'country_code': fields.String(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the MSP that 'owns' this Token."),
-    'party_id': fields.String(max_length=3, required=True, description="CPO ID of the MSP that 'owns' this Token (following the ISO-15118 standard)."),
-    'uid': fields.String(max_length=36, required=True, description='Unique ID by which this Token can be identified.'
+    'country_code': CaseInsensitiveString(max_length=2, required=True, description="ISO-3166 alpha-2 country code of the MSP that 'owns' this Token."),
+    'party_id': CaseInsensitiveString(max_length=3, required=True, description="CPO ID of the MSP that 'owns' this Token (following the ISO-15118 standard)."),
+    'uid': CaseInsensitiveString(max_length=36, required=True, description='Unique ID by which this Token can be identified.'
                                                                     'This is the field used by CPO system (RFID reader on the Charge Point) to identify this token.'
                                                                     'Currently, in most cases: type=RFID, this is the RFID hidden ID as read by the RFID reader, but that is not a requirement.'
                                                                     'If this is a APP_USER or AD_HOC_USER Token, it will be a uniquely, by the eMSP, generated ID.'
                                                                     'This field is named uid instead of id to prevent confusion with: contract_id.'),
     'type': fields.String(enum=token_type, required=True, description='Type of the token'),
-    'contract_id': fields.String(max_length=36, required=True, description='Uniquely identifies the EV Driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects."'),
+    'contract_id': CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the EV Driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects."'),
     'visual_number': fields.String(max_length=64, required=False, description='Visual readable number/identification as printed on the Token (RFID card), might be equal to the contract_id.'),
     'issuer': fields.String(max_length=64, required=True, description='Issuing company, most of the times the name of the company printed on the token (RFID card), not necessarily the eMSP.'),
-    'group_id': fields.String(max_length=36, required=False, description='This ID groups a couple of tokens. This can be used to make two or more tokens work as one, so that a session can be started with one token and stopped with another, handy when a card and key-fob are given to the EV-driver.'
+    'group_id': CaseInsensitiveString(max_length=36, required=False, description='This ID groups a couple of tokens. This can be used to make two or more tokens work as one, so that a session can be started with one token and stopped with another, handy when a card and key-fob are given to the EV-driver.'
                                                                          'Beware that OCPP 1.5/1.6 only support group_ids (it is called parentId in OCPP 1.5/1.6) with a maximum length of 20.'),
     'valid': fields.Boolean(required=True,description='Is this Token valid'),
     'whitelist': fields.String(enum=whitelist_type, required=True, description='Indicates what type of white-listing is allowed.'),
@@ -58,7 +60,7 @@ AuthorizationInfo = Model('AuthorizationInfo', {
     'allowed': fields.String(enum=allowed_type, required=True, description='Status of the Token, and whether charging is allowed at the optionally given location.'),
     'token': fields.Nested(Token, required=True, description='The complete Token object for which this authorization was requested.'),
     'location': fields.Nested(LocationReferences, required=False, description='Optional reference to the location if it was included in the request, and if the EV driver is allowed to charge at that location. Only the EVSEs the EV driver is allowed to charge at are returned.'),
-    'authorization_reference': fields.String(max_length=36, required=False, description='Reference to the authorization given by the eMSP, when given, this reference will be provided in the relevant Session and/or CDR.'),
+    'authorization_reference': CaseInsensitiveString(max_length=36, required=False, description='Reference to the authorization given by the eMSP, when given, this reference will be provided in the relevant Session and/or CDR.'),
     'info': fields.Nested(DisplayText, required=False, description='Optional display text, additional information to the EV driver.')
 })
 
