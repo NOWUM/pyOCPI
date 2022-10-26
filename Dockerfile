@@ -9,7 +9,6 @@ USER admin
 WORKDIR /app
 COPY . /app
 VOLUME /data
-ENV TZ="Europe/Berlin"
 ENV GUNICORN_CMD_ARGS="--bind=0.0.0.0:9000 --chdir=./ --worker-tmp-dir /dev/shm --workers=2 --threads=2 --worker-class=gthread"
 EXPOSE 9000
 
