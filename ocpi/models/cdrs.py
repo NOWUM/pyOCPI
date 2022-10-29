@@ -8,6 +8,7 @@ from flask_restx import fields, Model
 from ocpi.models.location import connector_type, connector_format, power_type, GeoLocation
 from ocpi.models.tokens import token_type
 from ocpi.models.tariffs import Price, Tariff, add_models_to_tariffs_namespace
+from ocpi.models.types import CaseInsensitiveString
 
 # Enums:
 auth_method = ['AUTH_REQUEST', 'COMMAND', 'WHITELIST']  # AuthMethod
@@ -21,38 +22,40 @@ CdrDimension = Model('CdrDimension', {
 })
 
 CdrLocation = Model('CdrLocation', {
-    'id': fields.String(max_length=36, required=True, description='Uniquely identifies the location within the CPO’s platform (and suboperator platforms). This field can never be changed, modified or renamed.'),
+    'id': fields.CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the location within the CPO’s platform (and suboperator platforms). This field can never be changed, modified or renamed.'),
     'name': fields.String(max_length=255, required=False, description='Display name of the location.'),
     'address': fields.String(max_length=45, required=True, description='Street/block name and house number if available.'),
     'city': fields.String(max_length=45, required=True, description='City or town.'),
     'postal_code': fields.String(max_length=10, required=True, description='Postal code of the location.'),
     'country': fields.String(max_length=3, required=True, description='ISO 3166-1 alpha-3 code for the country of this location.'),
     'coordinates': fields.Nested(GeoLocation, required=True, description='Coordinates of the location.'),
-    'evse_uid': fields.String(max_length=36, required=True, description='Uniquely identifies the EVSE within the CPO’s platform (and suboperator platforms). For example a database unique ID or the actual EVSE ID. This field can never be changed, modified or renamed. This is the technical identification of the EVSE, not to be used as human readable identification, use the field: evse_id for that.'),
-    'evse_id': fields.String(max_length=48, required=True, description='Compliant with the following specification for EVSE ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects.".'),
-    'connector_id': fields.String(max_length=36, required=False, description='Identifier of the connector within the EVSE.'),
+    'evse_uid': fields.CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the EVSE within the CPO’s platform (and suboperator platforms). For example a database unique ID or the actual EVSE ID. This field can never be changed, modified or renamed. This is the technical identification of the EVSE, not to be used as human readable identification, use the field: evse_id for that.'),
+    'evse_id': fields.CaseInsensitiveString(max_length=48, required=True, description='Compliant with the following specification for EVSE ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects.".'),
+    'connector_id': fields.CaseInsensitiveString(max_length=36, required=False, description='Identifier of the connector within the EVSE.'),
     'connector_standard': fields.String(enum=connector_type, required=True, description='The standard of the installed connector.'),
     'connector_format': fields.String(enum=connector_format, required=True, description='The format (socket/cable) of the installed connector.'),
     'connector_power_type': fields.String(enum=power_type, required=True, description='')
 })
 
 CdrToken = Model('CdrToken', {
-    'uid': fields.String(max_length=36, required=True, description='''Unique ID by which this Token can be identified.
+    'country_code': fields.CaseInsensitiveString(max_length=2, required=True, description='ISO-3166 alpha-2 country code of the CPO that "owns" this CDR.'),
+    'party_id': fields.CaseInsensitiveString(max_length=3, required=True, description='CPO ID of the CPO that "owns" this CDR (following the ISO-15118 standard).'),
+    'uid': fields.CaseInsensitiveString(max_length=36, required=True, description='''Unique ID by which this Token can be identified.
                          This is the field used by the CPO’s system (RFID reader on the Charge Point) to identify this token.
                          Currently, in most cases: type=RFID, this is the RFID hidden ID as read by the RFID reader, but that is not a requirement.
                          If this is a type=APP_USER Token, it will be a unique, by the eMSP, generated ID.'''),
     'type': fields.String(enum=token_type, required=True, description='Type of the token'),
-    'contract_id': fields.String(max_length=36, required=True, description='Uniquely identifies the EV driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects."')
+    'contract_id': fields.CaseInsensitiveString(max_length=36, required=True, description='Uniquely identifies the EV driver contract token within the eMSP’s platform (and suboperator platforms). Recommended to follow the specification for eMA ID from "eMI3 standard version V1.0" (http://emi3group.com/documents-links/) "Part 2: business objects."')
 })
 
 ChargingPeriod = Model('ChargingPeriod', {
     'start_date_time': fields.DateTime(required=True, description='Start timestamp of the charging period. A period ends when the next period starts. The last period ends when the session ends.'),
     'dimensions': fields.List(fields.Nested(CdrDimension), required=True, description='List of relevant values for this charging period.'),
-    'tariff_id': fields.String(max_length=36, required=False, description='Unique identifier of the Tariff that is relevant for this Charging Period. If not provided, no Tariff is relevant during this period.')
+    'tariff_id': fields.CaseInsensitiveString(max_length=36, required=False, description='Unique identifier of the Tariff that is relevant for this Charging Period. If not provided, no Tariff is relevant during this period.')
 })
 
 SignedValue = Model('SignedValue', {
-    'nature': fields.String(max_length=32, required=True, description='''Nature of the value, in other words, the event this value belongs to.
+    'nature': fields.CaseInsensitiveString(max_length=32, required=True, description='''Nature of the value, in other words, the event this value belongs to.
                             Possible values at moment of writing:
                             - Start (value at the start of the Session)
                             - End (signed value at the end of the Session)
@@ -63,7 +66,7 @@ SignedValue = Model('SignedValue', {
 })
 
 SignedData = Model('SignedData', {
-    'encoding_method': fields.String(max_length=36, required=True, description='The name of the encoding used in the SignedData field. This is the name given to the encoding by a company or group of companies. See note below.'),
+    'encoding_method': fields.CaseInsensitiveString(max_length=36, required=True, description='The name of the encoding used in the SignedData field. This is the name given to the encoding by a company or group of companies. See note below.'),
     'encoding_method_version': fields.Integer(required=False, description='Version of the EncodingMethod (when applicable)'),
     'public_key': fields.String(max_length=512, required=False, description='Public key used to sign the data, base64 encoded.'),
     'signed_values': fields.List(fields.Nested(SignedValue), required=True, description='One or more signed values.'),
@@ -72,15 +75,15 @@ SignedData = Model('SignedData', {
 
 # Objects:
 Cdr = Model('Cdr', {
-    'country_code': fields.String(max_length=2, required=True, description='ISO-3166 alpha-2 country code of the CPO that "owns" this CDR.'),
-    'party_id': fields.String(max_length=3, required=True, description='CPO ID of the CPO that "owns" this CDR (following the ISO-15118 standard).'),
-    'id': fields.String(max_length=39, required=True, description='Uniquely identifies the CDR within the CPO’s platform (and suboperator platforms). This field is longer than the usual 36 characters to allow for credit CDRs to have something appended to the original ID. Normal (non-credit) CDRs SHALL only have an ID with a maximum length of 36.'),
+    'country_code': fields.CaseInsensitiveString(max_length=2, required=True, description='ISO-3166 alpha-2 country code of the CPO that "owns" this CDR.'),
+    'party_id': fields.CaseInsensitiveString(max_length=3, required=True, description='CPO ID of the CPO that "owns" this CDR (following the ISO-15118 standard).'),
+    'id': fields.CaseInsensitiveString(max_length=39, required=True, description='Uniquely identifies the CDR within the CPO’s platform (and suboperator platforms). This field is longer than the usual 36 characters to allow for credit CDRs to have something appended to the original ID. Normal (non-credit) CDRs SHALL only have an ID with a maximum length of 36.'),
     'start_date_time': fields.DateTime(required=True, description='Start timestamp of the charging session, or in-case of a reservation (before the start of a session) the start of the reservation.'),
     'end_date_time': fields.DateTime(required=True, description='The timestamp when the session was completed/finished, charging might have finished before the session ends, for example: EV is full, but parking cost also has to be paid.'),
-    'session_id': fields.String(max_length=36, required=False, description='Unique ID of the Session for which this CDR is sent. Is only allowed to be omitted when the CPO has not implemented the Sessions module or this CDR is the result of a reservation that never became a charging session, thus no OCPI Session.'),
+    'session_id': fields.CaseInsensitiveString(max_length=36, required=False, description='Unique ID of the Session for which this CDR is sent. Is only allowed to be omitted when the CPO has not implemented the Sessions module or this CDR is the result of a reservation that never became a charging session, thus no OCPI Session.'),
     'cdr_token': fields.Nested(CdrToken, required=True, description='Token used to start this charging session, includes all the relevant information to identify the unique token.'),
     'auth_method': fields.String(enum=auth_method, required=True, description='Method used for authentication.'),
-    'authorization_reference': fields.String(max_length=36, required=False, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value. When different authorization_reference values have been given by the eMSP that are relevant to this Session, the last given value SHALL be used here.'),
+    'authorization_reference': fields.CaseInsensitiveString(max_length=36, required=False, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value. When different authorization_reference values have been given by the eMSP that are relevant to this Session, the last given value SHALL be used here.'),
     'cdr_location': fields.Nested(CdrLocation, required=True, description='Location where the charging session took place, including only the relevant EVSE and Connector.'),
     'meter_id': fields.String(max_length=255, required=False, description='Identification of the Meter inside the Charge Point.'),
     'currency': fields.String(max_length=3, required=True, description='Currency of the CDR in ISO 4217 Code.'),
@@ -97,9 +100,9 @@ Cdr = Model('Cdr', {
     'total_parking_cost': fields.Nested(Price, required=False, description='Total sum of all the cost related to parking of this transaction, including fixed price components, in the specified currency.'),
     'total_reservation_cost': fields.Nested(Price, required=False, description='Total sum of all the cost related to a reservation of a Charge Point, including fixed price components, in the specified currency.'),
     'remark': fields.String(max_length=255, required=False, description='Optional remark, can be used to provide additional human readable information to the CDR, for example: reason why a transaction was stopped.'),
-    'invoice_reference_id': fields.String(max_length=39, required=False, description='This field can be used to reference an invoice, that will later be send for this CDR. Making it easier to link a CDR to a given invoice. Maybe even group CDRs that will be on the same invoice.'),
+    'invoice_reference_id': fields.CaseInsensitiveString(max_length=39, required=False, description='This field can be used to reference an invoice, that will later be send for this CDR. Making it easier to link a CDR to a given invoice. Maybe even group CDRs that will be on the same invoice.'),
     'credit': fields.Boolean(required=False, description='When set to true, this is a Credit CDR, and the field credit_reference_id needs to be set as well.'),
-    'credit_reference_id': fields.String(max_length=39, required=False, description='Is required to be set for a Credit CDR. This SHALL contain the id of the CDR for which this is a Credit CDR.'),
+    'credit_reference_id': fields.CaseInsensitiveString(max_length=39, required=False, description='Is required to be set for a Credit CDR. This SHALL contain the id of the CDR for which this is a Credit CDR.'),
     'last_updated': fields.DateTime(required=True, description='Timestamp when this CDR was last updated (or created).')
 })
 

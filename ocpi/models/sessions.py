@@ -45,9 +45,9 @@ CdrDimension = Model('CdrDimension', {
 
 
 ChargingPeriod = Model('ChargingPeriod', {
-    'start_date_time': fields.DateTime(description='Start timestamp of the charging period. A period ends when the next period starts. The last period ends when the session ends.'),
-    'dimensions':  fields.List(fields.Nested(CdrDimension), description='List of relevant values for this charging period.'),
-    'tariff_id': fields.String(max_length=36, description='Unique identifier of the Tariff that is relevant for this Charging Period. If not provided, no Tariff is relevant during this period.'),
+    'start_date_time': fields.DateTime(required=True, description='Start timestamp of the charging period. A period ends when the next period starts. The last period ends when the session ends.'),
+    'dimensions':  fields.List(fields.Nested(CdrDimension), required=True, description='List of relevant values for this charging period.'),
+    'tariff_id': fields.CaseInsensitiveString(max_length=36, description='Unique identifier of the Tariff that is relevant for this Charging Period. If not provided, no Tariff is relevant during this period.'),
 })
 
 
