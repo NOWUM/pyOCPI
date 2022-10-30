@@ -10,6 +10,7 @@ from .sessions import BaseSession, add_models_to_session_namespace
 from .sessions import auth_method, CdrToken, ChargingPeriod, ChargingPreferences
 from .location import connector_type, EnergyMix
 from .tariffs import PriceComponent
+from .types import CaseInsensitiveString
 
 reservation_status = ["REQUEST", "ACTIVE",
                       "COMPLETED", "INVALID", "PENDING", "RESERVATION"]
