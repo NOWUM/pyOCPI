@@ -61,10 +61,10 @@ BaseSession = Model('BaseSession', {
     'start_date_time': fields.DateTime(required=True, description='The timestamp when the session became ACTIVE in the Charge Point.'),
     'end_date_time': fields.DateTime(description='The timestamp when the session was completed/finished, charging might have finished before the session ends, for example: EV is full, but parking cost also has to be paid.'),
     'location_id': fields.String(max_length=36, required=True, description='Location.id of the Location object of this CPO, on which the charging session is/was happening.'),
-    'kWh': fields.Float(default=0, description='How many kWh were charged.'),
-    'currency': fields.String(max_length=3, description='ISO 4217 code of the currency used for this session.'),
+    'kWh': fields.Float(default=0, required=True, description='How many kWh were charged.'),
+    'currency': fields.String(max_length=3, required=True, description='ISO 4217 code of the currency used for this session.'),
     'total_cost': fields.Nested(Price, description='The total cost of the session in the specified currency. This is the price that the eMSP will have to pay to the CPO.'),
-    'status': fields.String(enum=session_status, default="PENDING", description='The status of the session.'),
+    'status': fields.String(enum=session_status, required=True, default="PENDING", description='The status of the session.'),
     'charging_periods': fields.List(fields.Nested(ChargingPeriod), description='An optional list of Charging Periods that can be used to calculate and verify the total cost.', required=False),
     'last_updated': fields.DateTime(description='Timestamp when this Session was last updated (or created).')
 })
@@ -75,7 +75,7 @@ Session = BaseSession.clone('Session', {
     'authorization_reference': CaseInsensitiveString(max_length=36, description='Reference to the authorization given by the eMSP. When the eMSP provided an authorization_reference in either: real-time authorization or StartSession, this field SHALL contain the same value.', required=False),
     'evse_uid': CaseInsensitiveString(max_length=36, required=True, description='EVSE.uid of the EVSE of this Location on which the charging session is/was happening.'),
     'connector_id': CaseInsensitiveString(max_length=36, required=True, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
-    'meter_id': fields.String(max_length=255, required=True, description='Optional identification of the kWh meter.'),
+    'meter_id': fields.String(max_length=255, description='Optional identification of the kWh meter.'),
 })
 
 profile_type = ["CHEAP", "FAST", "GREEN", "REGULAR"]

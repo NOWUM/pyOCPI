@@ -30,6 +30,9 @@ Reservation = BaseSession.clone('Reservation', {
     'energy_mix': fields.Nested(EnergyMix, description='Name of the energy supplier, delivering the energy for this location or reservation'),
     'connect_date_time' : fields.DateTime(required=False, description='The timestamp when the session was connected to the CS. Can be omitted if same as start_date_time'),
     'disconnect_date_time' : fields.DateTime(required=False, description='The timestamp when the session was disconnected from the CS. Can be omitted if same as end_date_time'),
+    'evse_uid': CaseInsensitiveString(max_length=36, description='EVSE.uid of the EVSE of this Location on which the charging session is/was happening.'),
+    'connector_id': CaseInsensitiveString(max_length=36, description='Connector.id of the Connector of this Location the charging session is/was happening.'),
+    'meter_id': fields.String(max_length=255, description='Optional identification of the kWh meter.'),
 })
 
 
