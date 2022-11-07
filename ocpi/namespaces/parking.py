@@ -82,7 +82,7 @@ def sender():
             party_id = party_id.upper()
 
             return make_response(self.parking_manager.updateParkingSession,
-                                 country_id, party_id, parking_ns.payload)
+                                 country_id, party_id, reservation_id, parking_ns.payload)
 
 
 def receiver():
@@ -127,7 +127,10 @@ def receiver():
             party_id = party_id.upper()
 
             return make_response(self.parking_manager.patchParkingSession,
-                                 session_id, parking_ns.payload)
+                                country_id,
+                                party_id,
+                                session_id,
+                                parking_ns.payload)
             # TODO save and process preferences somewhere
 
     return parking_ns
