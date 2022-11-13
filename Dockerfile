@@ -1,7 +1,5 @@
-FROM python:3.8-slim
-RUN pip install --no-cache-dir gunicorn
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+FROM python:3.10-slim
+RUN pip install --no-cache-dir gunicorn -e .
 
 RUN useradd -s /bin/bash admin
 
