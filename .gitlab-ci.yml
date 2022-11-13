@@ -7,11 +7,10 @@ stages:
 - build
 
 license-check:
-  image: python:3.8-slim
+  image: python:3.10-slim
   stage: check
   script:
-    - pip install --no-cache-dir -r requirements.txt
-    - pip install pip-licenses
+    - pip install --no-cache-dir -e . pip-licenses
     - pip-licenses --fail-on="GNU General Public License (GPL)"
 
 build-docker:
