@@ -6,43 +6,64 @@ Created on Wed Mar 31 22:31:18 2021
 @author: maurer
 """
 
-from flask_restx import fields, Model
+from __future__ import annotations
 
-version_number = ['2.0', '2.1', '2.1.1', '2.2', '3.0']
+from flask_restx import Model, fields
 
-interface_role = ['SENDER', 'RECEIVER']
+version_number = ["2.0", "2.1", "2.1.1", "2.2", "3.0"]
 
-module_id = ['cdrs',
-             'chargingprofiles',
-             'commands',
-             'credentials',  # required for all
-             'hubclientinfo',
-             'locations',
-             'sessions',
-             'tariffs',
-             'tokens',
-             ]
+interface_role = ["SENDER", "RECEIVER"]
 
-Version = Model('Version', {
-    'version': fields.String(enum=version_number, description='The version number.'),
-    'url': fields.String(description='URL to the endpoint containing version specific information.'),
-})
+module_id = [
+    "cdrs",
+    "chargingprofiles",
+    "commands",
+    "credentials",  # required for all
+    "hubclientinfo",
+    "locations",
+    "sessions",
+    "tariffs",
+    "tokens",
+]
 
-Endpoint = Model('Endpoint', {
-    'identifier': fields.String(enum=module_id),
-    'role': fields.String(enum=interface_role),
-    'url': fields.String()
-})
+Version = Model(
+    "Version",
+    {
+        "version": fields.String(
+            enum=version_number, description="The version number."
+        ),
+        "url": fields.String(
+            description="URL to the endpoint containing version specific information."
+        ),
+    },
+)
+
+Endpoint = Model(
+    "Endpoint",
+    {
+        "identifier": fields.String(enum=module_id),
+        "role": fields.String(enum=interface_role),
+        "url": fields.String(),
+    },
+)
 
 
-VersionsData = Model('VersionsData', {
-    'versions': fields.List(fields.Nested(Version)),
-})
+VersionsData = Model(
+    "VersionsData",
+    {
+        "versions": fields.List(fields.Nested(Version)),
+    },
+)
 
-VersionDetailsData = Model('VersionDetailsData', {
-    'version': fields.String(enum=version_number, description='The version number.'),
-    'endpoints': fields.List(fields.Nested(Endpoint)),
-})
+VersionDetailsData = Model(
+    "VersionDetailsData",
+    {
+        "version": fields.String(
+            enum=version_number, description="The version number."
+        ),
+        "endpoints": fields.List(fields.Nested(Endpoint)),
+    },
+)
 
 
 def add_models_to_version_namespace(namespace):
