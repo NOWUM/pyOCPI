@@ -27,9 +27,7 @@ class get_versions(Resource):
     def get(self):
         return make_response(self.versionsmanager.versions)
 
-# TODO flexibel version number
-
-
+# TODO flexible version number for OCPI 3.x
 @versions_ns.route('2.2', doc={"description": "API Endpoint for Version details"})
 class get_details(Resource):
 

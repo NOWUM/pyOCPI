@@ -1,0 +1,9 @@
+{
+    "name": "CPO",
+    "token": "xxx",
+    "client_url": "https://emsp:9000/ocpi",
+    "client_token": "xxx",
+    "party_id": "FHA",
+    "country_code": "DE"
+  }
+  

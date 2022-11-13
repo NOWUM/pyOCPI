@@ -31,7 +31,7 @@ def home():
 # country_code, party_id and role is "username"
 # token is "password"
 # "username" and "password" must be communicated "out of band" (per mail or so)
-# multiple roles could be implemented simultanously
+# multiple roles can be implemented simultanously
 cred_roles = [{
     'role': 'CPO',
     'business_details': {
@@ -47,7 +47,7 @@ cred_roles = [{
     'country_code': 'DE'}]
 
 # inject dependencies here
-# must be as expected
+# must have expected method signatures
 ses = om.SessionManager()
 loc = om.LocationManager()
 commands = om.CommandsManager()
@@ -74,10 +74,21 @@ if os.path.exists(config):
     log.info(f'reading config file {config}')
     with open(config, 'r') as f:
         conf = json.load(f)
-        cm._updateToken(conf['token'], None, None, endpoint_list=[])
-        cm.credentials_roles[0]['business_details']['name'] = conf['name']
-        cm.credentials_roles[0]['party_id'] = conf['party_id']
-        cm.credentials_roles[0]['country_code'] = conf['country_code']
+    
+    client_url = conf.get('client_url', None)
+    endpoints = None
+    if client_url:
+        try:
+            endpoints = cm._getEndpoints(client_url)
+        except Exception as e:
+            log.error(e)
+    cm._updateToken(conf['token'], 
+                    client_url, 
+                    conf.get('client_token'),
+                    endpoints)
+    cm.credentials_roles[0]['business_details']['name'] = conf['name']
+    cm.credentials_roles[0]['party_id'] = conf['party_id']
+    cm.credentials_roles[0]['country_code'] = conf['country_code']
 else:
     log.info(f'config file {config} does not exist')
     cm._updateToken('TESTTOKEN', None, None)

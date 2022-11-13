@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "pyocpi"
+version = "0.2"
+description = "Python library for the Open Charge Point Interface (OCPI)"
+authors = ["Florian Maurer <maurer@fh-aachen.de>"]
+license = "MIT License"
+readme = "README.md"
+
+homepage = "https://github.com/NOWUM/pyocpi"
+repository = "https://github.com/NOWUM/pyocpi"
+
+keywords = ["ev", "charging", "OpenAPI", "Swagger", "REST"]
+
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+flask = "*"
+flask-restx = ">=0.5.0" 
+importlib_metadata = { version = ">=4.0.0", markers = "python_version < '3.8'" }
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.8.0"
+isort = "^5.10.1"
+mypy  = "^0.971"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+add_imports = ["from __future__ import annotations"]
+
+[tool.pytest]
+testpaths = "tests"
+
+[tool.mypy]
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+# output
+show_error_context = true
+show_column_numbers = true
+show_error_codes = true
+pretty = true
