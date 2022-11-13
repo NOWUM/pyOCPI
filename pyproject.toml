@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pyocpi"
+name = "python-ocpi"
 version = "0.2"
 description = "Python library for the Open Charge Point Interface (OCPI)"
 authors = ["Florian Maurer <maurer@fh-aachen.de>"]
@@ -18,6 +18,10 @@ classifiers=[
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
     "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+packages = [
+    { include = "pyocpi" },
 ]
 
 [tool.poetry.dependencies]

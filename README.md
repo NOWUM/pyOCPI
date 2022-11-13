@@ -7,6 +7,12 @@ This is a very tedious way, as the protocol is very complex it is not needed tha
 
 To reduce reimplementation, an academic implementation is provided here, which furthermore allows to integrate with a new RESERVATIONS endpoint, if needed.
 
+Currently, the only other public Python Implementation can be found here:
+https://github.com/TECHS-Technological-Solutions/ocpi/
+
+The Documentation of OCPI can be found here:
+https://github.com/ocpi/ocpi/
+
 ## Install Instructions
 
 `pip install pyocpi`

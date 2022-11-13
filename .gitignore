@@ -3,3 +3,4 @@ data
 .spyproject
 pyocpi.egg-info
 .idea/
+dist
