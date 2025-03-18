@@ -1,6 +1,6 @@
 __pycache__
 data
 .spyproject
-pyocpi.egg-info
+python_ocpi.egg-info
 .idea/
 dist

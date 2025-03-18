@@ -1,13 +1,17 @@
-[tool.poetry]
-name = "python-ocpi"
-version = "0.3.1"
-description = "Python library for the Open Charge Point Interface (OCPI)"
-authors = ["Florian Maurer <maurer@fh-aachen.de>"]
-license = "MIT License"
-readme = "README.md"
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
-homepage = "https://github.com/NOWUM/pyocpi"
-repository = "https://github.com/NOWUM/pyocpi"
+
+[project]
+name = "python-ocpi"
+version = "0.3.2"
+description = "Python library for the Open Charge Point Interface (OCPI)"
+authors = [
+  { name = "Florian Maurer", email = "maurer@fh-aachen.de"},
+]
+license = {text = "MIT"}
+readme = "README.md"
 
 keywords = ["ev", "charging", "OpenAPI", "Swagger", "REST"]
 
@@ -19,25 +23,26 @@ classifiers=[
     "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+requires-python = ">=3.10"
 
-packages = [
-    { include = "ocpi" },
+dependencies = [
+    "flask >= 2.1.2",
+    "flask-restx >= 1.0.3",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.7"
-flask = "*"
-flask-restx = ">=0.5.0" 
-importlib_metadata = { version = ">=4.0.0", markers = "python_version < '3.8'" }
+[project.optional-dependencies]
+dev = [
+    "black >= 22.8.0",
+    "isort >= 5.10.1",
+    "mypy  >= 0.971",
+]
 
-[tool.poetry.group.dev.dependencies]
-black = "^22.8.0"
-isort = "^5.10.1"
-mypy  = "^0.971"
+[project.urls]
+homepage = "https://github.com/NOWUM/pyocpi"
+repository = "https://github.com/NOWUM/pyocpi"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools]
+packages = {find = {}}
 
 [tool.isort]
 profile = "black"

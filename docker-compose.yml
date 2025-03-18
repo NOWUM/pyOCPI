@@ -1,6 +1,6 @@
 version: "3"
 services:
-  SmartChargingHub:
+  pyocpi:
     build: .
     image: registry.git.fh-aachen.de/nowum-energy/smarte-ladesaeulen/pyocpi:latest
     container_name: ocpi
