@@ -7,7 +7,7 @@ stages:
 - build
 
 license-check:
-  image: python:3.10-slim
+  image: python:3.13-slim
   stage: check
   script:
     - pip install --no-cache-dir -e . pip-licenses

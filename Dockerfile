@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.13-slim
 RUN pip install --no-cache-dir gunicorn -e .
 
 RUN useradd -s /bin/bash admin
